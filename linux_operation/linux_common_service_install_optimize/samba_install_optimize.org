@@ -30,13 +30,15 @@
    启动samba =/etc/init.d/smb start= ;
 ** 访问samba
    - 在windows中访问samba[3] :: 在运行中输入 =\\samba_server_ip\module_name= ;
-	如果在Linux中设置了共享目录可写,但是在samba_server中配置为不可写,
-	那么便不可写;
    - 在Linux中访问samba
      - 利用已安装的samba-client , 输入 =smbclient //smb_server_ip/module_name= ;
-     - 利用cifs[4]挂载 :: =yum install cifs-utils=
-		   =mount -t cifs //samba_server_ip/module_name /opt= 不需要密码;
-	  挂载完成后,可以使用 =df -h= 查看挂载情况;
+     - 利用cifs[4]挂载
+
+        =yum install cifs-utils=
+
+        =mount -t cifs //samba_server_ip/module_name /opt= 不需要密码;
+
+        挂载完成后,可以使用 =df -h= 查看挂载情况;
 ** samba =writable= 权限的分析
    - 如果samba的path没有写权限,那么即使samba服务开放了写权限,也是无法写入的;
    - 如果samba的 *writable* 权限没开放,那么也是无法写入的;
@@ -47,6 +49,7 @@
 
 [2] 这里的目录要与配置文件中的共享模块[aming]下指定的目录相同 ;
 
-[3] 
+[3] 即使配置了 =workgroup=WORKGROUP= ,仍然无法在网上邻居内直接看见;
+  同样,即使不修改workgroup,仍然可以使用该方法共享成功;
 
 [4] CIFS 是一个新提出的协议，它使程序可以访问远程Internet计算机上的文件并要求此计算机提供服务。CIFS 使用客户/服务器模式。客户程序请求远在服务器上的服务器程序为它提供服务。服务器获得请求并返回响应。CIFS是公共的或开放的SMB协议版本，并由Microsoft使用。SMB协议在局域网上用于服务器文件访问和打印的协议。像SMB协议一样，CIFS在高层运行，而不像TCP/IP协议那样运行在底层。CIFS可以看做是应用程序协议如文件传输协议和超文本传输协议的一个实现 ;
