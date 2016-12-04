@@ -1,3 +1,4 @@
+#+OPTIONS: toc:t
 * ftp部署和优化
   ftp == file transfer protocol
 ** 使用vsftp部署
