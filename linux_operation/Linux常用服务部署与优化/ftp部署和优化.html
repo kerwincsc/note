@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>ftp部署和优化</title>
+<!-- 2016-12-04 周日 15:56 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">ftp部署和优化</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. ftp部署和优化</a>
+<ul>
+<li><a href="#sec-1-1">1.1. 使用vsftp部署</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. 安装vsftp</a></li>
+<li><a href="#sec-1-1-2">1.1.2. 使用默认配置启动vsftp</a></li>
+<li><a href="#sec-1-1-3">1.1.3. 配置vsftpd.conf</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. 使用pureftp部署</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. 安装pureftpd</a></li>
+<li><a href="#sec-1-2-2">1.2.2. 配置pure-ftpd</a></li>
+<li><a href="#sec-1-2-3">1.2.3. 测试pure-ftpd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> ftp部署和优化</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+ftp == file transfer protocol
+</p>
+</div>
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> 使用vsftp部署</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+vsftp == Very Secure FTP
+</p>
+</div>
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> 安装vsftp</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+yum install -y vsftpd
+</p>
+</div>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> 使用默认配置启动vsftp</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>启动vsftp <code>/etc/init.d/vsftp start</code>
+      如果出现启动失败,如:<img src="image/vsftp_start_error.png" alt="vsftp_start_error.png" />
+
+<p>
+<code>netstat -lnp</code> 查看ftp端口21,是否被占用,如果被占用,kill掉占用程序,再重启;
+</p>
+
+<p>
+如果出现<img src="image/lftp_login_error.png" alt="lftp_login_error.png" />
+</p>
+
+<p>
+则可能是防火墙的问题,要检查iptables和selinux
+</p>
+</li>
+<li>使用lftp<sup><a id="fnr.1" name="fnr.1" class="footref" href="#fn.1">1</a></sup>登录到vsftp
+
+<p>
+使用默认配置的情况下,可以使用系统用户进行登录 <code>lftp user@192.168.0.249</code>;
+</p>
+
+<p>
+但是在这种情况下,进入到ftp服务器中,有非常大的权限,很危险,可以看到整个系统;
+</p>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> 配置vsftpd.conf</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+针对默认配置中的过大权限问题可以做如下修改:
+</p>
+<dl class="org-dl">
+<dt> 指定ftp服务器根目录 </dt><dd><code>chroot_local_user=YES</code>; 在这种情况下,无法切换到系统的其他目录中去,即限制了目录权限;
+</dd>
+<dt> (no term) </dt><dd>配置虚拟用户
+<dl class="org-dl">
+<dt> 创建虚拟用户对应的用户 </dt><dd>useradd virftp -s /sbin/nologin
+</dd>
+<dt> 创建存放虚拟用户的用户名和密码的文件 </dt><dd>vim /etc/vsftpd/vsftpd<sub>login</sub>
+<pre class="example">
+user1_name
+user1_passwd
+user2_name
+user2_passwd
+</pre>
+</dd>
+<dt> 修改vsftpd<sub>login的权限</sub>,使其只能被root读写 </dt><dd>chmod 600 /etc/vsftpd/vsftpd<sub>login</sub>
+</dd>
+<dt> 生成能被vsftpd识别的二进制密码库文件 </dt><dd><code>db_load -T -t hash -f /etc/vsftpd/vsftpd_login /etc/vsftpd/vsftpd_login.db</code> <sup><a id="fnr.2" name="fnr.2" class="footref" href="#fn.2">2</a></sup>
+</dd>
+<dt> 生成存放虚拟用户配置文件的目录 </dt><dd><code>mkdir /etc/vsftpd/vsftpd_user_conf</code>
+</dd>
+<dt> 切换到 <code>vsftpd_user_conf</code> </dt><dd>cd !$
+</dd>
+<dt> 创建和虚拟用户同名的虚拟用户配置文件 </dt><dd><code>vim test1_name</code>
+<pre class="example">
+#虚拟用户根目录
+local_root=/home/virftp/test1
+#是否允许匿名登录
+anonymous_enable=NO
+#是否允许写入
+write_enable=YES
+#本地umask值
+local_umask=022
+#是否允许匿名上传
+anon_upload_enable=NO
+#是否允许匿名创建目录
+anon_mkdir_write_enable=NO
+idle_session_timeout=600
+data_connection_timeout=120
+#最大连接客户端数
+max_clients=10
+max_per_ip=5
+#最大速率
+local_max_rate=50000
+</pre>
+</dd>
+<dt> 在映射用户的家目录下创建虚拟用户的家目录 </dt><dd><code>mkdir /home/virftp/test1</code>
+</dd>
+<dt> 更改虚拟用户的家目录的属主属组 </dt><dd><code>chown -R virftp:virftp /home/virftp/test1</code>
+</dd>
+<dt> 编辑认证文件 </dt><dd>=vim /etc/pam.d/vsftpd
+<pre class="example">
+auth sufficient /lib/security/pam_userdb.so db=/etc/vsftpd/vsftpd_login
+account sufficient /lib/security/pam_userdb.so db=/etc/vsftpd/vsftpd_login
+</pre>
+</dd>
+<dt> 确认是否存在指定文件 </dt><dd><code>/lib/security/pam_userdb.so</code>,如果是在32位系统中,就在 <code>/lib</code> 目录下, 如果是64位,则在 <code>/lib64</code> 下,想要知道自己系统是什么架构, <code>uname -a</code>
+</dd>
+<dt> 编辑vsftpd.conf </dt><dd>做如下要求的修改:禁止匿名登录, <del>禁止本地用户登录</del>,禁止写,匿名用户禁止创建目录等,打开 <code>chroot_local_user=YES</code>,并追加如下内容:
+<pre class="example">
+guest_enable=YES
+guest_username=virftp
+virtual_use_local_privs=YES
+user_config_dir=/etc/vsftpd/vsftpd_user_conf
+</pre>
+</dd>
+</dl>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> 使用pureftp部署</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+pureftp的优点
+pureftp的缺点
+</p>
+</div>
+
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> 安装pureftpd</h4>
+<div class="outline-text-4" id="text-1-2-1">
+<hr  />
+<ul class="org-ul">
+<li>下载软件
+<pre class="example">
+[root@localhost ~]# cd /usr/local/src/
+[root@localhost src]# wget http://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.42.tar.bz2
+</pre>
+</li>
+<li>安装pure-ftpd
+<pre class="example">
+[root@localhost src]# tar jxf pure-ftpd-1.0.42.tar.bz2
+[root@localhost src]# cd pure-ftpd-1.0.42
+[root@localhost pure-ftpd-1.0.42]# ./configure \
+--prefix=/usr/local/pureftpd \
+--without-inetd \
+--with-altlog \
+--with-puredb \
+--with-throttling \
+--with-peruserlimits  \
+--with-tls
+[root@localhost pure-ftpd-1.0.42]# make &amp;&amp; make install
+</pre>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> 配置pure-ftpd</h4>
+<div class="outline-text-4" id="text-1-2-2">
+<hr  />
+<ul class="org-ul">
+<li>修改配置文件
+<pre class="example">
+[root@localhost pure-ftpd-1.0.42]# cd configuration-file
+[root@localhost pure-ftpd-1.0.42]# mkdir -p /usr/local/pureftpd/etc/
+[root@localhost configuration-file]# cp pure-ftpd.conf    /usr/local/pureftpd/etc/pure-ftpd.conf
+[root@localhost configuration-file]# cp pure-config.pl    /usr/local/pureftpd/sbin/pure-config.pl
+[root@localhost configuration-file]# chmod 755    /usr/local/pureftpd/sbin/pure-config.pl
+</pre>
+<p>
+在启动pure-ftpd之前要先修改配置文件,配置文件为 <code>/usr/local/pureftpd/etc/pure-ftpd.conf</code> , 直接拷贝以下内容;
+</p>
+<pre class="example">
+ChrootEveryone              yes
+BrokenClientsCompatibility  no
+MaxClientsNumber            50
+Daemonize                   yes
+MaxClientsPerIP             8
+VerboseLog                  no
+DisplayDotFiles             yes
+AnonymousOnly               no
+NoAnonymous                 no
+SyslogFacility              ftp
+DontResolve                 yes
+MaxIdleTime                 15
+PureDB                        /usr/local/pureftpd/etc/pureftpd.pdb
+LimitRecursion              3136 8
+AnonymousCanCreateDirs      no
+MaxLoad                     4
+AntiWarez                   yes
+Umask                       133:022
+MinUID                      100
+AllowUserFXP                no
+AllowAnonymousFXP           no
+ProhibitDotFilesWrite       no
+ProhibitDotFilesRead        no
+AutoRename                  no
+AnonymousCantUpload         no
+PIDFile                     /usr/local/pureftpd/var/run/pure-ftpd.pid
+MaxDiskUsage               99
+CustomerProof              yes
+</pre>
+</li>
+
+<li>启动pure-ftpd
+<pre class="example">
+[root@localhost ~]# /usr/local/pureftpd/sbin/pure-config.pl /usr/local/pureftpd/etc/pure-ftpd.conf
+</pre>
+<p>
+如果显示以Running开关的信息,就表明启动成功;
+</p>
+</li>
+
+<li>建立帐号
+<pre class="example">
+[root@localhost ~]# mkdir /data/www/
+[root@localhost ~]# useradd www
+[root@localhost ~]# chown -R www:www /data/www/
+[root@localhost ~]# /usr/local/pureftpd/bin/pure-pw useradd ftp_user1  -uwww -d /data/www/
+Password:
+Enter it again:
+</pre>
+<p>
+其中，-u将虚拟用户ftp<sub>user1与系统用户www关联在一起，也就是说使用ftp</sub><sub>user1账号登陆ftp后，会以www的身份来读取文件或下载文件。</sub>-d 后边的目录为ftp<sub>user1账户的家目录，这样可以使ftp</sub><sub>user1只能访问其家目录</sub>/data/www/. 到这里还未完成，还有最关键的一步，就是创建用户信息数据库文件:
+</p>
+<pre class="example">
+[root@localhost ~]#  /usr/local/pureftpd/bin/pure-pw mkdb
+</pre>
+<p>
+pure-pw还可以列出当前的ftp账号，当然也可以删除某个账号, 我们再创建一个账号:
+</p>
+<pre class="example">
+[root@localhost ~]#  /usr/local/pureftpd/bin/pure-pw  useradd ftp_user2 -uwww -d /tmp
+[root@localhost ~]#  /usr/local/pureftpd/bin/pure-pw mkdb
+</pre>
+
+<p>
+列出当前账号:
+</p>
+<pre class="example">
+[root@localhost ~]# /usr/local/pureftpd/bin/pure-pw list
+</pre>
+
+<p>
+删除账号的命令为:
+</p>
+<pre class="example">
+[root@localhost ~]#  /usr/local/pureftpd/bin/pure-pw  userdel ftp_user2
+</pre>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> 测试pure-ftpd</h4>
+<div class="outline-text-4" id="text-1-2-3">
+<hr  />
+<p>
+测试需要使用的工具叫做 <code>lftp</code>;
+</p>
+<pre class="example">
+[root@localhost ~]# yum install -y lftp
+</pre>
+<p>
+测试:
+</p>
+<pre class="example">
+[root@localhost ~]# touch /data/www/123.txt
+[root@localhost ~]# lftp ftp_user1@127.0.0.1
+口令:
+lftp ftp_user1@127.0.0.1:~&gt; ls
+drwxr-xr-x    2 514        www              4096 Jun 12 11:14 .
+drwxr-xr-x    2 514        www              4096 Jun 12 11:14 ..
+-rw-r--r--    1 514        www                 0 Jun 12 11:14 123.txt
+</pre>
+<p>
+登陆后，使用 ls 命令可以列出当前目录都有什么文件。
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" name="fn.1" class="footnum" href="#fnr.1">1</a></sup> <p class="footpara">
+lftp是本地登录ftp的一个软件 <code>yum install -y lftp</code>
+</p></div>
+
+<div class="footdef"><sup><a id="fn.2" name="fn.2" class="footnum" href="#fnr.2">2</a></sup> <p class="footpara">
+生成的文件名没有要求
+</p></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">Created: 2016-12-04 周日 15:56</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 25.1.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
