@@ -83,5 +83,6 @@ nameserver 192.168.0.2
     #+END_EXAMPLE
   - 重启网卡
     - 方法一 :: =[root@Linux network-scripts]#service network restart=
-    - 方法二 :: =[root@Linux network-scripts]#ifdown eth0= =[root@Linux network-scripts]#ifup eth0=
+    - 方法二 :: =[root@Linux network-scripts]#ifdown eth0=
+  =[root@Linux network-scripts]#ifup eth0=
     - 方法三 :: =[root@Linux network-scripts]#ifconfig eth0 down= =[root@Linux network-scripts]#ifconfig eth0 up=
