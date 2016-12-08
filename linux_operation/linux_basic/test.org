@@ -118,7 +118,7 @@ BOOTPROTO=static                   ---      静态IP设定
 
     修改时间 =# date -s 22:10:30= ;
 
-    同时修改日期和时间 =# date MMDDhhmmYYYY.ss
+    同时修改日期和时间 =# date MMDDhhmmYYYY.ss=
 
 11. 如何调整putty显示的字体以及大小？ 如何更改putty的字符集，让其支持中文显示？
     右击窗口--->Change Settings--->Window--->Appearance--->Font Settings--->Change ;
