@@ -1,0 +1,82 @@
+* Samba的部署与优化
+  Samba是在Linux和UNIX系统上实现SMB协议的一个免费软件，由服务器及客户端程序构成。SMB（Server Messages Block，信息服务块）是一种在局域网上共享文件和打印机的一种通信协议，它为局域网内的不同计算机之间提供文件及打印机等资源的共享服务。SMB协议是客户机/服务器型协议，客户机通过该协议可以访问服务器上的共享文件系统、打印机及其他资源。通过设置“NetBIOS over TCP/IP”使得Samba不但能与局域网络主机分享资源，还能与全世界的电脑分享资源。
+** samba的安装
+   - 服务端
+     =yum install samba=
+   - 客户端
+     =yum install samba-client=
+** samba的启动
+   启动samba =/etc/init.d/smb start= ;
+** samba的访问
+*** 非登录访问samba的配置
+   - 进入配置文件 =vim /etc/samba/smb.conf= ;
+   - 修改 =security = user= 为 =security = share= ;
+   - 修改 =workgroup = MYGROUP= 为 =workgroup = WORKGROUP= [1];
+   - 增加共享模块,如:
+     #+BEGIN_EXAMPLE
+     [aming]
+     # 这是自定义的描述,让自己看明白就行了
+         comment = share all
+     # 指定共享目录
+         path = /tmp/sambadir
+     # 是否允许在网上邻居发现
+     # browsable=yes 也是可以的
+         browseable = yes
+     # 是否公开
+         public = yes
+     # 是否可写
+     # writeable = no 也是可以的
+         writable = no
+     #+END_EXAMPLE
+   - 创建共享目录[2] =mkdir /tmp/samdir=
+
+*** 非登录访问samba
+   - 在windows中访问samba[3] :: 在运行中输入 =\\samba_server_ip\module_name= ;
+   - 在Linux中访问samba
+     - 利用已安装的samba-client , 输入 =smbclient //smb_server_ip/module_name= ;
+     - 利用cifs[4]挂载
+
+        =yum install cifs-utils=
+
+        =mount -t cifs //samba_server_ip/module_name /opt= 不需要密码;
+
+        挂载完成后,可以使用 =df -h= 查看挂载情况;
+
+*** 需要用户名和密码的登录访问samba的配置
+    - 将 =security = share= 改为 =security = user= ;
+    - 创建新模块
+      #+BEGIN_EXAMPLE
+      [module_name]
+              comment = share for users
+              path = /tmp/sambadir
+              browseable = yes
+              writeable = yes
+              public = no
+      #+END_EXAMPLE
+    - 创建新用户,用来做samba登录用户的映射用户[5] =useradd samba_user=
+    - 利用pdbedit创建samba的登录名并映射到指定的系统用户 =pdbedit -a samba_user= , 输入登录密码[6] ;
+    - 重启服务 =/etc/init.d/smb restart=
+
+*** 需要用户名和密码访问samba的登录
+    - 在windows下
+    - 在Linux下
+      - 使用smbclient :: =smbclient -Uuser_name //samba_server_ip/module_name=
+      - 使用挂载的方式 :: =mount -t cifs -o  username=user_name,password=passwd //samba_server_ip/module_name /opt=
+** samba =writable= 权限的分析
+   - 如果samba的path没有写权限,那么即使samba服务开放了写权限,也是无法写入的;
+   - 如果samba的 *writable* 权限没开放,那么也是无法写入的;
+综上,只要samba服务或者samba的path目录中任意一个没有写权限,就一定没有写权限;
+* Footnotes
+
+[1] 如果是与windows系统进行共享,这里一定要成与之对应的工作组名称,如 =WORKGROUP= ;但是实际证明,在当前功能基础上,不改workgroup也是可以的;
+
+[2] 这里的目录要与配置文件中的共享模块[aming]下指定的目录相同 ;
+
+[3] 即使配置了 =workgroup=WORKGROUP= ,仍然无法在网上邻居内直接看见;
+  同样,即使不修改workgroup,仍然可以使用该方法共享成功;在 *user* 模式下不配置也能正常使用; 
+
+[4] CIFS 是一个新提出的协议，它使程序可以访问远程Internet计算机上的文件并要求此计算机提供服务。CIFS 使用客户/服务器模式。客户程序请求远在服务器上的服务器程序为它提供服务。服务器获得请求并返回响应。CIFS是公共的或开放的SMB协议版本，并由Microsoft使用。SMB协议在局域网上用于服务器文件访问和打印的协议。像SMB协议一样，CIFS在高层运行，而不像TCP/IP协议那样运行在底层。CIFS可以看做是应用程序协议如文件传输协议和超文本传输协议的一个实现 ;
+
+[5] 这个用户不需要设置密码,因为用户登录时,虽然登录名和这里创建的用户名一样,但实际上,这个用户名,是登录名的一个映射,因此,这里创建的用户名,不是一定要有密码的
+
+[6] 正如我上面说的,这里的samba_user映射到系统的samba_user,但不代表密码也映射过去,所以这里的密码仅仅是用来登录samba服务器的口令;
