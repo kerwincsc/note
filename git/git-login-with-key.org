@@ -1,0 +1,40 @@
+* 用密钥进行免密登录git服务器
+** 登录git.oschina
+   - 生成密钥对
+     =ssh-keygen -t rsa -C "comment注释" -f "e:\id_rsa"=
+     =-t rsa= 指定了密钥类型;
+
+     =-C "comment"= 注释
+
+     如果不指定 =-f= 选项,那么在生成密钥对的过程中,他会询问密钥对的存放位置,是否给密钥对加密(以防密钥被别人复制);
+
+     如果在询问密钥对的存放位置时,直接默认,那么密钥对就会生成为 =.ssh/id_rsa= ;
+
+     其余放在了非默认位置的密钥都需要复制到默认目录,以供后面进行验证;
+
+   - 验证
+     - 将生成的密钥对复制到 =.ssh= 下;
+
+     - 将 =id_rsa.pub= 里的内容复制到oschina的公钥列表中;
+
+     - 在git bash中输入 =ssh -T git@git.oschina.net=
+       返回Welcome to Git@OSC, 你的名字! 表示添加成功.
+
+   - 修改传输协议
+     到本地git repository的.git\config文件，如果url使用的是https协议，改为git协议;
+     #+BEGIN_EXAMPLE
+     [remote "origin"]  
+     url = https://git.oschina.net/oschina/git-osc.git  
+     fetch = +refs/heads/*:refs/remotes/origin/* 
+     #+END_EXAMPLE
+     改为
+     #+BEGIN_EXAMPLE
+     [remote "origin"]  
+     url = git@git.oschina.net:oschina/git-osc.git  
+     fetch = +refs/heads/*:refs/remotes/origin/*
+     #+END_EXAMPLE
+
+   - 注意事项
+     生成的sshkey文件一定要命名为id_rsa，因为ssh默认读id_rsa的sshkey
+** 登录github
+   
