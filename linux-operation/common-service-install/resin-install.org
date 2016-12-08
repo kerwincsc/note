@@ -1,0 +1,12 @@
+resin安装与配置
+* 安装
+  - 下载
+    =wget http://www.caucho.com/download/resin-4.0.36.tar.gz=
+    个人不建议这样下载,因为慢的令人发指;
+  - 编译安装
+    =./configure --prefix=/usr/local/resin --with-java=/usr/local/jdk1.8.0_111=
+    =make=
+    =make install=
+* 配置
+
+* 常用操作
