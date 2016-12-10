@@ -58,6 +58,7 @@
 
        binlog-ignore-db=mysql表示忽略备份mysql数据库
      - 进入<主>mysql
+
        =grant replication slave on *.* to 'repl'@'127.0.0.1' identified by '123123';=
        以密码 _123123_ 给 _127.0.0.1_ 上的用户 _repl_ 授予复制权限;
 
