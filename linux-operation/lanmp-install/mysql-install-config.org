@@ -70,13 +70,11 @@
 
        =show master status;=
        会出现这个表
-       #+BEGIN_SRC 
+       #+BEGIN_EXAMPLE
        | File               | Positon | Binlog_Do_DB | Binlog_Ignore_DB |
        |--------------------+---------+--------------+------------------|
        | mysql-first.000002 | 106     |              | mysql            |
-
-       
-       #+END_SRC
+       #+END_EXAMPLE
 ** 常用操作与信息
 *** 登录mysql方法
     - =mysql -u username -p password=
