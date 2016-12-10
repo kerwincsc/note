@@ -37,4 +37,10 @@
    - 注意事项
      生成的sshkey文件一定要命名为id_rsa，因为ssh默认读id_rsa的sshkey
 ** 登录github
-   
+   - 生成密钥对参考上面部分
+
+   - 验证部分
+     - 修改为 =ssh -T git@github.com= 就可以了
+
+     - 传输协议也要跟着一起修改
+       - =git@github.com:youname/repo.git=

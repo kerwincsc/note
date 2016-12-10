@@ -1,0 +1,86 @@
+* mysql安装与配置
+** 安装
+   - 下载mysql到/usr/local/src/
+     #+BEGIN_EXAMPLE
+     cd /usr/local/src/
+     wget http://syslab.comsenz.com/downloads/linux/mysql-5.1.40-linux-i686-icc-glibc23.tar.gz
+     #+END_EXAMPLE
+   - 解压
+     #+BEGIN_EXAMPLE
+     [root@localhost src]# tar zxvf /usr/local/src/mysql-5.1.40-linux-i686-icc-glibc23.tar.gz
+     #+END_EXAMPLE
+   - 把解压完的数据移动到/usr/local/mysql
+     #+BEGIN_EXAMPLE
+     [root@localhost src]# mv mysql-5.1.40-linux-i686-icc-glibc23 /usr/local/mysql
+     #+END_EXAMPLE
+   - 建立mysql用户
+     #+BEGIN_EXAMPLE
+     [root@localhost src]# useradd -s /sbin/nologin -M mysql
+     #+END_EXAMPLE
+     其中
+     #+BEGIN_EXAMPLE
+     -M, --no-create-home          do not create the user's home directory
+     -s, --shell SHELL             login shell of the new account
+     #+END_EXAMPLE
+   - 初始化数据库
+     #+BEGIN_EXAMPLE
+     [root@localhost src]# cd /usr/local/mysql
+     [root@localhost mysql]# mkdir -p /data/mysql ; chown -R mysql:mysql /data/mysql
+     [root@localhost mysql]# ./scripts/mysql_install_db --user=mysql --datadir=/data/mysql
+     #+END_EXAMPLE
+     如果初始化数据库时不在数据库目录,就要这么写
+     #+BEGIN_EXAMPLE
+     /usr/local/mysql/scripts/mysql_install_db --user=mysql --datadir=/data/mysql --basedir=/usr/local/mysql/
+     #+END_EXAMPLE
+     这个需要指定数据库安装目录;
+   - 拷贝配置文件
+     #+BEGIN_EXAMPLE
+     [root@localhost mysql]# cp support-files/my-large.cnf /etc/my.cnf
+     #+END_EXAMPLE
+** 配置
+*** mysql主从复制
+    <从>与<主>的数据同步
+**** <主>的操作
+     - 修改<主>的配置文件
+       在 =[mysqld]= 下增加两行:
+       #+BEGIN_EXAMPLE
+       # Replication Master Server (default)
+       # binary logging is required for replication
+       # 定义bin log生成的名字,会在指定的datadir下生成
+       log-bin=mysql-first
+       # 对指定数据不进行主从复制
+       binlog-ignore-db=mysql
+       binlog-do-db=wordpress
+       #+END_EXAMPLE
+       server-id=1中的1可以任定义，只要是唯一的就行
+
+       binlog-do-db=wordpress是表示只备份wordpress数据库
+
+       binlog-ignore-db=mysql表示忽略备份mysql数据库
+     - 进入<主>mysql
+       =grant replication slave on *.* to 'repl'@'127.0.0.1' identified by '123123';=
+       以密码 _123123_ 给 _127.0.0.1_ 上的用户 _repl_ 授予复制权限;
+
+       =flush privileges;=
+       刷新权限;
+
+       =flush tables with read lock;=
+       读锁;
+
+       =show master status;=
+       会出现这个表
+       #+BEGIN_SRC 
+       | File               | Positon | Binlog_Do_DB | Binlog_Ignore_DB |
+       |--------------------+---------+--------------+------------------|
+       | mysql-first.000002 | 106     |              | mysql            |
+
+       
+       #+END_SRC
+** 常用操作与信息
+*** 登录mysql方法
+    - =mysql -u username -p password=
+    - =mysql -S /tmp/mysql.sock=
+    - =mysql -h hostname -P port=
+*** 数据库的导出与导入
+    - =mysqldump -S /tmp/mysql.sock database-name > backup-name.sql=
+    - =mysql -S /tmp/mysql.sock databse-name < backup-name.sql=
