@@ -73,6 +73,33 @@
        | File               | Positon | Binlog_Do_DB | Binlog_Ignore_DB |
        |--------------------+---------+--------------+------------------|
        | mysql-first.000002 | 106     |              | mysql            |
+       记住 *mysql-first.000002* 和 *106* ;
+**** <从>的操作
+     - 修改<从>配置文件
+
+       将 *server-id* 修改成与<主>的server-id不同即可,如 =server-id          =2=
+       
+       增加 =replicate-do-db     = db1,db2= ; 与 =binlog-do-db     = db1,db2= 相对
+
+       增加 =replicate-ignore-db     = mysql= ;与 =binlog-ignore-db     = mysql= 相对
+
+     - 进入<从>mysql
+       #+BEGIN_EXAMPLE
+       # 停止slave
+       slave stop;
+       # 指定<主>的相关参数
+       # 这里的master_port和master_log_pos后面跟的是数字,不需要使用单引号;
+       change master to master_host='127.0.0.1', master_port=3306, master_user='repl', master_password='123123', master_log_file='mysql-first.000002', master_log_pos=106;
+       # 启动slave
+       slave start;
+       # 
+       show slave status\G;
+       如果Slave_SQL_Running: Yes 且 Slave_IO_Running: Yes,则代表成功;
+       #+END_EXAMPLE 
+
+       最后进行主从操作时要记得 =unlock tables;=
+
+       在实际工作中,主从复制是很脆弱的存在,所以需要为其写监控脚本,主要监控 *Slave_IO_Running: Yes* 和 *Slave_SQL_Running: Yes* ,还有 *Last_IO_Error*
 ** 常用操作与信息
 *** 登录mysql方法
     - =mysql -u username -p password=
