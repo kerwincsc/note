@@ -2,6 +2,98 @@
   dns == domain name server
 
   类似于早期/etc/hosts文件的功能,但是更加强大;
+** dns安装
+   1. =yum install bind=
+   2. =yum install bind-utils= 安装后,就可以使用dig命令
+   3. 测试解析 =dig @127.0.0.1 localhost= ; @后跟的是DNS服务器地址, 用其它域名取代localhost
+   4. 测试反解析 =dig @127.0.0.1 -x 127.0.0.1= ;
+** DNS主配置文件的配置
+   - 配置正解析,域名--->IP地址
+     在最后一行加上如下内容:
+     #+BEGIN_EXAMPLE
+     zone "123.com" IN {
+         type master;
+         file "123.com.zone";
+     };
+     这里的每个结尾都要加分号";"
+     #+END_EXAMPLE
+     
+     保存退出后,使用 =namedd-checkconf= 检测主配置文件是否有误;
+
+     新建编辑文件/var/named/123.com.zone
+     #+BEGIN_EXAMPLE
+     $TTL 1D
+     @       IN SOA  @ csc_714.163.com. (
+                                        2016121201       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum
+             IN      NS      ns.123.com.
+             IN      MX 5    mail.123.com.
+     mail    IN      A       192.168.200.249
+     ns      IN      A       192.168.200.250
+     www     IN      A       11.11.11.11
+     bbs     IN      CNAME   www
+     #+END_EXAMPLE
+     zone文件编辑后要进行配置检测 =named-checkzone "123.com" /var/named/123.com.zone=
+
+     使用 =dig @192.168.0.249(dns-server-ip) www.123.com= 进行测试;
+
+   - 配置反解析, IP地址--->域名
+     在作为邮件服务器使用时,可能需要用到. 因为有的需要核对IP和域名,如果解析不到,就不发送邮件;
+     
+     在主配置文件中写如以下信息:
+     #+BEGIN_EXAMPLE
+     zone "11.168.192.in-addr.arpa" IN {
+        type master;
+        file "11.168.192.zone";
+     };
+     #+END_EXAMPLE
+
+     编辑新建文件/var/named/0.168.192.zone
+     #+BEGIN_EXAMPLE
+     $TTL 1D
+     @       IN SOA  @  admin.123.com. (
+                                        20161212       ; serial
+                                        1D      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        3H )    ; minimum 
+     160     IN      PTR     ns.123.com.
+     20      IN      PTR     mail.123.com.
+     #+END_EXAMPLE
+     
+     测试 =dig @192.168.0.249 -x 192.168.0.20= 应该能反解析出mail.123.com
+** DNS主从配置
+** 常用配置的信息
+   - 主配置文件路径 =/etc/named.conf=
+   - 域名反解析配置文件 =/var/named/named.loopback=
+   - 域名解析配置文件 =/var/named/named.localhost=
+     #+BEGIN_EXAMPLE
+     # TTL=Time To Live 即存活时间;1D=1天,即86400秒
+     # 所以也可以写成  $TTL 86400
+     $TTL 1D
+     # "@"代表localhost, SOA是一种记录,一种类型, 其他还有NS,A,MX等等;
+     # rname.invalid. 是管理员邮箱,实际上 rname@invalid
+     # 如csc_714@163.com, 实际上应该写成 csc_714.163.com.
+     @       IN SOA  @ rname.invalid. (
+     # 序列号,可以按照一定格式书写,或者随意;
+                                        0       ; serial
+     # 这是针对<从>机的, 某一定时间后,刷新从机,保证与<主>机的信息的同步;
+                                        1D      ; refresh
+     # 针对<从>机的, 如果某次连接失败后, 在1H后, 再次重连;
+                                        1H      ; retry
+     # 过期时间,类似于生存周期, 表示一周后过期,需要重新和主机取得信息同步;
+                                        1W      ; expire
+     # 与TTL有关系,当TTL未指定时,TTL的时间等于3H;
+                                        3H )    ; minimum
+        NS      @
+        A       127.0.0.1
+     # IPv6相关
+        AAAA    ::1
+     #+END_EXAMPLE
+   =/var/named/named.ca= 未明白是什么文件
 * F&Q
   - Q: 序列号可以随便定义吗？有没有什么要求?
     A: 没要求，但每次改动，都要把序列号的值增加; 
