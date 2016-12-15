@@ -45,12 +45,12 @@
      
      在主配置文件中写如以下信息:
      #+BEGIN_EXAMPLE
-     zone "11.168.192.in-addr.arpa" IN {
+     zone "0.168.192.in-addr-arpa" IN {
         type master;
-        file "11.168.192.zone";
+        file "0.168.192.zone";
      };
      #+END_EXAMPLE
-
+     
      编辑新建文件/var/named/0.168.192.zone
      #+BEGIN_EXAMPLE
      $TTL 1D
@@ -66,6 +66,41 @@
      
      测试 =dig @192.168.0.249 -x 192.168.0.20= 应该能反解析出mail.123.com
 ** DNS主从配置
+   - 在<从>机上安装bind =yum install bind bind-utils=
+   - 在<从>机主配置文件中,写入以下信息
+     #+BEGIN_EXAMPLE
+     zone "123.com" IN {
+     # 将type改为slave
+        type slave;
+     # 从主接收来的配置文件的存放目录
+        file "slaves/123.com.zone";
+     # <主>的IP地址,注意,是masters, 有s
+        masters { 192.168.0.101; };
+     };
+
+     zone "0.168.192.in-addr.arpa" IN {
+        type slave;
+        file "slaves/0.168.192.zone";
+        masters { 192.168.0.101; };
+     };
+     #+END_EXAMPLE
+   - 完成后, 重启<从>机
+     重启后,主机的域名配置文件就会被下载到<从>机上, 当我们在主机上修改域名配置文件时,一定要记得修改 *serial* , 这样, 在设定的时间 *refresh* 后, <从>机会自动去和主机进行域名配置的同步;
+     - 由于上面自动同步较慢, 所以可以在<主>机上进行如下配置:
+       #+BEGIN_EXAMPLE
+       zone "123.com" IN {
+             type master;
+             file "123.com.zone";
+
+       # 下两行为新增的两行
+       ## 开启通知
+             notify yes;
+       ## 通知以下IP地址
+             also-notify { 192.168.0.103; };
+       };
+       #+END_EXAMPLE
+
+     - 当修改完<主>的域名配置文件后, 重启<主>机服务, 配置将立刻被同步;
 ** 常用配置的信息
    - 主配置文件路径 =/etc/named.conf=
    - 域名反解析配置文件 =/var/named/named.loopback=
@@ -94,6 +129,8 @@
         AAAA    ::1
      #+END_EXAMPLE
    =/var/named/named.ca= 未明白是什么文件
+   - 检查主配置文件是否有误 =named-checkconf=
+   - 检查域名配置文件是否有误 =named-checkzone "zone-name" zone-name-path=
 * F&Q
   - Q: 序列号可以随便定义吗？有没有什么要求?
     A: 没要求，但每次改动，都要把序列号的值增加; 
