@@ -1,0 +1,96 @@
+* HA安装与配置
+  HA == high available
+  
+  使用开源软件heartbeat实现高可用集群
+
+----------
+  前期准备:
+  - 将双机的ip和主机名写入双方的hosts
+** heartbeat安装
+   - =yum install heartbeat=
+     如果没有找到这个包, 就是因为没有安装 *epel[1]*
+     - 下载 =wget www.lishiming.net/data/attachment/forum/epel-release-6-8_32.noarch.rpm=
+     - 安装 =rpm -ivh epel-release-6-8_32.noarch.rpm=
+   - 安装libnet =yum install libnet=
+
+** 配置
+   - 配置样例的拷贝
+     1. =cd /usr/share/doc/heartbeat-3.0.4/=
+     2. =cp authkeys haresources ha.cf /etc/ha.d/=
+   - 编辑样例 =cd /etc/ha.d/=
+     1. =vim authkeys=
+	#+BEGIN_EXAMPLE
+	#
+	auth 3
+	#1 crc
+	#2 sha1 HI!
+	3 md5 Hello!
+	#+END_EXAMPLE
+	更改权限, 使其只能被当前用户读写 =chmod 600 authkeys=
+     2. =vim haresources=
+	#+BEGIN_EXAMPLE
+	#-------------------------------------------------------------------
+	#
+	#       An example where a shared filesystem is to be used.
+	#       Note that multiple aguments are passed to this script using
+	#       the delimiter '::' to separate each argument.
+	#       主机名   虚拟IP/24/虚拟网卡   启动程序
+	master-centos6  192.168.0.248/24/eth0:2 nginx
+	#
+	#       Regarding the node-names in this file:
+	#
+	#       They must match the names of the nodes listed in ha.cf, which in turn
+	#       must match the `uname -n` of some node in the cluster.  So they aren't
+	#       virtual in any sense of the word.
+	#+END_EXAMPLE
+     3. =vim ha.cf=
+	#+BEGIN_EXAMPLE
+	#  指定debugfile存储位置
+	debugfile /var/log/ha-debug
+	# 指定logfile存储位置
+	logfile /var/log/ha-log
+	# 日志的级别
+	logfacility local0
+	# 每2秒探测一次是否存活
+	keepalive 2
+	# 超出30秒仍未ping通, 就认为其"死亡"
+	deadtime 30
+	# 有10秒未ping通, 就会发警告, 并记录在日志/var/log/ha-log
+	warntime 10
+	# 服务的初始化需要时间, 在这段时间内, ping不通不会认为其死亡;
+	initdead 60
+	# 心跳线通信端口
+	udpport 694
+	# 备机的网卡和IP地址 , 也可以使用 bcast, 心跳网卡最好不与虚拟IP相同网卡
+	ucast eth0 192.168.0.103
+	# 自动故障复原
+	auto_failback on
+	# 主备机主机名
+	node master-centos6
+	node slave
+	# 仲裁地址
+	ping 192.168.0.1
+	# 以hacluster这个用户来运行脚本ipfail以检测网络连通性, 当进程死掉, respawn来拉起
+	respawn hacluster /usr/lib/heartbeat/ipfail
+	#+END_EXAMPLE
+   - 将<主>机上配置好的样例复制到<从>上去 =scp authkeys haresources ha.cf slave:/etc/ha.d/= 并进行如下修改:
+     - 修改ha.cf, 将ucast改成<主>机的ip =ucast eth0 192.168.0.101=
+     - 安装nginx进行测试
+       1. =yum install nginx=
+       2. 向<主>机和<从>机的index.html写入内容
+	  =echo "111111111master" > /usr/share/nginx/html/index.html=
+	  =echo "111111111slave" > /usr/share/nginx/html/index.html=
+     - 先启动主机的heartbeat, 再启动从机的heartbeat;
+       访问index.html,显示的是应该是 *111111111master* ;
+
+       关闭主机, 从机服务自动启动, 此时刷新页面, 显示的应该是 *111111111slave* ;
+
+       再次启动主机, 主机服务自动启动, 刷新页面, 得到 *111111111master* , 表明高可用服务配置完成;
+** 常用操作与信息
+   - 启动服务 =/etc/init.d/heartbeat start=
+   - 配置文件 =/etc/ha.d/authkeys= =/etc/ha.d/haresources= =/etc/ha.d/ha.cf=
+
+* Footnotes
+
+[1] EPEL , 全称是Extra Packages for Enterprise Linux , 是yum的一个软件源，里面包含了许多基本源里没有的软件;
+
