@@ -1,0 +1,20 @@
+* 修改mysql用户密码
+** 忘记root密码
+   - =vim /etc/my.cnf= 并在 =[mysqld]= 下增加如下一行:
+     #+BEGIN_EXAMPLE
+     skip-grant-tables
+     #+END_EXAMPLE
+     保存配置后, 重启mysql服务
+   - 进入mysql命令行 =mysql= 因为加了 =skip-grant-tables= 所以不需要输入密码
+     在mysql命令行下进行如下操作
+     - 选择数据库mysql =use mysql=
+     - 更新root用户密码 
+       #+BEGIN_EXAMPLE
+       UPDATE user SET PASSWORD=PASSWORD('Your new password') WHERE user='root';
+       #+END_EXAMPLE
+     - 更新权限 =flush privileges=
+     - 退出mysql命令行
+   - 将增加的 *skip-grant-tables*  注释或删除后, 重启mysql, 使用新密码登入
+
+** 忘记普通用户密码
+** 修改普通用户密码

@@ -1,0 +1,87 @@
+* zabbix安装与配置
+** 配置
+*** 服务端配置
+   - 安装扩展源
+   - 安装LAMP环境
+   - 安装zabbix服务端 =yum install zabbix20 zabbix20-agent zabbix20-server zabbix20-server-mysql zabbix20-web zabbix20-web-mysql net-snmp-devel=
+     安装完成后, 启动 *zabbix-server* *zabbix-agent* *httpd* *mysqld*
+   - 配置zabbix数据库
+     - 创建zabbix数据库 =mysql -uroot -p -e "create database zabbix"=
+     - 设置zabbix数据库的默认字符集, 并将数据表schema, image, data数据导入数据库zabbix
+       =mysql -uroot -p --default-character-set=utf8 zabbix < /usr/share/zabbix-mysql/schema.sql=
+
+       =mysql -uroot -p --default-character-set=utf8 zabbix < /usr/share/zabbix-mysql/images.sql=
+
+       =mysql -uroot -p --default-character-set=utf8 zabbix < /usr/share/zabbix-mysql/data.sql=
+   - 创建操作mysql的用户
+     #+BEGIN_EXAMPLE
+     mysql -uroot -p -e "grant all on *.* to 'zabbix'@'localhost' identified by 'zabbix';"
+     #+END_EXAMPLE
+   - 编辑zabbix主配置文件
+     - 查看 =DBName= 行, 确认DBName等于之前创建的用来存放zabbix数据的库名, 默认情况下, 创建为zabbix;
+     - 查看 =DBUser= 行, 修改确认DBUser等于之前创建的zabbix用来操作mysql的用户名, 一般情况下, 也同样使用zabbix作为默认创建的用户名;
+     - 取消对 =DBPassword= 行的注释, 并使其值等于mysql中zabbix用户的密码;
+     - 查看 =DBSocket= 行, 检查其路径下是否确实有mysql.sock, 如果没有, 需要进行指定套接字文件;
+   - 主配置文件配置无误后, 便可启动zabbix服务 =/etc/init.d/zabbix_server start=
+   - 进入web端对zabbix进行配置 =http://ip/zabbix=
+     根据 *Check of pre-requisites* 提示, 对配置进行调整, 如下图:
+     file://image/zabbix-web-install-pre-requisites.png
+
+     - 将 =PHP option post_max_size= 由8M调整为16M
+       #+BEGIN_EXAMPLE
+       post_max_size = 16M
+       #+END_EXAMPLE
+     - 将 =PHP option max_execution_time= 由30调整为300
+       #+BEGIN_EXAMPLE
+       max_execution_time = 300
+       #+END_EXAMPLE
+     - 将 =PHP option max_input_time= 由60调整为300
+       #+BEGIN_EXAMPLE
+       max_input_time = 300
+       #+END_EXAMPLE
+     - 修改完成后, 重启httpd使生效 =/etc/init.d/httpd restart= 点Retry, 确保所有条件都符合, 进入下一步;
+     - 在 *Configure DB connection* 界面填入相应数据
+       file://image/zabbix-configure-db-connection.png
+
+       #+BEGIN_EXAMPLE
+       Database tyep          MySQL          默认选
+       Database host          localhost      填写数据库所在主机, 一般就是默认
+       Database port          0              填0,表现默认端口
+       Database name          zabbix         数据库名
+       User                   zabbix         操作数据库zabbix的用户名
+       Password               ******         对应密码
+       #+END_EXAMPLE
+       填写完成后, 要点击 _Test connection_ 测试是否可以正确连接, 成功后可以点击进入下一步;
+     - 完成安装后进行zabbix登录界面, 输入默认用户名 *admin* 密码 *zabbix* 进入
+       我在这一步遇到了问题, 输入用户名和密码提示错误, 排查后发现数据库zabbix内的表users中, 没有内容, 于是重新导入数据库文件, 问题解决
+*** 增加被监控客户端
+    - 安装zabbix-agent =yum install -y zabbix20-agent=
+    - 编辑zabbix-agentd配置文件 =vim /etc/zabbix_agentd.conf=
+      #+BEGIN_EXAMPLE
+      # 监控服务器地址
+      Server=192.168.0.100
+      # 这段看得不太明白, 不过10050是默认端口号, 如果修改了默认端口号, 在这里要指定
+      ServerActive=0.0.0.0:10050
+      # 这里填写的Hostname是在web页面上显示的名字, 不一定是真实的hostname
+      Hostname=222master
+      #+END_EXAMPLE
+    - 配置完成后, 启动zabbix-agent服务 =/etc/init.d/zabbix-agent starte=
+      建议启动完成后, =netstat -lnp= 查看服务是否正常启动
+    - 在服务端执行
+      #+BEGIN_EXAMPLE
+      zabbix_get -s 192.168.0.108 -p10050 -k "system.hostname"
+      #+END_EXAMPLE
+      检测是否与监控客户端正常通信, 如果能够返回客户端的HOSTNAME, 则说明zabbix服务通信正常;
+
+      我在这里遇到了一个问题, 服务端无法正常获取客户端hostname, 服务端提示无法正常与客户端通信, 但是服务端ping客户端是可以通的;
+
+      我的机器是虚拟机, 并且是双网卡, eth0是桥接且自动获取地址, eth1是NAT且配固定IP;
+
+      双方使用eth1网卡进行通信, 在这里情况下, 服务端测试客户端便无法通过;
+
+      使用eth0网卡进行通信便无问题; 具体原因不明;
+** 常用操作与信息
+   - 启动服务
+     =/etc/init.d/zabbix-server start= =/etc/init.d/zabbix-agent start=
+
+     =/etc/init.d/httpd start= =/etc/init.d/mysqld start=

@@ -122,11 +122,50 @@
     客户端上重启一下nrpe服务: service nrpe restart
 
     服务端也重启一下nagios服务: service nagios restart
+** 配置邮件告警
+   编辑contacts.cfg =vim /etc/nagios/objects/contacts.cfg=
+   #+BEGIN_EXAMPLE
+   define contact{
+        contact_name               123
+        use                             generic-contact
+        alias                           aming
+        email              lishiming2009@139.com
+        }
+   define contact{
+        contact_name               456
+        use                             generic-contact
+        alias                            aaa
+        email              aminglinux@139.com
+        }
+   define contactgroup{
+        contactgroup_name           common
+        alias                                  common
+        members                          123,456
+        }
+   #+END_EXAMPLE
+   然后在要需要告警的服务里面加上contactgroup
+   #+BEGIN_EXAMPLE
+   define service{
+        use     generic-service
+        host_name       192.168.0.12
+        service_description     check_load
+        check_command           check_nrpe!check_load
+        max_check_attempts 5
+        normal_check_interval 1
+        contact_groups        common
+   }
+   #+END_EXAMPLE
 ** 常用操作与信息
    - 检测主配置文件配置是否有错 =nagios -v /etc/nagios/nagios.cfg=
    - nrpe主配置文件位置 =/etc/nagios/nrpe.cfg=
    - nagios日志文件 =/var/log/nagios/nagios.log=
-
+   - 几个重要参数说明
+     #+BEGIN_EXAMPLE
+     notifications_enabled : 是否开启提醒功能。1为开启，0为禁用。一般，这个选项会在主配置文件（nagios.cfg）中定义，效果相同;
+     notification_interval: 表示重复发送提醒信息的最短间隔时间。默认间隔时间是60分钟。如果这个值设置为0，将不会发送重复提醒;
+     notification_period: 发送提醒的时间段。非常重要的主机（服务）我定义为7×24，一般的主机（服务）就定义为上班时间。如果不在定义的时间段内，无论什么问题发生，都不会发送提醒;
+     notification_options: 这个参数定义了发送提醒包括的情况：d = 状态为DOWN, u = 状态为UNREACHABLE , r = 状态恢复为OK ,  f = flapping。，n=不发送提醒;
+     #+END_EXAMPLE
 * Footnotes
 
 [1] NRPE是监控软件nagios的一个扩展，它被用于被监控的服务器上，向nagios监控平台提供该服务器的一些本地的情况。例如，cpu负载、内存使用、硬盘使用等等。NRPE可以称为nagios的for linux 客户端
