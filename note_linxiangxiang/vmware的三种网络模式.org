@@ -3,7 +3,8 @@
 * 创建虚拟机：
     - a. vmware和virtualbox
     - b. 镜像的问题：centos6和centos7
-    - c. vmware网卡模式：
+    - c. vmware网卡模式
+
       1. 仅主机：虚拟机用网线和pc连接
 
 	[[file:image/host-only.png]]
@@ -12,9 +13,9 @@
       
          [[file:image/bridge.png]]
 
-      通过不同的mac地址上网
+	 通过不同的mac地址上网
    
-      1. nat模式：pc路由转发，虚拟机把pc当成路由器
+      3. nat模式：pc路由转发，虚拟机把pc当成路由器
 
          [[file:image/nat.png]]
 
@@ -27,3 +28,4 @@
       虚拟机上网，是通过虚拟机的nat设备（.2的网关），转换成主机的ip地址（mac地址），在外面抓包的话，抓的都是主机的ip
 
       vmware8网卡禁用，本机不能和虚拟机通信，但是虚拟机是可以上网的;
+				   
