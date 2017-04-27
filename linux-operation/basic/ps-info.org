@@ -1,0 +1,58 @@
+#+TITLE: ps工具介绍
+
+* 命令所属包
+  =yum install procps= 这个应该是系统自带的
+* 简介
+  - ps => process status
+  - linux上的每一个程序都会在运行时在系统中创建相应的进程
+  - 每个进程都有一个唯一的进程标识号码, 每个进程又与一个UID和一个GID相关联, 以决定这个进程的功能, 通常与一个进程相关的UID与GID与启动这个进程的用户的UID和GID相同
+    #+BEGIN_EXAMPLE
+    Linux系统的内核就是使用这个PID来追踪、控制以及管理进程的.
+    #+END_EXAMPLE
+  - 当一个进程创建另一个进程时, 前一个进程称为父进程, 后一个进程称为子进程
+    #+BEGIN_EXAMPLE
+    当子进程运行时, 父进程处于等待状态;
+    当子进程完成了它的工作之后, 子进程会通知父进程, 然后父进程终止子进程;
+    如果父进程是一个交互的shell, 将出现shell的提示符, 这表示shell正在准备执行新命令;
+    #+END_EXAMPLE
+  - 语法格式
+    #+BEGIN_EXAMPLE
+    ps [选项]
+    #+END_EXAMPLE
+    选项可以是:
+    #+BEGIN_EXAMPLE
+    -e:   显示系统上每个进程的信息, 这些信息包括PID、TTY、TIME和CMD, 其中e是every的第一个字母
+    -f:   显示每一个进程的全部信息列表, 除了-e选项显示的信息之外, 还额外地增加了UID、父进程标识符号(即PPID, Parent Process ID)和进程启动时间(STIME), 其中f是full的第一个字母
+    #+END_EXAMPLE
+* 命令输出结果显示
+  #+BEGIN_EXAMPLE
+  [root@centos64 ~]# ps -ef
+  UID        PID  PPID  C STIME TTY          TIME CMD
+  root         1     0  0 16:36 ?        00:00:01 /sbin/init
+  root         2     0  0 16:36 ?        00:00:00 [kthreadd]
+  root         3     2  0 16:36 ?        00:00:00 [migration/0]
+  root         4     2  0 16:36 ?        00:00:00 [ksoftirqd/0]
+  root         5     2  0 16:36 ?        00:00:00 [migration/0]
+  #+END_EXAMPLE
+  #+BEGIN_EXAMPLE
+  1.   UID:   该进程的拥有者的用户名
+  2.   PID:   该进程的唯一标识号码
+  3.   PPID:  父进程的进程标识号码
+  4.   C:     这个值已经不再使用
+  5.   STIME: 该进程启动的时间(小时:分:秒)
+  6.   TTY:   这个进程的控制终端, 注意系统守护进程将显示问号(?), 表示这个进程不是使用终端启动的
+  7.   TIME:  该进程的累计执行时间
+  8.   CMD:   命令名、选项和参数
+  #+END_EXAMPLE
+* 延伸命令pgrep
+  列出命令名中包含字符串crond的任何进程的PID, 是一个模糊匹配, -l选项只是把对应PID的命令名给列出来
+  - 用法1
+    #+BEGIN_EXAMPLE
+    [root@centos64 ~]# pgrep crond
+    1137
+    #+END_EXAMPLE
+  - 用法2
+    #+BEGIN_EXAMPLE
+    [root@centos64 ~]# pgrep -l crond
+    1137 crond
+    #+END_EXAMPLE

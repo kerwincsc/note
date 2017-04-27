@@ -1,0 +1,383 @@
+#+TITLE: Docker
+* docker的介绍
+  每次运行docker镜像, 都会生成一个全新的容器, 并分配唯一ID; 从面向对象的思想来理解, docker镜像就是类, 容器就是类的对象; 每new一次docker, 就会产生唯一容器, 并以ID进行标识;
+
+  从新生成的容器中退出后, 容器便注销了, 等待下次根据ID再次进入; 期间, 如果docker服务被关闭后再次打开, 那么要再运行指定容器, 需要先启动指定ID的容器, 才能根据对应ID进入;
+
+  容器的内核是虚拟宿主机的内核的, 所以内核版本和宿主内核版本一样;
+* docker操作
+** 安装
+   - 安装epel源 =yum install -y epel-release=
+   - 安装docker =yum install -y docker-io=
+** docker镜像管理
+   - =docker pull centos= 从docker.com获取centos镜像
+   - =docker images= 查看本地都有哪些镜像
+   - =docker tag centos aming123= 为centos镜像设置名为aming123的标签, 再使用 =docker images= 查看会多出来一行, 该行的IMAGE ID和centos的一样, 但是REPOSITORY名字不同
+   - =docker tag centos centos:ming= 使docker images多出一行, 其中REPOSITORY名为centos, tag为ming
+   - =docker search <image-name>= 从docker仓库搜索docker镜像, 后面是关键词
+   - =docker run -t -i cents /bin/bash= 用下载到的镜像开启容器, -i表示让容器的标准输入打开, -t表示分配一个伪终端, 注意, 要把-i -t放到镜像名字前面;
+   - 当该镜像发生修改后, 我们可以把该镜像提交重新生成一个新版本运行在本地
+   - =docker ps= 查看运行的容器, 加上-a选项可以查看没有运行的容器;
+   - =docker rmi centos= 用来删除指定镜像, 其中, 后面的参数可以是tag, 如果是tag时, 实际上是删除该tag, 只要该镜像还有其他tag, 就不会删除该镜像. 当后面的参数为镜像ID时, 则会彻底删除整个镜像, 连同所有标签一同删除;
+** docker基于已有镜像的容器创建镜像
+   - 运行 =docker run= 后, 进入到该容器中, 我们做一些变更, 比如安装一些东西, 然后针对这个容器创建新的镜像
+   - =docker commit -m "change somth" -a "somebody info" container_id 新镜像名字= (通过 =docker ps -a= 获取 id)
+
+     例如:
+     #+BEGIN_EXAMPLE
+     docker commit -m "install httpd" -a "Aming" 2c74d574293f aming/centos
+     #+END_EXAMPLE
+     这个命令有点像svn的提交(svn我没用过, 我觉得和git的commit很像), -m 加一些发动信息, -a 指定作者相关信息, 2c74d 这一串为容器id, 再后面为新镜像的名字;
+
+   - 新的镜像再创建基于其的容器, 此容器将包含之前做的变更;
+
+** docker基于本地模版创建镜像
+   - 模板获取
+     可以直接在网上下载一个[[https://download.openvz.org/template/precreated/][模板]]
+   - 模板导入成docker镜像
+     #+BEGIN_EXAMPLE
+     cat <module_name> | docker import - <name_you_want>
+     #+END_EXAMPLE
+     导入完成后, 可以查看是否存在这么一个镜像 =docker images=
+
+** docker基于现有镜像导出为文件进行迁移、备份和恢复
+   - 把现有镜像导出为一个模板文件
+     #+BEGIN_EXAMPLE
+     docker save -o aming-centos.tar <mirror_name>
+     #+END_EXAMPLE
+     或
+     #+BEGIN_EXAMPLE
+     docker save -o aming-centos.tar <image_id>
+     #+END_EXAMPLE
+   - 用文件恢复本地镜像
+     #+BEGIN_EXAMPLE
+     docker load --input <file_name>
+     #+END_EXAMPLE
+     或者
+     #+BEGIN_EXAMPLE
+     docker load < <file_name>
+     #+END_EXAMPLE
+   - 如果有需要, 可以注册一个docker hub的账号, 并把自己的docker镜像上传
+     #+BEGIN_EXAMPLE
+     docker push <image_name>
+     #+END_EXAMPLE
+
+
+** docker容器管理
+   - =docker create -it <mirror-name>= 基于<mirror-name>镜像创建一个新的容器, 但是该容器没有启动, 这个镜像要真实存在
+   - =docker start <container_id>= 启动指定<container_id>的容器
+
+   - =docker exec -it <container_id> /bin/bash= 进入指定ID的容器的命令行
+
+   - =docker run -d <mirror-name>= 可以让容器在后台运行
+     #+BEGIN_EXAMPLE
+     比如: docker run -d centos bash -c "while :; do echo '123'; sleep 1; done;"
+     #+END_EXAMPLE
+
+   - =docker run --name web -itd <mirror-name> bash= 给容器自定义名字web
+
+   - 让容器退出后直接删除
+     #+BEGIN_EXAMPLE
+     docker run --rm -it <mirror-name> bash -c "sleep 30"
+     #+END_EXAMPLE
+     在这里, 命令执行完容器就会退出, 不能和-d一直使用
+
+   - =docker attach <container_id>= 进入一个后台运行的容器, 但是attach命令不算好用, 比如想退出终端, 就得exit, 这样容器也就退出了;
+
+   - =docker stop <container_id>= 停止一个指定ID的容器
+
+   - =docker export <container_id> > file.tar= 导出容器, 可以迁移到其他机器上, 迁移到其他机器上时, 需要导入 =cat <module_name> | docker import - <name_you_want>=
+
+   - =docker rm <container_id>= 删除指定ID的容器
+
+** docker仓库管理(有待完成<1.8docker仓库管理>)
+   =docker pull registry= 下载registry镜像
+** docker数据管理
+*** 数据的挂载
+   - 挂载本地的目录到容器里
+     #+BEGIN_EXAMPLE
+     docker run -itd -v /data/:/data1 aming bash
+     #+END_EXAMPLE
+     *-v* 用来指定挂载目录, *:* 前面的/data/为本地目录, *:* 后面的/data1/为容器里的目录
+   - 挂载已有容器的数据卷
+
+     其实, 我们挂载目录的时候, 可以指定容器的name, 如果不指定就随机定义了. 可以使用 =docker ps -a= 查看所有容器的name, 当你创建新的容器且想要使用某个容器的数据卷时, 找到容器的名称, 并使用下面的命令挂载;
+     #+BEGIN_EXAMPLE
+     docker run -itd --volumes-from stoic_jones centos bash
+     #+END_EXAMPLE
+     也可以使用容器ID挂载:
+     #+BEGIN_EXAMPLE
+     docker run -itd --volumes-from container_id centos bash
+     #+END_EXAMPLE
+     这样, 我们使用镜像centos创建了新的容器, 并且使用stoic_jones容器的数据卷;
+   - 定义数据卷容器: 挂载共享卷
+
+     有时候, 我们需要多个容器之间相互共享数据, 类似于linux里的NFS, 所以就可以搭建一个专门的数据卷容器, 然后其他容器直接挂载该数据卷;
+     - 首先,建立数据卷容器
+       #+BEGIN_EXAMPLE
+       docker run -itd -v /data/ --name volume_container aming/centos bash
+       #+END_EXAMPLE
+       注意, 这里的/data/是容器的/data目录, 并非本地的/data/目录;
+
+     - 然后, 让其他容器挂载该数据卷
+       #+BEGIN_EXAMPLE
+       docker run -itd --volumes-from voume_container aming bash
+       #+END_EXAMPLE
+*** 数据卷的备份与恢复
+    - 备份
+      - 宿主机创建备份目录 =mkdir /vol_data_backup=
+      - 新建容器 *docker_a* , 并使其挂载待备份的数据卷容器 *volume_a* , 同时使 */backup* 目录映射宿主机的 */vol_data_backup* 目录
+	#+BEGIN_EXAMPLE
+	 docker run -itd --volumes-from volume_a -v /vol_data_backup/:/backup --name docker_a centos bash
+	#+END_EXAMPLE
+      - 进入 docker_a , 打包数据卷容器的挂载目录 
+	#+BEGIN_EXAMPLE
+	docker exec -it docker_a bash
+	tar cvf /backup/data.tar /data/
+	#+END_EXAMPLE
+    - 恢复
+      - 新建数据卷容器volume_b
+	#+BEGIN_EXAMPLE
+	docker run -itd -v /data/ --name volume_b centos bash
+	#+END_EXAMPLE
+      - 新建普通容器docker_b并挂载数据卷容器volume_b, 同时映射宿主机备份目录/vol_data_backup
+	#+BEGIN_EXAMPLE
+	docker run -itd --volumes-from volume_b --name docker_b -v /vol_data_backup/:/backup centos bash
+	#+END_EXAMPLE
+      - 将映射目录/backup/内的data.tar解开
+	#+BEGIN_EXAMPLE
+	tar xvf /backup/data.tar
+	#+END_EXAMPLE
+** docker网络管理
+*** 四种网络模式
+   - host模式
+     使用docker run时, 使用 --net=host 指定
+
+     docker使用的网络实际上和宿主机一样, 在容器内看到的网卡ip是宿主机上的ip
+   - container模式
+     使用 --net=container:container_id/container_name
+
+     多个容器使用共同的网络, 看到的ip是一样的;
+   - none模式
+     这种模式下, 不会配置任何网络
+   - bridge模式
+     默认模式, 不用指定, 默认就是这种网络模式; 这种模式会为每个容器分配一个独立的Network Namesapce. 类似于vmware的nat网络模式. 同一个宿主机上的所有容器会在同一个网段下, 相互之间是可以通信的;
+*** 外部访问容器
+    - 首先, 使用centos镜像新建一个容器, 然后在该容器中安装httpd服务, 并启动
+    - 再把该容器导成一个新的镜像(centos-httpd), 然后再使用新镜像创建容器, 并指定端口映射
+      #+BEGIN_EXAMPLE
+      docker run -itd -p 5123:80 centos-httpd bash
+      #+END_EXAMPLE
+      -p 可以指定端口映射, 本例中将容器的80端口映射为本地的5123端口
+    - 进入装有httpd服务的容器 =docker exec -it container_id bash=
+    - 启动httpd =httpd -k start=
+    - 编辑/var/www/html/1.html, 任意写点东西, 保存退出, 并exit容器
+    - 测试 =curl 127.0.0.1:5123/1.html=
+*** 容器互联
+    - 下载一个mysql镜像 =docker pull mysql=
+    - 新建一个容器并映射端口 =docker run -itd -p 13306:3306 --name db centos-6-x86 bash=
+    - 再新建一个容器并映射端口 =docker run -itd -p 12308:80 --name web --link db:db centos-6-x86 bash=
+    - 在web上运行env命令可以查看到关于db的环境变量
+*** 配置桥接网络-和vmware中的桥接
+    为了使本地网络中的机器和Docker容器更方便的通信, 我们经常会有将Docker容器配置到和主机同一网段;
+    - centos6
+      - 修改ifcfg-eth0网卡文件
+	#+BEGIN_EXAMPLE
+	DEVICE=eth0
+	TYPE=Ethernet
+	ONBOOT=yes
+	BOOTPROTO=none
+	# 需要增加这行
+	BRIDGE=br0
+	#+END_EXAMPLE
+      - 增加ifcfg-br0网卡文件
+	#+BEGIN_EXAMPLE
+	DEVICE=br0
+	TYPE=Bridge
+	ONBOOT=yes
+	BOOTPROTO=none
+	IPADDR=172.17.42.111
+	NETMASK=255.255.255.0
+	#+END_EXAMPLE
+      - 安装pipwork
+	#+BEGIN_EXAMPLE
+	git clone https://github.com/jpetazzo/pipework
+	cp ~/pipework/pipework /usr/local/bin
+	#+END_EXAMPLE
+      - 新建一个容器并指定网络模式为 --net=none
+	#+BEGIN_EXAMPLE
+	docker run -itd --net=none --name kerwinchen centos /bin/bash
+	#+END_EXAMPLE
+      - 升级iptoute, 不然可能会报错 Object 'netns' is unknown, try 'ip help'
+	#+BEGIN_EXAMPLE
+	rpm -Uvh https://repos.fedorapeople.org/openstack/EOL/openstack-grizzly/epel-6/iproute-2.6.32-130.el6ost.netns.2.x86_64.rpm
+	#+END_EXAMPLE
+      - =pipework br0 kerwin 172.7.15.201/24= 201为容器ip, @后面的ip为宿主机ip
+      - 进入容器kerwin查看是否添加成功
+    - centos7
+      - 安装pipwork
+	#+BEGIN_EXAMPLE
+	git clone https://github.com/jpetazzo/pipework
+	cp ~/pipework/pipework /usr/local/bin
+	#+END_EXAMPLE
+      - 开启一个容器
+	#+BEGIN_EXAMPLE
+	docker run -itd --net=none --name kerwin centos /bin/bash
+	#+END_EXAMPLE
+      - =pipework br0 kerwin 172.7.15.201/24@172.7.15.107= #201为容器IP, @后面的IP为宿主机IP
+      - =brctl addif br0 eth0= #eth0为宿主机网卡, 这一步是把br0和eth0桥接起来
+      - =ip addr add 172.7.15.107/24 br0= #把107的IP绑定在br0上
+      - =docker exec -it kerwin /bin/bash= #进去后ifconfig查看就可以看到新添加的ip
+** Dockerfile创建镜像
+   - Dockerfile格式
+     1. FROM //指定基于哪个基础镜像
+	#+BEGIN_EXAMPLE
+	格式   FROM <image>   或者   FROM <image>:<tag>
+	比如:
+	FROM centos
+	FROM centos:lastest
+	#+END_EXAMPLE
+	
+     2. MAINTAINER //指定作者信息
+	#+BEGIN_EXAMPLE
+	格式   MAINTAIN <name> , 比如
+	MAINTAINER kerwin ;kerwin@hotmail.com
+	#+END_EXAMPLE
+	
+     3. RUN //镜像操作指令
+	#+BEGIN_EXAMPLE
+	格式   RUN <command>   或者  RUN ["executable", "param1", "param2"]
+	比如
+	RUN yum install httpd
+	RUN ["/bin/bash", "-c", "echo hello"]
+	#+END_EXAMPLE
+
+     4. CMD //三种模式:
+	#+BEGIN_EXAMPLE
+	CMD ["executable", "param1", "param2"]
+	CMD command param1 param2
+	CMD ["param1", "param2"]
+	#+END_EXAMPLE
+	RUN和CMD看起来挺像, 但是CMD用来指定容器启动时用到的命令, 只能有一条. 比如:
+	#+BEGIN_EXAMPLE
+	CMD ["/bin/bash", "/usr/local/nginx/sbin/nginx", "-c", "/usr/local/nginx/conf/nginx.conf"]
+	#+END_EXAMPLE
+
+     5. EXPOSE
+	#+BEGIN_EXAMPLE
+	格式为 EXPOSE <port> [<port>...], 比如
+	EXPOSE 22 80 8443
+	#+END_EXAMPLE
+	这个用来指定要映射出去的端口, 比如容器内部我们启动了sshd和nginx, 所以我们需要把22和80端口暴露出去. 这个需要配合 *-P* (大写) 来工作, 也就是说在启动容器时, 需要加上-P, 让它自动分配. 如果指定具体的端口, 也可以使用-p(小写)来指定;
+
+     6. ENV
+	#+BEGIN_EXAMPLE
+	格式   ENV <key><value> , 比如
+	ENV PATH /usr/local/mysql/bin:$PATH
+	#+END_EXAMPLE
+	它主要是为后续的RUN指令提供一个环境变量, 我们也可以定义一些自定义的变量
+
+	ENV MYSQL_version 5.6
+
+     7. ADD
+	#+BEGIN_EXAMPLE
+	格式   add <src> <dest>
+	#+END_EXAMPLE
+	将本地的一个文件或目录拷贝到容器的某个目录里. 其中src为Dockerfile所在目录的相对路径, 它也可以是一个url. 比如
+	#+BEGIN_EXAMPLE
+	ADD <conf/vhosts> </usr/localnginx/conf>
+	#+END_EXAMPLE
+
+     8. COPY
+	#+BEGIN_EXAMPLE
+	格式同add
+	使用方法和add一样, 不同的是, 它不支持url
+	#+END_EXAMPLE
+
+     9. ENTRYPOINT   格式类似CMD
+	#+BEGIN_EXAMPLE
+	容器启动时要执行的命令, 它和CMD很像, 也是只有一条生效, 如果写多个只有最后一条生效.
+	和CMD不同的是:
+	CMD是可以被docker_run指令覆盖的, 而ENTRYPOINT不能覆盖.
+	比如, 容器名字为kerwin
+	我们在Dockerfile中指定如下CMD:
+	CMD ["/bin/echo", "test"]
+	假如启动容器的命令是 docker run kerwin 这样会输出test
+	假如启动容器的命令是 docker run -it kerwin /bin/bash 什么都不会输出
+	ENTRYPOINT不会被覆盖, 而且会比CMD或者docker run指定的命令要靠前执行
+	ENTRYPOINT ["echo", "test"]
+	docker run -it kerwin 123
+	则会输入test 123 , 这相当于要执行命令 echo test 123
+	#+END_EXAMPLE
+
+     10. VOLUME
+	 #+BEGIN_EXAMPLE
+	 格式   VOLUME ["/data"]
+	 创建一个可以从本地主机或其他容器挂载的挂载点
+	 #+END_EXAMPLE
+
+     11. USER
+	 #+BEGIN_EXAMPLE
+	 格式   USER daemon
+	 指定运行容器的用户
+	 #+END_EXAMPLE
+
+     12. WORKDIR
+	 #+BEGIN_EXAMPLE
+	 格式   WORKDIR /path/to/workdir
+	 为后续的RUN、CMD或者ENTRYPOINT指定工作目录
+	 #+END_EXAMPLE
+   - Dockerfile示例安装nginx
+     - 书写Dockerfile
+       #+BEGIN_EXAMPLE
+       ############################################################
+       # Dockerfile to build Nginx Installed Containers
+       # Based on CentOS
+       ############################################################
+       
+       # Set the base image to CentOS
+       From centos
+       
+       # File Auther/Maintainer
+       MAINTAINER kerwin kerwin@foxmail.com
+       
+       # Install necessary tools
+       RUN yum install -y pcre-devel wget net-tools gcc zlib zlib-devel make openssl-devel
+       
+       # Install Nginx
+       ADD http://nginx.org/download/nginx-1.8.0.tar.gz .
+       RUN tar zxvf nginx-1.8.0.tar.gz
+       RUN mkdir -p /usr/local/nginx
+       RUN cd nginx-1.8.0 && ./configure --prefix=/usr/local/nginx && make && make install
+       RUN rm -fv /usr/local/nginx/conf/nginx.conf
+       COPY .nginx_conf /usr/local/nginx/conf/nginx.conf
+       
+       # Expose ports
+       EXPOSE 80
+       
+       # Set the default command to execute
+       # when creating a new container
+       # CMD /usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+       #+END_EXAMPLE
+       安装其他的, 比如 lamp 环境时, 就需要根据要求修改依赖和源码, 然后按步就班即可;
+     - 生成镜像 =docker build -t centos_nginx .=
+
+       命令末尾的 *.* 表示, 在当前目录下寻找Dockerfile
+     - 新建容器并自动映射端口 =docker run -itd -P centos_nginx bash=
+     - 进入容器, 启动nginx, 测试服务是否正确安装
+
+** FAQ
+   - Run 和 Create
+     - =docker run= 时, 都会创建并立即运行一个新的容器, 并自动自成一个唯一的容器ID, 下次如果还想再启动此ID的容器, 配合对应ID即可运行相应容器;
+     - =docker create= 时, 会创建一个新的容器, 但是不会自动运行, 需要我们手动启动, 并使用 =docker exec= 或 =docker attach= 进入
+   - 数据挂载的两种方式
+     - 本地目录目录挂载
+       #+BEGIN_EXAMPLE
+       docker run -itd -v /data/:/data1 aming bash
+       #+END_EXAMPLE
+       这里面的/data/目录, 是本地的真实目录, /data1目录是容器被创建后挂载的目录名
+     - 数据卷容器挂载
+       #+BEGIN_EXAMPLE
+       docker run -itd -v /data/ --name volumes_container_name aming/centos bash
+       #+END_EXAMPLE
+       这一步创建了一个数据卷容器以便于共享挂载, /data/不是本地真实存在的目录, 容器挂载这个目录后, 显示的就是这个名字;

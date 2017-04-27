@@ -1,0 +1,119 @@
+#+TITLE: AWK常见用法
+* 打印指定列
+** 以默认分隔符打印指定列
+   - who | awk '{print $1}' :: 打印who命令结果的每一行的第一列
+** 以指定分隔符打印指定列
+   - awk -F: '{print $1}' /etc/passwd :: 以':'为分隔符打印passwd文件的第一列
+
+* 特殊变量
+  - *NF* :: 在分隔符确定的情况下, 这个变量显示一行中有多少个字段
+  - *NR* :: 显示数据行的行号
+	    #+BEGIN_EXAMPLE
+	    $ awk -F: '{ print NR ":" $0 }' /etc/passwd
+	    #+END_EXAMPLE
+  - *$0* :: 即第0个字段, 即为显示当前行
+  - *END* 和 *BEGIN * :: 任何在BEGIN之后列出的操作（在{}内）将在Unix awk开始扫描输入之前执行，而END之后列出的操作将在扫描完全部的输入之后执行。因此，通常使用BEGIN来显示变量和预置（初始化）变量，使用END来输出最终结果
+
+* 利用awk计算文件大小
+  - 通过筛选ls命令的结果, 变现实现计算文件大小
+    #+BEGIN_EXAMPLE
+    ls -lhF /boot | awk '{ print $5 "\t" $9}'
+    -h   以合适的单位显示文件大小
+    #+END_EXAMPLE
+
+* 条件语句的使用
+  #+BEGIN_EXAMPLE
+  awk -F: '{ if (length($1)==3) print $0 }' /etc/passwd
+  #+END_EXAMPLE
+  如果passwd文件中任意行的第一列字段长度为3, 就将此行打印出来;
+* 循环语句的使用
+  1. =vim forscript=
+  #+BEGIN_EXAMPLE
+  {
+   count[length($1)]++
+  }
+  END{
+      for (i=1; i<9; i++)
+         print "There are " count[i] "user accounts with " i "letter names."
+  }
+  #+END_EXAMPLE
+  2. =awk -F: -f forcript < /etc/passwd=
+* 正则表达式相关
+  - 正则表达式匹配域号， 使用符号'~'后紧跟正则表达式, 也可以用if语句. awk中if后面的条件用括号括起来;
+
+    有如下文件"grade.txt"
+    #+BEGIN_EXAMPLE
+    M.Tansley     05/99     48311     Green     8     40     44
+    J.Lulu     06/99     48317     green     9     24     26
+    P.Bunny     02/99     48     Yellow     12     35     28
+    J.Troll     07/99     4842     Brown-3     12     26     26
+    L.Tansley     05/99     4712     Brown-2     12     30     28
+    #+END_EXAMPLE
+    - 下面命令打印$4包含Brown的行
+      #+BEGIN_EXAMPLE
+      $ awk '$4~/Brown/ {print $0}' grade.txt
+
+      J.Troll         07/99   4842    Brown-3 12      26      26
+      L.Tansley       05/99   4712    Brown-2 12      30      28
+      #+END_EXAMPLE
+    - 非精确匹配
+      #+BEGIN_EXAMPLE
+      $ awk '$3 ~/48/ {print $0}' grade.txt
+
+      M.Tansley       05/99   48311   Green   8       40      44
+      J.Lulu          06/99   48317   green   9       24      26
+      P.Bunny         02/99   48      Yellow  12      35      28
+      J.Troll         07/99   4842    Brown-3 12      26      26
+      #+END_EXAMPLE
+    - 精确匹配
+      #+BEGIN_EXAMPLE
+      $ awk '$3=="48" {print $0}' grade.txt
+
+      P.Bunny         02/99   48      Yellow  12      35      28
+      #+END_EXAMPLE
+    - 不匹配, 使用'!~'
+      #+BEGIN_EXAMPLE
+      $ awk '$4 != "Brown-2" {print $0}' grade.txt
+
+      M.Tansley     05/99     48311     Green     8     40     44
+      J.Lulu     06/99     48317     green     9     24     26
+      P.Bunny     02/99     48     Yellow     12     35     28
+      J.Troll     07/99     4842     Brown-3     12     26     26
+      #+END_EXAMPLE
+
+      #+BEGIN_EXAMPLE
+      $ awk '$0 !~ /Brown/' grade.txt
+      
+      M.Tansley       05/99   48311   Green   8       40      44
+      J.Lulu          06/99   48317   green   9       24      26
+      P.Bunny         02/99   48      Yellow  12      35      28
+      #+END_EXAMPLE
+    - 小于
+      #+BEGIN_EXAMPLE
+      $ awk '$6 < $7 {print $0 "$1 Try better at the next comp"}' grade.txt
+
+      M.Tansley       05/99   48311   Green   8       40      44$1 Try better at the next comp
+      J.Lulu          06/99   48317   green   9       24      26$1 Try better at the next comp
+      #+END_EXAMPLE
+    - 同时匹配大小写
+      #+BEGIN_EXAMPLE
+      $ awk '/[Gg]reen/' grade.txt
+
+      M.Tansley       05/99   48311   Green   8       40      44
+      J.Lulu          06/99   48317   green   9       24      26
+      #+END_EXAMPLE
+    - 匹配第一个域的第三个字符是'a'
+      #+BEGIN_EXAMPLE
+      $ awk '$1 ~/^...a/' grade.txt
+
+      M.Tansley       05/99   48311   Green   8       40      44
+      L.Tansley       05/99   4712    Brown-2 12      30      28
+      #+END_EXAMPLE
+    - '或'匹配, 使用'|', 需要使用括号括起来
+      #+BEGIN_EXAMPLE
+      awk '$0 ~/(Yellow|Brown)/' grade.txt 
+
+      P.Bunny     02/99     48     Yellow     12     35     28
+      J.Troll     07/99     4842     Brown-3     12     26     26
+      L.Tansley     05/99     4712     Brown-2     12     30     28
+      #+END_EXAMPLE

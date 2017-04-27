@@ -1,0 +1,12 @@
+#+TITLE:rewrite模块之访问控制
+* 访问控制
+#+BEGIN_EXAMPLE
+<VirtualHost *:80>
+    DocumentRoot "/data/www/host1"
+    <IfModule rewrite_module>
+        RewriteEngine on
+        RewriteCond {REQUEST_URI} ^.*/tmp/test.txt [NC]
+        RewriteRule .* - [F]
+    </IfModule>
+</VirtualHost>
+#+END_EXAMPLE

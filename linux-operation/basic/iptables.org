@@ -1,0 +1,36 @@
+#+TITLE: iptables使用
+
+* 简介
+** 什么是iptables?
+
+   常见于linux系统下的应用层防火墙工具;
+** 什么是Netfilter?
+
+   Netfilter是Linux操作系统核心层内部的一个数据包处理模块
+
+* iptables规则组成
+** iptables中的4表5链
+   - 四张表: filter  nat   mangle   raw
+     - filter表: 访问控制、规则匹配
+     - nat表: 地址转发
+   - 五条链: INPUT   OUTPUT FORWARD PREROUTING POSTROUTING
+
+* 场景模拟
+  - 模拟用iptables控制并发的http访问
+    - 工具: client上存在apache自带压力测试工具ab
+      #+BEGIN_EXAMPLE
+      ab -n 1000000 -c 40 http://server_ip/test.txt
+      #+END_EXAMPLE
+      说明: ab模拟以每秒40请求, 总共发1000000请求, 进行压力测试;
+    - 在server上查看指定的client_ip的并发连接数
+      #+BEGIN_EXAMPLE
+      netstat -anp|grep 80|grep client_ip|grep -c ESTABLE
+      #+END_EXAMPLE
+      说明: grep 过滤出访问80端口的client_ip总共有多少已经建立的连接;
+    - 可以使用w,top等命令查看此时server的负载, 可以发现负载非常高
+    - 现在可以通过iptables加一条命令来限制同一IP的最大连接数
+      #+BEGIN_EXAMPLE
+      iptables -I INPUT -p tcp --dport 80 -s client_ip -m connlimit --connlimit-above 10 -j REJECT
+      #+END_EXAMPLE
+      说明: 对于client_ip, 最大将允许有10个连接被建立, 超出10个将会被拒绝;
+    - 这时, 再使用ab来建立大于10的并发请求将出现 =apr_socket_recv: Connection refused= 错误, 只有并发数小于10时, 才能请求成功;

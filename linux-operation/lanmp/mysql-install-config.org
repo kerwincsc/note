@@ -1,5 +1,53 @@
 * mysql安装与配置
-** 安装
+** 编译安装
+   - 安装cmake =yum install cmake=
+   - 添加mysql用户
+     #+BEGIN_EXAMPLE
+     useradd -s /sbin/nologin -M -c "MySQL User" mysql
+     #+END_EXAMPLE
+   - 创建mysql数据库目录 =mkdir -p /data/mysql=
+   - 改变其属主与属组 =chown -R mysql:mysql /data/mysql=
+   - 解压源代码 =tar zxvf mysql-5.5.18.tar.gz= =cd mysql-5.5.18=
+   - 编译
+     #+BEGIN_EXAMPLE
+     cmake . -DCMAKE_INSTALL_PREFIX=/usr/local/Comsenz/mysql -DMYSQL_DATADIR=/data/mysql -DSYSCONFDIR=/usr/local/Comsenz/etc/ -DWITH_BLACKHOLE_STORAGE_ENGINE=1
+     make && make install
+     #+END_EXAMPLE
+   - =cd /usr/local/Comsenz/mysql=
+   - =./scripts/mysql_install_db --user=mysql=
+   - =chmod 755 /etc/rc.d/init.d/mysqld=
+   - 加入开机自启 =chkconfig --add mysqld= =chkconfig --level 3 mysqld on=
+   - 修改文件 =vim /etc/init.d/mysqld=
+     #+BEGIN_EXAMPLE
+     basedir=/usr/local/Comsenz/mysql
+     datadir=/data/mysql
+     #+END_EXAMPLE
+   - 在 Comsenz 目录下创建 etc 目录，并将 MySQL 配置文件拷贝到该目录下
+     #+BEGIN_EXAMPLE
+     mkdir -p /usr/local/Comsenz/etc
+     cp ./support-files/my-huge.cnf /usr/local/Comsenz/etc/my.cnf
+     #+END_EXAMPLE
+   - 编辑配置文件 /usr/local/Comsenz/etc/my.cnf
+     #+BEGIN_EXAMPLE
+     在 [mysqld] 段增加
+     datadir = /data/mysql
+     wait-timeout = 10
+     max_connections = 512
+     max_connect_errors = 10000000
+     local-infile=0 如果启动有误, 删除此项, 目前不知道这项
+     在 [mysqld] 段修改
+     max_allowed_packet = 16M
+     thread_cache_size = CPU个数*2
+     将 log-bin 注释
+     #+END_EXAMPLE
+   - =mv /usr/local/Comsenz/mysql/data/* /data/mysql=
+   - =service mysqld start=
+   - 设置mysql的root用户密码
+     #+BEGIN_EXAMPLE
+     bin/mysqladmin -u root password 'admin999'
+     其中 admin999 是要设置的 root 密码
+     #+END_EXAMPLE
+** 二进制免编译包安装
    - 下载mysql到/usr/local/src/
      #+BEGIN_EXAMPLE
      cd /usr/local/src/

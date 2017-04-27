@@ -1,0 +1,23 @@
+* 什么是 Emacs daemon
+关于Emacs有一个很著名的笑话，就是Emacs = Emacs Makes A Computer Slow。Emacs启用慢是一个人尽皆知的事实。由于启动时要加载大量的脚本和插件，使得Emacs在启动时往往需要数秒之久。因此我在进行一些快速简单的任务，如svn commit时，都是使用nano或者vim来进行的。
+
+Emacs daemon就是为了这个而诞生的。它将Emacs变成了一个C/S模型——只需要启动一个服务器在后台作为守护进程（daemon）跑着，之后启动的每个emacs都是一个客户端，它连接上服务器进行工作。这样一来，只要在启动服务器时运行初始化脚本，客户端启动无需运行脚本，实现启动时间从Firefox到Chrome的转变。
+
+* 使用 Emacs daemon
+要使用Emacs daemon，至少需要Emacs 23。它提供了一个emacsclient程序，用于启动客户端。
+
+有客户端就必然要有服务端。要启动一个daemon，需要在运行emacs时加入一个–daemon参数。幸运的是，我们不用手动启动服务端，而是可以利用emacsclient的-a参数。emacsclient的-a参数用于指定连接不上服务器时使用的别的编辑器（alternate editor），当把这项留空时，它会自动启动服务端。如果不想指定-a，也可以将ALTERNATE_EDITOR环境变量设为""。
+
+除了-a参数，emacsclient还要手工指定使用终端还是X来启动。要从终端启动，需要使用-t参数：
+
+* 具体操作
+  - 在/etc/profile.d/下新建文件emacs.sh, 内容为:
+#+begin_example
+    emacs --daemon &> /dev/null
+    alias ec='emacsclient -t -a ""'
+#+end_example
+    1. 第一行用来启动Emacs-daemon;
+    2. 第二行用来作假名;
+    3. 启动脚本还有可以做调整的地方, 例如判断daemon是否已运行, 未运行则启动daemon
+
+参考:http://emacser.com/daemon.htm

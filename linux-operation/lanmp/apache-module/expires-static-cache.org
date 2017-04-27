@@ -1,0 +1,19 @@
+#+TITLE: expires之静态缓存
+#+BEGIN_EXAMPLE
+<VirtualHost *:80>
+    DocumentRoot "/data/www"
+    ServerName www.test.com
+    <IfModule mod_expires.c>
+        ExpiresActive on
+        ExpiresByType image/gif "access plus 1 days"
+        ExpiresByType image/jpeg "access plus 24 hours"
+        ExpiresByType image/png "access plus 24 hours"
+        ExpiresByType text/css "now plus 2 hours"
+        ExpiresByType application/x-javascript "now plus 2 hours"
+        ExpiresByType application/x-shockwave-flash "now plus 2 hours"
+        ExpiresDefault "now plus 0 min"
+</VirtualHost>
+        第一行: 激活载入的模块;
+        第二到六行: 分别设置gif, jpeg, png, css, js脚本, flash文件的缓存时间;
+        第七行: 除却以上单独设置的缓存外, 其余文件的缓存时间为0, 即不缓存;
+#+END_EXAMPLE

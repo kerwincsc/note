@@ -1,0 +1,140 @@
+#+TITLE: Tomcat应用服务器的配置与优化
+* Tomcat应用服务器的配置与优化
+
+** 下载安装JDK
+   - 下载 =wget http://download.oracle.com/otn-pub/java/jdk/8u111-b14/jdk-8u111-linux-i586.tar.gz=
+   - 解压 =tar zxvf jdk-8u111-linux-i586.tar.gz= 并移动到指定目录 =mv jdk1.8.0_111 /usr/local/= 
+     注意:这里的local有斜杠,表明移动到local目录下,不是移动重命名为local;
+   - 环境变量的配置
+     打开文件 =vim /etc/profile.d/java.sh= ; 输入以下内容:
+     #+BEGIN_EXAMPLE
+     JAVA_HOME=/usr/local/jdk1.6.0_23/
+     JAVA_BIN=/usr/local/jdk1.6.0_23/bin
+     JRE_HOME=/usr/local/jdk1.6.0_23/jre
+     PATH=$PATH:/usr/local/jdk1.6.0_23/bin:/usr/local/jdk1.6.0_23/jre/bin
+     CLASSPATH=/usr/local/jdk1.6.0_23/jre/lib:/usr/local/jdk1.6.0_23/lib:/usr/local/jdk1.6.0_23/jre/lib/charsets.jar
+     #+END_EXAMPLE
+   - 更新环境变量
+     =. /etc/profile.d/java.sh= 或 =source /etc/profile.d/java.sh=
+   - 测试是否安装成功
+     #+BEGIN_EXAMPLE
+     [root@centos6 local]# java -version
+     java version "1.8.0_111"
+     Java(TM) SE Runtime Environment (build 1.8.0_111-b14)
+     Java HotSpot(TM) Client VM (build 25.111-b14, mixed mode)
+     #+END_EXAMPLE
+     出现上面的结果,表明安装成功!接下来便可以安装tomcat了.
+
+** 下载安装tomcat7.0.73
+   - 下载tomcat =wget http://mirror.bit.edu.cn/apache/tomcat/tomcat-7/v7.0.73/bin/apache-tomcat-7.0.73.tar.gz=
+   - 解压 =tar zxvf apache-tomcat-7.0.73.tar.gz= 并移动到该目录下 =mv apache-tomcat-7.0.73 /usr/local/=
+   - 复制启动文件到 =/etc/init.d/= 下 =cp -v /usr/local/apache-tomcat-7.0.73/bin/catalina.sh /etc/init.d/tomcat=
+   - 编辑启动文件 =vim /etc/init.d/tomcat=
+     在第二行加入如下文件
+     #+BEGIN_EXAMPLE
+     # chkconfig: 112 63 37
+     # description: tomcat server init script
+     # Source Function Library
+     . /etc/init.d/functions
+
+     JAVA_HOME=/usr/local/jdk1.6.0_23/
+     CATALINA_HOME=/usr/local/tomcat
+     #+END_EXAMPLE
+     说明: 上半部分主要是为了使启动脚本语法符合chkconfig, 下半部分则是加入tomcat和jdk的环境变量, 以防启动时, 出现找不到 =Cannot find /etc/bin/setclasspath.sh= 错误;
+*** tomcat常用操作 
+   - 启动服务 =/etc/init.d/tomcat start=
+   - 停止服务 =/etc/init.d/tomcat stop=
+   - tomcat的没有一键重启,只能先停止服务,再启动服务
+   - 查看tomcat监听端口 =netstat -lnp | grep java=
+   - 把tomcat加入开机自启
+     #+BEGIN_EXAMPLE
+     [root@centos6 local]# chkconfig --add tomcat
+     tomcat 服务不支持 chkconfig
+     #+END_EXAMPLE
+     如果出现这种情况,说明此tomcat文件不符合chkconfig的语法,需要做如下修改:
+     #+BEGIN_EXAMPLE
+     #!/bin/sh
+
+     # Licensed to the Apache Software Foundation (ASF) under one or more
+     # contributor license agreements.  See the NOTICE file distributed with
+     # this work for additional information regarding copyright ownership.
+     # The ASF licenses this file to You under the Apache License, Version 2.0
+     # (the "License"); you may not use this file except in compliance with
+     # the License.  You may obtain a copy of the License at
+     #+END_EXAMPLE
+
+     增加如下
+
+     #+BEGIN_EXAMPLE
+     #!/bin/sh
+
+     # chkconfig: 2345 63 37
+     . /etc/init.d/functions
+     JAVA_HOME=/usr/local/jdk1.8.0_111
+     CATALINA_HOME=/usr/local/apache-tomcat-7.0.73
+
+     # Licensed to the Apache Software Foundation (ASF) under one or more
+     # contributor license agreements.  See the NOTICE file distributed with
+     # this work for additional information regarding copyright ownership.
+     #+END_EXAMPLE
+     上面的chkconfig后面的三个数字: 第一个是服务的运行级别,即运行级别为2,3,4,5;第二个数字是启动优先级,数值是0到99;第三个数是停止优先级,也是从0到99;
+
+     为什么要在这里再设置一遍 *=JAVA_HOME=* ? 在profile.d/java.sh中设置的变量不起作用,要再设置一遍;
+
+     将文件加入开机自启 =chkconfig --add tomcat= ;
+
+     =chkconfig tomcat on= 这里的命令将会读取 //etc/init.d/tomcat/ 文件内容,并根据chkconfig后面的数字决定在不同运行级别下是否启动,还有启停顺序;
+*** tomcat常用信息
+    - tomcat默认监听 8009 和 8080 端口;
+    - tomcat启动文件是tomcat/bin/CATALINA.sh,通常把他拷贝成/etc/init.d/tomcat
+    - tomcat的配置文件在 =./tomcat/conf/server.xml=
+** 配置Tomcat
+   - 改变tomcat的监听端口
+     #+BEGIN_EXAMPLE
+      <Connector port="8080" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+     #+END_EXAMPLE
+     将 *port* 改为:
+     #+BEGIN_EXAMPLE
+      <Connector port="80" protocol="HTTP/1.1"
+               connectionTimeout="20000"
+               redirectPort="8443" />
+     #+END_EXAMPLE
+     重启服务后 =netstat -lnp | grep java= 如果端口变为80,证明修改成功;
+   - 配置虚拟主机
+     server.xml配置文件下,每一个 *Host* 都代表一个虚拟主机;
+
+     找到</Host>下一行插入新的<Host>内容如下:
+     #+BEGIN_EXAMPLE
+     <Host name="www.123.cn" appBase="/data/tomcatweb"
+         unpackWARs="false" autoDeploy="true"
+         xmlValidation="false" xmlNamespaceAware="false">
+         <Context path="" docBase="./" debug="0" reloadable="true" crossContext="true"/>
+     </Host>
+     #+END_EXAMPLE
+     保存后，重启tomcat: =service tomcat stop= =service tomcat start= ;
+
+     在 =/data/tomcatweb= 下新建 =index.jsp= 并输入如下内容进行测试:
+     #+BEGIN_EXAMPLE
+     <html>
+     <body>
+         <center>
+             Now time is: <%=new java.util.Date()%>
+         </center>
+     </body>
+     </html>
+     #+END_EXAMPLE
+     访问这个虚拟主机 =# curl -x127.0.0.1:80 www.123.com -I=
+     
+     如果出现如下内容:
+     #+BEGIN_EXAMPLE
+     <html>
+     <body>
+         <center>
+            Now time is: Tue Nov 22 23:40:36 CST 2016
+      </center>
+     </body>
+     </html>
+     #+END_EXAMPLE
+     代表配置成功

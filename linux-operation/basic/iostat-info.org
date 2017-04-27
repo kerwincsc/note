@@ -1,0 +1,40 @@
+#+TITLE: iostat工具介绍
+
+* 命令所属包
+  - =yum install sysstat=
+
+* 简介
+  用来获取I/O设备性能方面的信息和CPU性能方面的信息;
+
+  语法格式如下:
+  #+BEGIN_SRC 
+  iostat [选项] [时间间隔] [刷新显示信息的次数]
+  #+END_SRC
+  在选项中有几个比较常用的:
+  #+BEGIN_EXAMPLE
+  1. -d:   显示硬盘所传输的数据和服务时间, 即包括每个硬盘, d是disk的第1个字母;
+  2. -p:   包含每个分区的统计信息, p是partition的第1个字母;
+  3. -c:   只显示CPU的使用信息;
+  4. -x:   显示扩展的硬盘统计信息, x是extended的缩写;
+  #+END_EXAMPLE
+* 命令输出结果解释
+  #+BEGIN_EXAMPLE
+  [root@centos64 ~]# iostat -d -p -h 4 8 
+  Linux 2.6.32-431.el6.x86_64 (centos64)  2017年03月10日  _x86_64_        (1 CPU)
+
+  Device:            tps   Blk_read/s   Blk_wrtn/s   Blk_read   Blk_wrtn
+  sda               0.31        19.36         4.63     349644      83556
+  sda1              0.03         0.22         0.00       4050         28
+  sda2              0.27        19.07         4.63     344370      83528
+  dm-0              0.87        18.89         4.63     341178      83528
+  dm-1              0.02         0.13         0.00       2376          0
+  #+END_EXAMPLE
+  #+BEGIN_EXAMPLE
+  tps: transfer per second 每秒钟传输的数量
+  Blk_read/s:  每秒钟读取的数据块的量
+  Blk_wrtn/s:   每秒钟写入的数据块的量
+  Blk_read:   总共读取的数据块的量
+  Blk_wrtn:   总共写入的数据块的量
+  上面的-h选项将以合适的大小显示读写速度, 也可以指定为 -m以兆字节显示; -k 以千字节显示
+  #+END_EXAMPLE
+  使用类似上面的iostat命令来监督分区的运行状况, 可以发现哪个硬盘分区是I/O瓶颈. *如果Linux系统上运行的是Oracle数据库管理系统, 消除I/O瓶颈往往是Oracle数据库优化的一个重要部分. 如发现sda2分区的I/O量过大, 而Oracle的所有数据都放在这个分区上, 此时就可以通过将有I/O竞争的一些数据移动到不同的硬盘上(如将表、索引以及排序区分别放到不同的硬盘上)来解开I/O瓶颈, 从而达到优化Oracle系统的目的, 而并不需要增加任何软硬件资源;*

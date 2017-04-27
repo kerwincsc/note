@@ -1,0 +1,225 @@
+#+TITLE:saltstack
+* 安装前准备
+  - 安装扩展源 =yum install -y epel-release=
+  - 设置双方的hostname以及hosts
+  - 关闭selinux, 清空iptables规则
+* 安装
+** 服务端
+   - =yum install -y salt-master salt-minion= 服务端程序和客户端程序都安装
+   - 配置minion要连接的服务端的地址 =vim /etc/salt/minion=
+     #+BEGIN_EXAMPLE
+     master: server.kerwin.com
+     #+END_EXAMPLE
+     说明: 这里的master填的是服务端域名,也可以是IP, 且冒号后面有空格
+   - 启动服务端 =/etc/init.d/salt-master start=
+   - 启动客户端 =/etc/init.d/salt-minion start=
+** 客户端
+   - =yum install -y salt-minion= 只安装客户端程序
+   - 配置minion要连接的服务端的地址 =vim /etc/salt/minion= 内容同上
+   - 启动客户端 =/etc/init.d/salt-minion start=
+* 认证
+  - =salt-key= 查看所有的已认证的, 未认证的,拒绝认证的客户端
+
+    [[file:image/salt-key.png]]
+
+  - =salt-key -a client.kerwin.com= 添加client.kerwin.com的认证
+    
+    此时, 我们在client的/etc/salt/pki/minion目录下会多出一个minion_master.pub文件
+    - =salt-key -A= 可以将所有未授权的进行统一授权
+* 远程执行命令
+  - =salt '*' test.ping= 这里的*表示已经签名的客户端, 也可以指定其中一个, 比如server.kerwin.com
+
+    这个test.ping是saltstack的一个测试模块, 在搭建完成后, 可以首先使用这个命令来测试;
+  - 利用cmd.run
+    #+BEGIN_EXAMPLE
+    salt '*' cmd.run 'df -h' 
+    #+END_EXAMPLE
+    说明:
+
+    这里的*必须是在master上已经被接受过的客户端, 可以通过salt-key查到, 通常是我们已经设定的id值. 关于这部分内容, 它支持通配, 列表以及正则.
+
+    比如两台客户端 web10 web11, 我们可以写成
+    #+BEGIN_EXAMPLE
+    salt 'web*'
+    salt 'web1[01]'
+    salt -L 'web10,web11'
+    salt -E 'web(10|11)'
+    #+END_EXAMPLE
+    等形式, 使用列表,即多个机器用逗号分隔,而且需要加-L; 使用正则必须带-E; 它还支持grains, 加-G, pillar加-I;
+  - grains
+    - grains是minion在启动时收集到的一些信息, 比如操作系统类型、网卡IP、内核版本、CPU架构等;
+
+    - 列出所有的grains项目名字 =salt 'client.kerwin.com' grains.ls=
+
+    - 列出所有grains项目以及值 =salt 'client.kerwin.com' grains.items=
+
+    - grains的信息并不是动态的, 并不会时时变更, 它只是在minion启动时收集到的;
+
+    - 我们可以根据grains收集到的一些信息, 做配置管理工作;
+
+    - grains支持自定义信息;
+      - =vim /etc/salt/grains= 此文件默认不存在
+	#+BEGIN_EXAMPLE
+	role: nginx
+	env: test
+	#+END_EXAMPLE
+	说明: 每一行的冒号后面都要有一个空格; 由于grains信息是在minion启动时收集的,所以配置完成后, 要重启minion客户端;
+      - 重启minion服务 =service salt-minion restart=
+      - 获取指定项目名称的grains信息 =salt '*' grains.item role env=
+
+	注意, 这里的是 *grains.item* , 结尾没有 *s*
+    - 可以借助grains的一些属性信息来执行远程命令
+      #+BEGIN_EXAMPLE
+      salt -G role:nginx cmd.run 'hostname'
+      #+END_EXAMPLE
+  - pillar
+    - pillar和grains不一样, 它是在master上定义的, 并且是针对minion定义的一些信息. 像一些比较重要的数据,如密码,可以存在pillar里, 还可以定义变量等;
+
+    - 配置自定义pillar
+      - =vim /etc/salt/master= 找到如下配置, 并取消注释
+	#+BEGIN_EXAMPLE
+	pillar_roots:
+	  base:
+	    - /srv/pillar
+	#+END_EXAMPLE
+	说明: 换行依次缩进2空格
+      - 按配置文件内的路径新建目录, 并将*.sls文件放入其中 =mkdir /srv/pillar=
+      - =vim /src/pillar/test.sls= 内容如下:
+	#+BEGIN_EXAMPLE
+	conf: /etc/123.conf
+	#+END_EXAMPLE
+	说明: 冒号后面要跟空格, 这是yaml的格式要求; 且配置文件的文件名不能是数字开关, 注意vim的自动缩进可能会影响到.sls文件默认的缩进;
+      - 编辑配置pillar入口sls配置文件 =vim /srv/pillar/top.sls= 名字一定是 top.sls
+	#+BEGIN_EXAMPLE
+	base:
+	  'client.kerwin.com':
+	    - test
+	#+END_EXAMPLE
+	说明: 第二行为主机名, 第三行为sls子配置文件; 以后每多一个sls配置文件,就多写一行;
+      - 配置完成后,可以不用重启master,使用命令刷新, pillar配置即可生效
+	#+BEGIN_EXAMPLE
+	salt 'master-centos6' saltutil.refresh_pillar
+	#+END_EXAMPLE
+	刷新完成后, 使用 =salt 'master-centos6' pillar.items= 来查看是否刷新成功
+    - 可以借助pillar的一些属性信息来执行远程命令
+      #+BEGIN_EXAMPLE
+      salt -I name:kerwinchen cmd.run 'w'
+      #+END_EXAMPLE
+* 举例:利用pillar配置管理安装apache
+  - =vim /etc/salt/master= 搜索找到file_roots, 打开如下内容的注释
+    #+BEGIN_EXAMPLE
+    file_roots:
+      base:
+        - /srv/salt
+    #+END_EXAMPLE
+
+  - =mkdir /srv/salt; cd /srv/salt=
+  - =vim /srv/salt/top.sls= 并加入以下内容
+    #+BEGIN_EXAMPLE
+    base:
+      '*':
+        - apache
+    #+END_EXAMPLE
+    意思是, 在所有的客户端上执行apache模块
+  - 重启服务端 =/etc/init.d/salt-master restart=
+
+  - =vim /srv/salt/apache.sls=
+    #+BEGIN_EXAMPLE
+    apache-service:
+      pkg.installed:
+        - name:
+          - httpd
+          - httpd-devel
+      service.running:
+        - name: httpd
+        - enable: True
+    #+END_EXAMPLE
+    说明: apache-servicej是id的名字, 自定义的. pkg.installed 为包安装函数, 下面是要安装的包的名字. service.running 也是一个函数, 来保证指定的服务启动, enable表示开机启动;
+* 文件中配置管理文件和目录
+** 配置管理文件
+   - =vim /srv/salt/filetest.sls= 并写入如下内容
+     #+BEGIN_EXAMPLE
+     file_test:
+       file.managed:
+         - name: /tmp/aminglinux.com
+         - source: salt://test/123/1.txt
+         - user: root
+         - group: root
+         - mode: 644
+     #+END_EXAMPLE
+     说明: 第一行的file_test为自定的名字, 表示该配置段的名字, 可以在别的配置段中引用它, source指定文件从哪里拷贝, 这里的test相当于/srv/salt/test
+   - 在top.sls中引用filetest
+     #+BEGIN_EXAMPLE
+     base:
+       'master-centos6':
+         - filetest
+     #+END_EXAMPLE
+   - 配置完成后, 运行 =salt '*' state.highstate= 进行配置的更新
+** 配置管理目录
+   - =vim /srv/salt/filedir.sls= 并写入如下内容
+     #+BEGIN_EXAMPLE
+     file_dir:
+       file.recurse:
+         - name: /tmp/testdir
+         - source: salt://test/123
+         - user: root
+         - file_mode: 644
+         - dir_mode: 755
+         - mkdir: True
+         - clean: True
+     #+END_EXAMPLE
+     说明: mkdir属性为True, 说明可以在客户端上创建目录, 经过测试仍然可以创建目录; clean属性为True, 意思是说当服务端上相应的目录文件删除后, 客户端也删除, 经实际测试, 为False时,客户端仍然能够和服务端保持一致;
+* 文件中配置远程执行命令
+  - =cd /srv/salt=
+  - =vim cmdtest.sls=
+    #+BEGIN_EXAMPLE
+    cmd_test:
+      cmd.run:
+        - onlyif: test -f /tmp/111.txt
+        - names:
+          - touch /tmp/aming123.txt
+          - mkdir /tmp/12331
+        - user: root
+    #+END_EXAMPLE
+  - =vim top.sls=
+    #+BEGIN_EXAMPLE
+    base:
+      'master-centos6':
+        - cmdtest
+    #+END_EXAMPLE
+* 配置管理远程执行脚本
+  - =vim /srv/salt/shelltest.sls=
+    #+BEGIN_EXAMPLE
+    shell_test:
+      cmd.script:
+        - source: salt://test/test.sh
+        - user: root
+    #+END_EXAMPLE
+    说明: 这个sls文件与其他文件的区别在于执行函数不同, cmd.script是用来执行脚本的函数
+* 配置管理任务计划
+  - =vim /srv/salt/crontest.sls=
+    #+BEGIN_EXAMPLE
+    cron_test:
+      cron.present:
+        - name: /bin/touch /tmp/111.txt
+        - user: root
+        - minute: '*'
+        - hour: '23'
+        - daymonth: '1-10'
+        - month: '2,5'
+        - dayweek: '*'
+    #+END_EXAMPLE
+    说明: cron.present是生成如下的cron, 如下删除, 将cron.present改成cron.absent即可; 如果分时日月周的任意一行没写, 那么将默认以 * 代替;
+* 可能会用到的命令
+  - 拷贝master上的文件到客户端 =cp.get_file=
+    #+BEGIN_EXAMPLE
+    salt 'master-centos6' cp.get_file salt://apache.sls /tmp/aminglinux.sls
+    #+END_EXAMPLE
+    说明: salt://apache.sls 是指在配置文件中定义的 /srv/salt/下的apache.sls; 后面跟的是客户端的路径;
+  - 拷贝目录 =cp.get_dir=
+    #+BEGIN_EXAMPLE
+    salt 'master-centos6' cp.get_dir salt://test /tmp/aminglinux
+    #+END_EXAMPLE
+    说明: 这步操作会将目录test拷贝至aminglinux目录下, 如果不存在aminglinux目录, 则会创建他;
+  - 显示存活的minion =salt-run manage.up=
+  - 在指定客户端上执行服务端上的脚本 =salt 'master-centos6' cmd.script salt://1.sh=

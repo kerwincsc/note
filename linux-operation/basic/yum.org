@@ -1,0 +1,101 @@
+#+TITLE: yum使用记录
+
+* yum保留已经安装过的包
+
+  可以设置使yum保留已经下载的rpm包, 供以后升级或重新安装时使用.
+
+  修改/etc/yum.conf即可:
+  #+BEGIN_EXAMPLE
+  [main]
+  cachedir=/home/soft1/yumcache
+  keepcache=1
+  debuglevel=2
+  #+END_EXAMPLE
+  cachedir是放置rpm包的地方, 可以修改;
+
+  keepcache=1表示保存下载的rpm包;
+* 更改yum源
+  - 首先备份/etc/yum.repos.d/CentOS-Base.repo
+    =mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup=
+  - 下载对应版本repo文件, 放入/etc/yum.repos.d/(操作前请做好相应备份)
+    - [[http://mirrors.163.com/.help/CentOS5-Base-163.repo][CentOS5]]
+    - [[http://mirrors.163.com/.help/CentOS6-Base-163.repo][CentOS6]]
+  - 运行以下命令生成缓存
+    - yum clean all
+    - yum makecache
+* yum局域网软件源搭建
+  - 安装http或者ftp服务器
+
+    建议用apache http server搭一个http服务器，安装apache的过程就略过了;
+
+    安装这个是为了提供软件包的下载。安装好的apache工作目录默认在/var/www/html，下面就用这个目录了;
+
+  - 准备rpm包, 下载最新的bin-DVD的系统镜像
+
+    把DVD1和DVD2.iso都下载下来，把DVD1.iso里的所有内容解压出来，放到/var/www/html/centos-6目录下，然后把DVD2.iso解压出来的Packages目录下的rpm包复制到/var/html/centos-6/Packages目录下，这样/var/html/centos-6/Packages里面就有了6000多个rpm包; 从浏览器中查看一下http://10.77.30.60/centos-6 ;
+
+    repodata目录此时是没有的，之后用createrepo命令生成repository之后才会有;
+
+  - 创建repository
+
+    安装createrepo，用yum或者rpm装都可以;
+
+    安装之后，创建repository：
+
+    $ createrepo /var/www/html/centos-6/
+
+    等待创建完成，要几分钟时间。创建完成之后，会在/var/www/html/centos-6/repodata下生成一些文件;
+
+  - 使用软件源: 在其他centos机器上试试软件源能不能用
+
+    首先修改机器上软件源配置文件:
+    #+BEGIN_EXAMPLE
+    # cd /etc/yum.repos.d/
+    # mkdir bk
+    # mv *.repo bk/
+    # cp bk/CentOS-Base.repo ./
+    # vi CentOS-Base.repo
+    #+END_EXAMPLE
+    CentOS-Base.repo文件修改之后如下:
+    #+BEGIN_EXAMPLE
+    [base]
+    name=CentOS-$releasever - Base
+    baseurl=http://10.77.30.60/centos-6/
+    gpgcheck=1
+    gpgkey=http://10.77.30.60/centos-6/RPM-GPG-KEY-CentOS-6
+    enabled=1
+    #released updates 
+    #[updates]
+    #name=CentOS-$releasever - Updates
+    #baseurl=http://10.77.30.60/centos-6/
+    #gpgcheck=1
+    #gpgkey=http://10.77.30.60/centos-6/RPM-GPG-KEY-CentOS-6
+    #enabled = 1
+    #+END_EXAMPLE
+    保存之后，就可以使用局域网的软件源了: =# yum update=
+* 搭建本地yum源
+* yum更新源优先级设置
+  - 安装 yum-priorities =yum install yum-priorities=
+  - priorities的配置文件是/etc/yum/pluginconf.d/priorities.conf，确认其是否存在
+
+    其内容为:
+    #+BEGIN_EXAMPLE
+    [main]
+    enabled=1   # 0禁用 1启用
+    #+END_EXAMPLE
+  - 编辑 /etc/yum.repos.d/目录下的*.repo 文件来设置优先级
+
+    参数为:
+    #+BEGIN_EXAMPLE
+    priority=N   # N的值为1-99
+    #+END_EXAMPLE
+    推荐的设置为:
+    #+BEGIN_EXAMPLE
+    [base], [addons], [updates], [extras] … priority=1 
+    [centosplus],[contrib] … priority=2
+    Third Party Repos such as rpmforge … priority=N   (where N is > 10 and based on your preference)
+    #+END_EXAMPLE
+    数字越大,优先级越低
+
+* 把源码包打包成rpm包
+  - [[http://www.linuxidc.com/Linux/2012-09/70096.htm][简单制作RPM二进包实例]]

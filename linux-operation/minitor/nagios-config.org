@@ -1,0 +1,173 @@
+* nagios安装与配置
+  监控不生成图表, 只根据阀值进行告警;
+** 前期准备
+   安装扩展源
+** 安装
+   - =yum install -y httpd nagios nagios-plugins nagios-plugins-all nrpe nagios-plugins-nrpe=
+** 监控服务器配置
+   - 设置登录nagios后台的用户和密码 =htpasswd -c /etc/nagios/passwd nagiosadmin=
+     这里生成的密码将会被用来登录nagios监控管理页面
+   - 编辑主配置文件 =vim /etc/nagios/nagios.cfg=
+     #+BEGIN_EXAMPLE
+     暂不做修改
+     #+END_EXAMPLE
+   - 检测配置文件配置地是否有错 =nagios -v /etc/nagios/nagios.cfg=
+   - 启动httpd和nagios =service httpd start= =service nagios start=
+   - 浏览器访问: http://ip/nagios
+** 增加被监控的服务器
+*** 被监控的服务器上的操作
+   - 安装nagios =yum install -y nagios-plugins nagios-plugins-all nrpe nagios-plugins-nrpe=
+   - 编辑nrpe的配置文件 =vim /etc/nagios/nrpe.cfg=
+     #+BEGIN_EXAMPLE
+     1. 找到“allowed_hosts=127.0.0.1” 改为 “allowed_hosts=127.0.0.1,192.168.0.11” 后面的ip为服务端ip; 
+     2. 找到” dont_blame_nrpe=0” 改为  “dont_blame_nrpe=1” 
+     #+END_EXAMPLE
+     第一步操作用来指定nagios服务端
+     第二步是为了允许指定命令的运行参数
+   - 启动nrpe服务 =/etc/init.d/nrpe start=
+     注意这步操作, 这里并不是启动nagios, 而是启动nrpe[1] , 被监控端的配置至此基本完成;
+*** 监控服务器上的操作
+    在Nagios上, 并不能像在cacti上一样, 在网页端进行被监控服务器的配置, 而要在监控端服务器上手动写配置文件;
+    - =cd /etc/nagios/conf.d/=
+    - =vim 192.168.0.12.cfg= 
+      这里的 +ip.cfg+ 的IP填写的是被监控服务器的IP, 并进行如下的示例配置,配置完后记得检测配置文件和重启nagios服务:
+      #+BEGIN_EXAMPLE
+      define host{
+      ; Name of host template to use
+        use                     linux-server
+      ; This host definition will inherit all variables that are defined
+      ; in (or inherited by) the linux-server host template definition.
+        host_name               192.168.0.12
+        alias                   0.12
+        address                 192.168.0.12
+        }
+      define service{
+        use                     generic-service
+        host_name               192.168.0.12
+        service_description     check_ping
+        check_command           check_ping!100.0,20%!200.0,50%
+        max_check_attempts 5
+        normal_check_interval 1
+      }
+      define service{
+        use                     generic-service
+        host_name               192.168.0.12
+        service_description     check_ssh
+        check_command           check_ssh
+        max_check_attempts      5
+        normal_check_interval 1
+      }
+      define service{
+        use                     generic-service
+        host_name               192.168.0.12
+        service_description     check_http
+        check_command           check_http
+        max_check_attempts      5
+        normal_check_interval 1
+      }
+      #+END_EXAMPLE
+      #+BEGIN_EXAMPLE
+      我们定义的配置文件中一共监控了三个service：ssh, ping, http;
+      这三个项目是使用本地的nagios工具去连接远程机器，也就是说即使客户端没有安装nagios-plugins以及nrpe也是可以监控到的; 
+      其他的一些service诸如负载、磁盘使用等是需要服务端通过nrpe去连接到远程主机获得信息，所以需要远程主机安装nrpe服务以及相应的执行脚本(nagios-plugins);
+      max_check_attempts 5  #当nagios检测到问题时，一共尝试检测5次都有问题才会告警，如果该数值为1，那么检测到问题立即告警;
+      normal_check_interval 1#重新检测的时间间隔，单位是分钟，默认是3分钟;
+      notification_interval           60 #在服务出现异常后，故障一直没有解决，nagios再次对使用者发出通知的时间。单位是分钟。如果你认为，所有的事件只需要一次通知就够了，可以把这里的选项设为0;
+      #+END_EXAMPLE
+** 增加监控服务
+*** 监控命令的配置
+   监控命令是在监控服务器上进行配置的
+   - 编辑 =vim /etc/nagios/objects/commands.cfg= 增加如下内容:
+     #+BEGIN_EXAMPLE
+     define command{
+        command_name    check_nrpe
+        command_line    $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+     }
+     #+END_EXAMPLE
+*** 写入相应被监控服务器的配置文件
+    - 编辑增加如下内容
+      #+BEGIN_EXAMPLE
+      define service{
+        use     generic-service
+        host_name       192.168.0.12
+        service_description     check_load
+        check_command           check_nrpe!check_load
+        max_check_attempts 5
+        normal_check_interval 1
+      }
+      define service{
+        use     generic-service
+        host_name       192.168.0.12
+        service_description     check_disk_hda1
+        check_command           check_nrpe!check_hda1
+        max_check_attempts 5
+        normal_check_interval 1
+      }
+      define service{
+        use     generic-service
+        host_name       192.168.0.12
+        service_description     check_disk_hda2
+        check_command           check_nrpe!check_hda2
+        max_check_attempts 5
+        normal_check_interval 1
+      }
+      #+END_EXAMPLE
+      check_nrpe是指需要被监控服务器的nrpe进行监控指令的运行, 并在惊叹号后面跟要在被监控服务器上执行的命令的别名, 如 *check_hda1* [2] , 其真实的命令及参数在nrpe =/etc/nagios/nrpe.cfg= 的主配置文件中进行定义
+      #+BEGIN_EXAMPLE
+      check_nrpe!check_load ：这里的check_nrpe就是在commands.cfg刚刚定义的，check_load是远程主机上的一个检测脚本;
+      在远程主机上vim /etc/nagios/nrpe.cfg 搜索check_load，这行就是在服务端上要执行的脚本了，我们可以手动执行这个脚本
+      把check_hda1更改一下：/dev/hda1 改为 /dev/sda1
+      再加一行command[check_hda2]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/sda2
+      #+END_EXAMPLE
+    客户端上重启一下nrpe服务: service nrpe restart
+
+    服务端也重启一下nagios服务: service nagios restart
+** 配置邮件告警
+   编辑contacts.cfg =vim /etc/nagios/objects/contacts.cfg=
+   #+BEGIN_EXAMPLE
+   define contact{
+        contact_name               123
+        use                             generic-contact
+        alias                           aming
+        email              lishiming2009@139.com
+        }
+   define contact{
+        contact_name               456
+        use                             generic-contact
+        alias                            aaa
+        email              aminglinux@139.com
+        }
+   define contactgroup{
+        contactgroup_name           common
+        alias                                  common
+        members                          123,456
+        }
+   #+END_EXAMPLE
+   然后在要需要告警的服务里面加上contactgroup
+   #+BEGIN_EXAMPLE
+   define service{
+        use     generic-service
+        host_name       192.168.0.12
+        service_description     check_load
+        check_command           check_nrpe!check_load
+        max_check_attempts 5
+        normal_check_interval 1
+        contact_groups        common
+   }
+   #+END_EXAMPLE
+** 常用操作与信息
+   - 检测主配置文件配置是否有错 =nagios -v /etc/nagios/nagios.cfg=
+   - nrpe主配置文件位置 =/etc/nagios/nrpe.cfg=
+   - nagios日志文件 =/var/log/nagios/nagios.log=
+   - 几个重要参数说明
+     #+BEGIN_EXAMPLE
+     notifications_enabled : 是否开启提醒功能。1为开启，0为禁用。一般，这个选项会在主配置文件（nagios.cfg）中定义，效果相同;
+     notification_interval: 表示重复发送提醒信息的最短间隔时间。默认间隔时间是60分钟。如果这个值设置为0，将不会发送重复提醒;
+     notification_period: 发送提醒的时间段。非常重要的主机（服务）我定义为7×24，一般的主机（服务）就定义为上班时间。如果不在定义的时间段内，无论什么问题发生，都不会发送提醒;
+     notification_options: 这个参数定义了发送提醒包括的情况：d = 状态为DOWN, u = 状态为UNREACHABLE , r = 状态恢复为OK ,  f = flapping。，n=不发送提醒;
+     #+END_EXAMPLE
+* Footnotes
+
+[1] NRPE是监控软件nagios的一个扩展，它被用于被监控的服务器上，向nagios监控平台提供该服务器的一些本地的情况。例如，cpu负载、内存使用、硬盘使用等等。NRPE可以称为nagios的for linux 客户端
+
+[2] check_hda1 实质上等于命令 =/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/sda1= ;

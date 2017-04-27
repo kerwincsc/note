@@ -1,0 +1,222 @@
+#+TITLE: Ansible
+* ansible安装与认证
+** ansible特点
+  - 不需要安装客户端, 通过sshd去通信
+  - 基于模块工作, 模块可以由任何语言开发
+  - 不仅支持命令行使用模块, 也支持编写yaml格式的playbook
+  - 支持sudo
+  - 有提供UI(浏览器图形化)http://www.ansible.com/tower, 10台主机以内免费
+  - 开源UI https://github.com/alaxli/ansible_ui 文档 http://download.csdn.net/detail/liyang23456/7741185
+** 安装与认证
+   - =yum install -y epel-release=
+   - =yum install -y ansible=
+   - 本机上生成密钥对, 并配置到其他机器上去, 配置本机时, 也要如此做
+* 远程执行命令
+  - 编辑ansible自带的hosts =vim /etc/ansible/hosts=
+    #+BEGIN_EXAMPLE
+    [testhost]
+    192.168.0.248
+    127.0.0.1
+    #+END_EXAMPLE
+    说明: testhost是组名, 可以根据需要定制, 其下可以跟主机IP地址, 或对应的域名, 如果跟的是域名, 就需要在本机的hosts文件中定义相关内容, 或者搭建公司内部的DNS; 127.0.0.1代表的是本机;
+  - 远程执行命令<w>
+    #+BEGIN_EXAMPLE
+    ansible testhost -m command -a 'w'
+    #+END_EXAMPLE
+    这样就可以批量执行命令了. 这里的testhost是主机组名, 当然也可以直接写一个IP, -m 后面是模块名字, -a 后面是命令;
+
+    还有一个模块shell可以实现相同功能
+    #+BEGIN_EXAMPLE
+    ansible testhost -m shell -a 'w'
+    #+END_EXAMPLE
+    如果出现以下错误提示:
+    #+BEGIN_EXAMPLE
+    "msg":"Aborting, target uses selinux but python bindings(libselinux-python) aren't installed!"
+    #+END_EXAMPLE
+    可以尝试安装 =yum install -y libselinux-python= 来解决;
+* 拷贝目录或者文件
+  - 拷贝目录
+    #+BEGIN_EXAMPLE
+    ansible testhosts -m copy -a "src=/etc/ansible dest=/tmp/ansibletest owner=root group=roor mode=644"
+    #+END_EXAMPLE
+    说明: 源目录会放到目标目录下面去, 如果目标指定的目录不存在, 它会自动创建. 如果拷贝的是文件, dest指定的名字和源如果不同, 并且它不是已经存在的目录, 相当于拷贝过去后又重命名. 但相反, 如果dest是目标机器上已经存在的目录, 则会直接把文件拷贝到该目录下面;
+  - 拷贝文件
+    #+BEGIN_EXAMPLE
+    ansible testhosts -m copy -a "src=/etc/passwd dest=/tmp/ansibletest"
+    #+END_EXAMPLE
+* 远程执行脚本
+  与saltstack不同, Ansible无法直接使客户端执行服务端已有的脚本; Ansible必须将脚本下发到客户端;
+  - 服务端配置脚本 =vim /tmp/test.sh=
+    #+BEGIN_EXAMPLE
+    #!/bin/bash
+    d=`date`
+    echo d > /tmp/test.txt
+    #+END_EXAMPLE
+  - 将服务端脚本下发到客户端
+    #+BEGIN_EXAMPLE
+    ansible 192.168.0.248 -m copy -a "src=/tmp/test.sh dest=/tmp/"
+    #+END_EXAMPLE
+  - 在服务端运行已下发到客户端的脚本
+    #+BEGIN_EXAMPLE
+    ansible 192.168.0.248 -m shell -a "/bin/bash /tmp/test.sh"
+    #+END_EXAMPLE
+    也可以这么写
+    #+BEGIN_EXAMPLE
+    ansible 192.168.0.248 -m shell -a "/tmp/test.sh"
+    #+END_EXAMPLE
+    说明: 这么写的前提是文件test.sh有执行权限, 可以在拷贝到客户端时修改权限指定 *mode=0755* 即可;
+  - shell模块还支持远程执行命令并且带管道
+    #+BEGIN_EXAMPLE
+    ansible testhost -m shell -a "cat /etc/passwd|wc -l"
+    #+END_EXAMPLE
+* 配置任务计划
+  - 添加一个任务计划
+    #+BEGIN_EXAMPLE
+    ansible testhost -m cron -a "name='test_cron' job='/bin/touch /tmp/1212.txt' weekday=6"
+    #+END_EXAMPLE
+  - 删除一个任务计划
+    #+BEGIN_EXAMPLE
+    ansible testhost -m cron -a "name='test_cron' state=absent"
+    #+END_EXAMPLE
+  - 其他的时间表示
+    #+BEGIN_EXAMPLE
+    分钟 minute 小时 hour 日期 day 月份 month
+    #+END_EXAMPLE
+
+* 安装rpm包/管理服务
+  - 安装rpm包
+    #+BEGIN_EXAMPLE
+    ansible testhost -m yum -a "name=httpd"
+    #+END_EXAMPLE
+  - 管理服务
+    #+BEGIN_EXAMPLE
+    ansible testhost -m service -a "name=httpd state=started enable=yes"
+    #+END_EXAMPLE
+    说明: name后是服务名; state是服务的状态:运行,停止,重启,重载配置; enable决定是否开机启动;
+* Ansible文档的使用
+  - 列出所有的模块 =ansible-doc -l=
+  - 查看指定模块的文档 =ansible-doc cron=
+* playbook的使用
+** 介绍
+   相当于把模块写入到配置文件中, 便于大规模部署,复杂配置;
+** 初试
+   - =vim /etc/ansible/test.yml=
+     #+BEGIN_EXAMPLE
+     ---
+     - hosts: 192.168.0.248
+       remote_user: root
+       tasks:
+         - name: test_playbook
+           shell: touch /tmp/lishiming.txt
+     #+END_EXAMPLE
+** 循环
+   #+BEGIN_EXAMPLE
+   ---
+   -  hosts: testhost
+      user: root
+      tasks:
+        - name: change mod for file
+          file: path=/tmp/{{ item }} mode=600 owner=root group=root
+          with_items:
+            - 1.txt
+            - 2.txt
+   #+END_EXAMPLE
+   说明: 目前只能说是固定写法, 用来修改客户端上的1.txt和2.txt的属性, 如果客户端是不存在对应文件, 将会报错;
+** 条件判断
+   #+BEGIN_EXAMPLE
+   ---
+   - hosts: testhost
+     user: root
+     gather_facts: True
+     tasks:
+       - name: use when
+         shell: touch /tmp/when.txt
+         when: facter_ipaddress == "192.168.0.248"
+   #+END_EXAMPLE
+   说明: 只有当facter_ipaddress为192.168.0.248, 才会在客户端下创建/tmp/when.txt
+** handlers
+   #+BEGIN_EXAMPLE
+   ---
+   - hosts: 192.168.0.248
+     remote_user: root
+     tasks:
+       - name: test_copy
+         copy: src=/etc/passwd dest=/tmp/aaa.txt
+         notify: test handlers
+     handlers:
+       - name: test handlers
+         shell: echo "11111" >> /tmp/aaa.txt
+   #+END_EXAMPLE
+   说明: 当待拷贝文件与客户端上一样时, 就不会再次拷贝, 也就是false, 就不会执行下面的test handlers;
+* 实战安装nginx
+  思路: 先在一台机器上编译安装好nginx、打包, 然后再用ansible分发下去
+  - 进入ansible配置文件目录 =vim /etc/ansible=
+  - 创建一个nginx_install的目录, 方便管理 =mkdir nginx_install; cd nginx_install=
+  - =mkdir -p roles/{common,install}/{handles,files,meta,tasks,templates,vars}=
+    #+BEGIN_EXAMPLE
+    说明: roles目录下有两个角色:
+        common 为一些准备操作;
+        install为安装nginx操作. 每个角色下面又有几个目录:
+            handlers下面是当发生改变时要执行的操作, 通常用在配置文件发生改变,重启服务;
+            files为安装时用到的一些文件;
+            meta为说明信息, 说明角色依赖等信息;
+            tasks里面是核心的配置文件;
+            templates通常存一些配置文件, 启动脚本等模板文件;
+            vars下为定义的变量;
+    #+END_EXAMPLE
+  - 在common下tasks目录内创建main.yml =vim /etc/ansible/nginx_install/roles/common/tasks/main.yml=
+    #+BEGIN_EXAMPLE
+    - name: Install initialization require software
+      yum: name={{ item }} state=installed
+      with_items:
+        - zlib-devel
+        - pcre-devel
+        - openssl-devel
+    #+END_EXAMPLE
+    说明: common目录下的tasks内的任务主要是为了做安装nginx的前期准备; 该main.yml是配置文件中的入口文件, 其功能安装nginx的依赖文件zlib-devel, pcre-devel, openssl-devel;
+  - 在install下tasks目录内创建copy.yml =vim /etc/ansible/nginx_install/roles/install/tasks/copy.yml=
+    #+BEGIN_EXAMPLE
+    - name: Copy Nginx Software
+      copy: src=nginx.tar.gz dest=/tmp/nginx.tar.gz owner=root group=root
+    - name: Uncompression Nginx Software
+      shell: tar zxf /tmp/nginx.tar.gz -C /usr/local
+    - name: Copy Nginx Start Script
+      template: src=nginx dest=/etc/init.d/nginx owner=root group=root mode=0755
+    - name: Copy Nginx Config
+      template: src=nginx.conf dest={{ nginx_basedir }}/conf/ owner=root group=root mode=0644
+    #+END_EXAMPLE
+    说明: copy.yml的用处在配置文件可以看到很明白:
+    - 通过copy模块复制打包好的nginx压缩文件到客户端指定目录下/tmp/, 并指定其属主属组为root
+    - 通过shell模块将压缩文件解压到指定目录/user/local
+    - 通过template模块将templates目录下的nginx和nginx.conf文件复制到对应客户端目录下, nginx_basedir是一个预告定义好的变量, 其中vars目录下的main.yml
+  - 在install下tasks目录内创建install.yml =vim /etc/ansible/nginx_install/roles/install/tasks/install.yml=
+    #+BEGIN_EXAMPLE
+    - name: Create Nginx User
+      user: name={{ nginx_user }} state=present createhome=no shell=/sbin/nologin
+    - name: Start Nginx Service
+      service: name=nginx state=restarted
+    - name: Add Boot Start Nginx Service
+      shell: chkconfig --level 345 nginx on
+    - name: Delete Nginx Compression Files
+      shell: rm -rf /tmp/nginx.tar.gz
+    #+END_EXAMPLE
+    说明: 
+    - 在客户端下创建{{ nginx_user }}, 其值已在vars中定义
+    - 启动nginx服务
+    - 把nginx服务加入到开机启动项上去
+    - 删除打包文件
+  - 在install下定义入口文件 =vim /etc/ansible/nginx_install/roles/install/tasks/main.yml=
+    #+BEGIN_EXAMPLE
+    - include: copy.yml
+    - include: install.yml
+    #+END_EXAMPLE
+    说明: 配置tasks目录的入口文件;
+  - 配置整个安装环境的入口文件 =vim /etc/ansible/nginx_install/install.yml=
+    #+BEGIN_EXAMPLE
+    - hosts: 192.168.0.248
+      remote_user: root
+      gather_facts: True
+      roles:
+        - common
+        - install
+    #+END_EXAMPLE

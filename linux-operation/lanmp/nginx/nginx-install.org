@@ -1,0 +1,51 @@
+#+TITLE: Nginx安装与配置
+
+* 安装
+  - 下载源码包 =wget http://nginx.org/download/nginx-1.10.3.tar.gz=
+  - 解压到/usr/local/src下 =tar zxvf nginx-1.10.3.tar.gz -C /usr/local/src=
+  - 配置编译参数
+    #+BEGIN_EXAMPLE
+    ./configure \
+    --prefix=/usr/local/nginx-1.10.3 \
+    --with-pcre \
+    --user=www \
+    --group=www \
+    --with-http_ssl_module \
+    --with-http_realip_module \
+    --with-http_addition_module \
+    --with-http_gunzip_module \
+    --with-http_gzip_static_module \
+    --with-http_auth_request_module \
+    --with-http_secure_link_module
+    #+END_EXAMPLE
+    - nginx源码安装依赖gcc进行编译 =yum install -y gcc=
+    - nginx的rewrite模块和HTTP核心模块要用到PCRE正则表达式语法 
+      #+BEGIN_EXAMPLE
+      yum install -y pcre pcre-devel
+      第一个安装包提供编译版本的库;
+      第二个安装包提供开发阶段的头文件和编译项目的源代码
+      #+END_EXAMPLE
+    - nginx各种模块中需要使用gzip压缩
+      #+BEGIN_EXAMPLE
+      yum install -y zlib zlib-devel
+      zlib库提供了开发人员的压缩算法
+      #+END_EXAMPLE
+    - 如果服务器提供安全网页时则会用到OpenSSL库
+      #+BEGIN_EXAMPLE
+      yum install -y openssl openssl-devel
+      #+END_EXAMPLE
+  - 到这里就可以启动nginx服务器了, 算是最简单的版本 =nginx start=
+    
+* 配置
+* 如何平滑升级
+  在许多情况下, 需要替代Nginx二进制文件, 例如, 在编译一个新版本, 希望将它用于生产环境中, 或者只想启用一个新的模块, 而重新编译程序. 在这种情况下, 大多数管理员都会停止服务器, 复制新的二进制以覆盖旧的二进制文件, 然后再重新启动Nginx. 然而在这种情况下没有考虑到一个问题, 在大多数网站, 会有一些情况, 服务的正常运行时间至关重要, 为避免丢失连接而不惜任何代价. 幸运的是, Nginx做到了这一点, Nginx嵌入了一种机制, 允许你切换二进制而不中断正常运行时间---实现0%的请求丢失
+  #+BEGIN_EXAMPLE
+  1.   用新的Nginx二进制替代旧的Nginx二进制(/usr/local/nginx/sbin/nginx);
+  2.   找到Nginx的master进程的pid, 例如, 通过使用 ps x|grep nginx|grep master 或查找pid文件内的值;
+  3.   给master进程发送一个USR2(12)信号---kill -USR2 *** , ***替换为第2步中找到的pid. 这将开始升级, 对旧的.pid文件重命名, 运行新的二进制文件;
+  4.   发送一个WINCH(28)信号到旧的master进程---kill -WINCH *** , *** 替换为第2步中找到的pid, 这将使旧的worker进程平滑关闭;
+  4.   确定所有旧的worker进程已终止, 然后再给旧的master进程发送QUIT信号---kill -QUIT *** , *** 替换为第2步中找到的pid;
+  #+END_EXAMPLE
+* Nginx压力测试 [[http://lcycenter.iteye.com/blog/1097645][Httperf
+]]
+

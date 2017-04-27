@@ -1,0 +1,79 @@
+#+TITLE:  使用kickstart无从值守自动安装centos
+
+* 1. 启动服务器上的操作
+  - dhcp服务器的安装
+    - =yum install -y dhcp=
+    - 安装dhcp服务器主要是用来给局域网内待安装机器分配IP地址的
+    - 编辑dhcp的配置文件 =vim /etc/dhcp/dhcpd.conf=
+      #+BEGIN_EXAMPLE
+      # DHCP Server Configuration file.
+      #   see /usr/share/doc/dhcp*/dhcpd.conf.example
+      #   see dhcpd.conf(5) man page
+      ddns-update-style none;
+      ignore client-updates;
+
+      allow booting;
+      allow bootp;
+
+      default-lease-time 21600;
+      max-lease-time 43200;
+
+      next-server 192.168.5.251; # TFTP server的IP地址;
+      filename "pxelinux.0"; #pxelinux启动文件位置;
+
+      subnet 192.168.5.0 netmask 255.255.255.0 {
+        range dynamic-bootp 192.168.5.200 192.168.5.253;
+
+      }
+      #+END_EXAMPLE
+    - 启动dhcp服务器 =systemctl start dhcpd=
+  - TFTP服务器的安装
+    - =yum install -y tftp-server=
+    - 编辑配置文件 =vim /etc/xinetd.d/tftp=
+      #+BEGIN_EXAMPLE
+      service tftp
+      {
+        socket_type             = dgram
+        protocol                = udp
+        wait                    = yes
+        user                    = root
+        server                  = /usr/sbin/in.tftpd
+        # 这里指定TFTP服务器根目录, 默认路径为/var/lib/tftpboot,
+        # 修改后, 记得使用ps aux|grep tftp, 查看是否仍然指向默认目录, 我遇到过;
+        server_args             = -s /tftpboot 
+        disable                 = no # 原本这是是yes, 所以改成no即可;
+        per_source              = 11
+        cps                     = 100 2
+        flags                   = IPv4
+      }
+      #+END_EXAMPLE
+    - 启动TFTP服务器 =systemctl start tftp=
+
+      在centos7中, s可以直接以套接字文件启动 =systemctl start tftp.socket=;
+      
+      如果要停掉TFTP服务, 就要停止套接字文件 =systemctl stop tftp.socket=;
+    - 复制文件到TFTP服务器根目录下
+      - *vmlinux* 可以从系统盘中复制;
+      - *initrd.img* 同上;
+      - *pxelinux.0* 可以通过安装syslinux包获取; yum安装后可以在/usr/share/syslinux下找到
+      - 新建pxelinux.cfg目录, 并复制安装光盘中isolinux.cfg到目录中, 记为default
+	#+BEGIN_EXAMPLE
+	default ks
+	label ks
+	kernel vmlinuz
+	append initrd=initrd.img ksdevice=eth0 ks=nfs:10.10.10.1:/tftpboot/ks.cfg
+	#+END_EXAMPLE
+	注：ksdevice=eth0 这一句可以指定由哪一个网卡安装，对于多网卡的机器用;
+
+	ks项指定安装服务器上的ks文件的位置;
+
+* 2. 安装服务器上的操作
+  - NFS的安装
+    - =yum install nfs-utils=
+    - 编辑 =vim /etc/exports=
+      #+BEGIN_EXAMPLE
+      # 指定安装介质和ks配置文件所在位置
+      /instsvr *(rw,sync)
+      #+END_EXAMPLE
+
+* 3. 局域网内待安装机器的操作

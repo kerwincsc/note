@@ -1,0 +1,90 @@
+#+TITLE: nginx启动脚本
+
+#+BEGIN_EXAMPLE
+#! /bin/bash
+# Author: Ryan Norbauer http://norbauerinc.com
+# Modified: Geoffrey Grosenbach http://topfunky.com
+set -e
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DESC="nginx daemon"
+NAME=nginx
+DAEMON=/usr/local/nginx/sbin/$NAME
+SCRIPTNAME=/etc/init.d/$NAME
+
+# If the daemon file is not found, terminate the script.
+test -x $DAEMON || exit 0
+
+d_start(){
+    $DAEMON || echo -n "already running"
+}
+
+d_stop(){
+    $DAEMON -s quit || echo -n "not running"
+}
+
+d_reload(){
+    $DAEMON -s reload || echo -n "could not reload"
+}
+
+case "$1" in
+start)
+    echo -n "Starting $DESC: $NAME"
+    d_start
+    echo "."
+;;
+stop)
+    echo -n "Stoping $DESC: $NAME"
+    d_stop
+    echo "."
+;;
+reload)
+    echo -n "Reloading $DESC configuration..."
+    d_reload
+    echo "reloaded."
+;;
+restart)
+    echo -n "Restarting $DESC: $NAME"
+    d_stop
+    # Sleep for two seconds before starting again, this should give the
+    # Nginx daemon some time to perform a graceful stop.
+    sleep 2
+    d_start
+    echo "."
+;;
+*)
+    echo "Usage: $SCRIPTNAME {start|stop|restart|reload}" >&2
+    exit 3
+esac
+#+END_EXAMPLE
+
+- 关于 =set -e= 的详解
+  摘自 [[http://blog.csdn.net/todd911/article/details/9954961][set -e解释]]
+Every script you write should include set -e at the top. This tells bash that it should exit the script if any statement returns a non-true return value. The benefit of using -e is that it prevents errors snowballing into serious issues when they could have been caught earlier. Again, for readability you may want to use set -o errexit.
+
+你写的每个脚本都应该在文件开头加上set -e,这句语句告诉bash如果任何语句的执行结果不是true则应该退出。这样的好处是防止错误像滚雪球般变大导致一个致命的错误，而这些错误本应该在之前就被处理掉。如果要增加可读性，可以使用set -o errexit，它的作用与set -e相同。
+
+Using -e gives you error checking for free. If you forget to check something, bash will do it for you. Unfortunately it means you can't check $? as bash will never get to the checking code if it isn't zero. There are other constructs you could use:
+
+使用-e帮助你检查错误。如果你忘记检查（执行语句的结果），bash会帮你执行。不幸的是，你将无法检查$?，因为如果执行的语句不是返回0，bash将无法执行到检查的代码。你可以使用其他的结构：
+#+BEGIN_EXAMPLE
+可选结构1
+command  
+if [ "$?"-ne 0]; then   
+    echo "command failed";   
+    exit 1;   
+fi   
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+可选结构2
+command || { echo "command failed"; exit 1; } 
+#+END_EXAMPLE
+#+BEGIN_EXAMPLE
+可选结构3
+if ! command; then  
+     echo "command failed";   
+    exit 1;   
+fi
+#+END_EXAMPLE
+
+来自<学习Nginx HTTP Server>

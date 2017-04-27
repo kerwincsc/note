@@ -1,0 +1,184 @@
+#+TITLE: Puppet安装与配置
+
+* 准备工作
+  - 因为puppet是C/S架构, 所以在测试时, 我们需要准备一台服务器, 至少一台客户端
+    | 主机  | hostname |        IPADDR |
+    |-------+----------+---------------|
+    | host1 | server   | 192.168.0.251 |
+    | host2 | client   | 192.168.0.248 |
+
+    - 两个机器关闭selinux, 清空iptables规则, 并保存, 设置hostname
+
+    - 在hosts文件中, 写入双方的IP地址和对应的网址
+
+    - 两台机器安装ntpdate, 并建立自动同步时间的任务计划, 为了让server和client时间统一
+
+      - 安装ntp服务 =yum install -y ntp=
+
+      - 进入任务计划表 =crontab -e=
+	#+BEGIN_EXAMPLE
+	*/10 * * * * ntpdate time.windows.com >/dev/null 2>&1
+	#+END_EXAMPLE
+      - 时间同步有好多方法, 这里再提供另一种方法 =yum install -y chrony=
+	#+BEGIN_EXAMPLE
+	vim /etc/chrony.conf
+	将server段改成如下即可, 这里的IP都是ntp服务器的地址, 其他保持默认即可;
+	server 58.220.207.226 iburst
+	server 202.112.29.82 iburst
+	server 202.108.6.95 iburst
+	server 120.25.108.11 iburst
+	#+END_EXAMPLE
+* 安装puppet
+** 服务端
+  - 下载安装相应版本的含有puppet软件包的源
+    #+BEGIN_EXAMPLE
+    rpm -ivh "http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm"
+    #+END_EXAMPLE
+  - 安装服务端程序 =yum install -y puppet-server=
+  - 启动服务端程序 =service puppetmaster start= 或 =/etc/init.d/puppetmaster start=
+    - 加入开机自启 =chkconfig puppetmaster on=
+** 客户端
+  - 安装含有puppet软件包的源
+    #+BEGIN_EXAMPLE
+    rpm -ivh "http://yum.puppetlabs.com/el/6/products/x86_64/puppetlabs-release-6-7.noarch.rpm"
+    #+END_EXAMPLE
+  - 安装客户端程序 =yum install -y puppet=
+  - 修改配置文件, 加agent块后加入以下内容
+    #+BEGIN_EXAMPLE
+    # 启用监听
+    listen = true
+    # puppet服务器的地址
+    server = server.kerwin.com
+    # 主动更新, 每隔30s
+    runinterval = 30
+    #+END_EXAMPLE
+  - 启动客户端程序 =service puppet start= 或 =/etc/init.d/puppet start=
+* 证书签名认证
+** 配置认证
+   - 服务端查看客户端证书列表 =puppet cert list -all=
+
+     如果证书已签发, 会在本行最前面带一个 *+* ;
+     - 服务端查看未签名的客户端 =puppet cert list=
+   - 在服务端申请一个待签名的客户端证书记录 =puppet agent --test --server server.kerwin.com=
+   - 在服务端给指定客户端签名 =puppet cert --sign client.kerwin.com=
+   - 服务端删除指定客户端证书 =puppet cert --clean client.kerwin.com=
+
+     证书删除后, 要想再次申请, 就要将客户端的ssl文件夹下的所有内容删除, 然后重启服务端
+
+     - 删除所有证书 =puppet cert --clean --all=
+     - 未签名的证书也可以删除, 但是得指定主机名 =puppet cert --clean hostname=
+
+*** 配置步骤
+    1. 在服务端查看已有的证书, 获取待签名的证书名
+    2. 签名 =puppet cert --sign <sign-name>=
+** 配置自动签名
+   - 服务端删除客户端证书 =puppet cert --clean -all=
+     - 没有签名的也要删除, 保证 =puppet cert --list -all= 没有任何证书
+   - 客户端删除ssl相关文件 =rm -rf /var/lib/puppet/ssl/*=
+   - 服务端创建自动签发的配置文件 =vim /etc/puppet/autosign.conf= 加入如下内容:
+     #+BEGIN_EXAMPLE
+     *.kerwin.com
+     #+END_EXAMPLE
+   - 服务端主配置文件 *puppet.conf* 中的main块里写入如下内容:
+     #+BEGIN_EXAMPLE
+     autosign = true
+     #+END_EXAMPLE
+   - 服务端重启puppetmaster服务 =/etc/init.d/puppetmaster restart=
+   - 客户端重启puppet服务 =/etc/init.d/puppet restart=
+   - 如果客户端不重启puppet服务, 也可以通过命令来自动签发
+     #+BEGIN_EXAMPLE
+     puppet agent --test --server server-name
+     #+END_EXAMPLE
+** 测试证书
+   - 在服务端编辑配置文件 =vim /etc/puppet/manifests/site.pp= 并添加如下内容:
+     #+BEGIN_EXAMPLE
+     node default {
+         file {"/tmp/123.txt":
+             content=>"test,test";
+         }
+     }
+     #+END_EXAMPLE
+     说明: 如果不配置该文件, 则客户端不会同步任何数据;
+   - 客户端上稍等一会(根据配置, 每隔30s会自动执行服务端上的任务), 或者直接命令行 =puppet agent --test --server server.kerwin.com= 这样, 在客户端的/tmp/下会有个123.txt文件, 内容为test,test
+* 配置模块
+  模块是puppet的配置单元, 模块里面会包含 _类_ 和 _资源_ . 同步文件、远程执行命令、cron等叫做资源, 都是通过模块来实现的.
+  - 配置定义模块
+    - 在服务端创建testmodule目录 =mkdir /etc/puppet/modules/testmodule=
+
+      这个目录名可以是模块名字, 然后继续创建模块对应的子目录;
+    - 在testmodule目录下建立子目录 =mkdir {files,manifests,templates}=
+
+      file里面存文件, 可以留空, manifests里面是配置文件, templates里面是模块文件, 可以为空
+    - 在files/下新建待测试的文件test.txt, 随便写点东西
+    - 在manifests/新建初始入口配置文件 =vim init.pp=
+      #+BEGIN_EXAMPLE
+      class testmodule{
+          file {"/tmp/2.txt":
+              owner => "root",
+              group => "root",
+              mode => 0400,
+              source =>"puppet://$puppetserver/modules/testmodule/test.txt"
+          }
+      }
+      #+END_EXAMPLE
+      说明: 类名字为testmodule, 类下面定义了一个资源file, 文件名字叫做/tmp/2.txt, owner, group, mode定义文件的属主、属组以及权限, source定义了这个文件从哪里获取. $puppetserver一会儿也要定义一下, 这里指的是puppet server服务器上/etc/puppet/modules/testmodule/files/1.txt
+    - 编辑/etc/puppet/manifests/site.pp文件
+      #+BEGIN_EXAMPLE
+      $puppetserver='server.kerwin.com'
+      node "master-centos6" {
+          include testm
+      }
+      #+END_EXAMPLE
+      说明: $puppetserver定义服务端的主机名, node后面为客户端的主机名, 这里面定义该客户端要加载的模块;
+
+      node后面跟随的内容, 可以使用 =puppet cert --list -all= 来查看
+    - 配置完成后, 在客户端执行命令
+      #+BEGIN_EXAMPLE
+      puppet agetn --test --server=server.kerwin.com
+      #+END_EXAMPLE
+      说明: 如果客户端上启动了puppet服务, 不用执行这命令, 它也会自动同步
+* 文件或目录资源
+  上面的模块其实只是同步了一个文件而已, 那么要想同步一个目录如何做?我们可以通过实现同步一个目录来做一个包发布系统. 比如在一台机器上编译安装好了apache, 那么就可以通过这样的模块来把这个apache目录整个分发到其他机器上.
+
+  模块配置文件如下:
+  #+BEGIN_EXAMPLE
+  class apache {
+      file {"/usr/local/apache2":
+          owner => "root",
+          group => "root",
+          source => "puppet://$puppetserver/modules/apache/apache2",
+          recurse => true,
+          purge => true
+
+      }
+  }
+  #+END_EXAMPLE
+  说明: =recurse=>true= 这个参数很关键, 它表示递归的意思, 没有这个不能同步目录. purge参数可以保证当服务端删除某个文件, 客户端可以跟着删除
+* 远程执行命令---命令资源
+  #+BEGIN_EXAMPLE
+  exec {
+      "123":
+      unless => "test -f /tmp/aminglinux.txt",
+      path => ["/bin", "/sbin", "/usr/bin", "/usr/sbin"],
+      command => "touch /tmp/aminglinux.txt"
+  }
+  #+END_EXAMPLE
+  说明: *123* 只是作为该资源的一个名字, unless后面的命令作为一个条件, 当条件成立时, 不会执行下面的命令, 如果想要条件成立时, 执行下面的命令, 用onlyif. 要注意的是, 我们一定要给执行的命令加个条件, 使用unless就可以, 必须满足这个条件才能执行命令, 否则这个命令会一直执行, 不太妥当;
+
+  path后面跟的是要执行的命令的路径, 意思和linux下的PATH是相同的, 当command行中的命令执行时, 会在path下查找命令名, 如果存在, 就执行;
+  
+* 任务计划---另一种资源
+  #+BEGIN_EXAMPLE
+  cron {
+      "kerwin":
+      command => "/sbin/ntpdate time.windows.com",
+      user => "root",
+      minute => "*/10",
+      #ensure => "absent"
+  }
+  #+END_EXAMPLE
+  说明:
+  
+  分时日月周分别对应puppet里面的minute, hour, monthday, month, weekday;
+
+  ensure设置为absent, 为删除该任务, 如果不设置该行, 则为建立;

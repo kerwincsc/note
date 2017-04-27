@@ -1,0 +1,93 @@
+#+TITLE: rpm工具介绍
+
+* 简介
+  - rpm包管理系统主要有以下3个组件:
+    - RPM本地数据库
+      #+BEGIN_EXAMPLE
+      所有的RPM本地数据库都存放在/var/lib/rpm目录中;
+      所谓的数据库就是一些存有数据的逻辑上相关的文件;
+      #+END_EXAMPLE
+    - rpm命令本身
+    - rpm的软件包文件
+      #+BEGIN_EXAMPLE
+      rpm的文件名分为5个部分, 命名方式如下:
+      name-version-release.architectures.rpm
+      第一部分是name, 表示这个rpm软件名的名称;
+      第二部分是version, 表示这个rpm包的版本编号;
+      第三部分是release, 表示这个rpm包的版本发布次数(修正号码);
+      第四部分是architectures, 表示这个rpm包适用于哪些IT平台;
+      最后一部分是rpm, 表示这个rpm包的文件扩展名;
+      #+END_EXAMPLE
+* 常见用法
+  - 安装软件 =rpm -i,--install=
+  - 升级旧版本的软件 =rpm -U,--upgrade=
+  - 刷新/更新旧版本的软件 =rpm -F,--freshen=
+  - 移除/删除软件 =rpm -e,--erase=
+    #+BEGIN_EXAMPLE
+    通常在使用以上安装参数时, 都会配合使用-v和-h的参数以显示安装的进度;
+    其中v是verbose的第1个字母, 使用-v参数提供更详细的输出, 而h是hash的第一个字母, 使用-h参数将按安装进度列出hash符号即#;
+    一般-v和-h同时使用, 这样安装时就可以看到安装进度;
+    #+END_EXAMPLE
+    |                    | 没有旧版本 | 有旧版本                             | 适用范围                                 |
+    |--------------------+------------+--------------------------------------+------------------------------------------|
+    | rpm -i, --install  | 安装       | 安装新版本并保留旧版本               | 升级内核                                 |
+    | rpm -U,  --upgrade | 安装       | 删除旧版本, 之后安装新版本(软件升级) | 应用程序(一些应用程序只允许保留一个版本) |
+    | rpm -F, --freshen  | 不安装     | 删除旧版本, 之后安装新版本(软件升级) | 升级目前的系统                                  |
+
+  - 查询RPM软件包中的信息
+    - 查询已安装的包
+      - =rpm -qa= :: 可以显示目前操作系统上安装的全部软件包, 其中q是query, a是all;
+
+      - =rpm -qf filename= :: 显示这个文件是由哪个软件包安装的, f是file;
+
+      - =rpm -qi packagename= :: 显示这个软件包的信息, i是information;
+
+      - =rpm -ql packagename= :: 列出这个软件包中所包含的全部文件, l是list;
+
+    - 查询未安装的包
+      - =rpm -qip packagename= :: 显示这个软件包的相关信息, p是package;
+
+      - =rpm -qlq packagename= :: 列出这个软件包所包含的全部文件, l是list;
+
+  - 验证RPM软件包是否被修改过
+    - =rpm -Va= :: 将所有已经安装的rpm软件包与RPM数据库进行比较来验证安装后的文件是否修改过, V是Verify;
+
+    - =rpm -V packagename= :: 验证指定软件包安装后的文件是否被修改过;
+
+    - =rpm -Vp packagename= :: 将已经安装的rpm软件包与"packagename"所指定的软件包进行比较来验证安装后的文件有哪些被修改过;
+
+  #+BEGIN_EXAMPLE
+  [root@centos64 ~]# rpm -Va
+  .......T.  c /etc/bashrc
+  S.5....T.  c /etc/dhcp/dhcpd.conf
+  ....L....  c /etc/pam.d/system-auth
+  #+END_EXAMPLE
+  下面是对每一个字符所表示的具体含义给出进一步解释:
+  #+BEGIN_EXAMPLE
+  S:   表示软件包的大小与安装时的不同, 也就是说这个文件的大小被更改过, S是Size;
+  M:   表示软件包的文件类型, 也就是文件的权限或类型被修改过, 与当初安装时的不同, M是Mode;
+  5:   表示文件的MD5值与当初安装时的不同, MD5的值是用来检测文件是否有问题;
+  D:   表示设备的主设备号或者从设备号被修改过了, D是Device;
+  L:   表示文件的连接路径被修改过, L是Link;
+  U:   表示文件的拥有者被修改过, U是User;
+  G:   表示文件的拥有群组被修改过, G是Group;
+  T:   表示文件的mTime, 也就是文件的修改时间被修改过, T是Time;
+  C:   表示selinux环境被修改过, C是Context;
+  #+END_EXAMPLE
+
+* rpm2cpio工具
+  - 因为普通用户无权在Linux系统上使用rpm命令安装RPM软件包;
+  - rpm2cpio将rpm类型文件转为cpio类型的文件, 这样普通用户就可以安装软件包;
+  - 使用方法
+    - 将rpm包转换成cpio
+    #+BEGIN_EXAMPLE
+    rpm2pcio sysstat-5.0.5-11.rhel4.i386.rpm>~/pack/sysstat.cpio
+    #+END_EXAMPLE
+    - 查看包内所有文件
+      #+BEGIN_EXAMPLE
+      cpio -it < sysstat.cpio
+      #+END_EXAMPLE
+    - 解开文件到当前目录
+      #+BEGIN_EXAMPLE
+      cpio -id< sysstat.cpio
+      #+END_EXAMPLE

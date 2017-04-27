@@ -19,6 +19,8 @@
   
 *** 文件测试运算符
     文件测试运算符用于检测 Unix 文件的各种属性
+    #+CAPTION: 操作符说明
+    #+NAME: 这里是元字符NAME
     [[./image/file-test-operator.png]]
 ** if条件判断
 

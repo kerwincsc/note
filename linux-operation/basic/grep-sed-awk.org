@@ -1,0 +1,305 @@
+#+TITLE: grep sed awk
+
+* sed
+** 基本操作命令
+   - *p* (打印相关行) 需要与 *-n* 一直使用
+
+     - 打印指定行号的行
+
+       #+BEGIN_EXAMPLE
+       sed -n '10p' file.txt
+       sed -n '10,20p' file.txt
+       #+END_EXAMPLE
+     - 打印正则匹配的行
+
+       #+BEGIN_EXAMPLE
+       sed -n '/root/p' file.txt
+       sed -n '/root/,/shift/p' file.txt
+       sed -n '/root/,10p' file.txt
+       sed -n '2,/mysql/p' file.txt
+       sed -n '1,100{/abc/p}' file.txt
+       #+END_EXAMPLE
+       打印正则匹配范围的行比较特殊:
+
+       - '正则,行号'   :
+	  
+	  正则匹配到的行号小于右边的行号, 则打印匹配到的行到指定行号的行;
+
+	  正则匹配到的行号大于右边的行号, 则仅打印正则匹配的行;
+
+       - '行号,正则'   :
+
+	  正则匹配到的行号小于右边的行号, 则打印匹配到的行到指定行号的行;
+
+	  正则匹配到的行号大于右边的行号, 则打印匹配到行直到文件的行尾;
+      
+        - '正则1,正则2'   :
+
+	  正则1匹配到的行号小于正则2匹配到的行号, 则打印正则1到正则2之间的行;
+
+	  正则1匹配到的行号大于正则2匹配到的行号, 则打印正则1匹配的行到文件的行尾;	  
+     - 不打印指定行
+
+       #+BEGIN_EXAMPLE
+       sed -n '10!p' file.txt
+       sed -n '10,20!p' file.txt
+       #+END_EXAMPLE
+
+     - 间隔行
+
+       #+BEGIN_EXAMPLE
+       nl /etc/passwd | sed -n '2~2p'
+       #+END_EXAMPLE
+       说明: 从第2行开始, 每隔2行打印
+
+   - 行处理命令
+
+     - *a* / *i*   :   追加行/插入行
+
+       #+BEGIN_EXAMPLE
+       sed '3a test' file.txt
+       sed '3,5a test' file.txt
+       sed '3i test' file.txt
+       sed '3,5i test' file.txt
+       #+END_EXAMPLE
+       说明: 追加和插入的行处理命令, 会在每一行前/后插入字符串;
+
+     - *c*   :   替代行
+
+       #+BEGIN_EXAMPLE
+       sed '3c hahaha' file.txt
+       sed '3,5c hahaha' file.txt
+       #+END_EXAMPLE
+       说明: 替代行的处理命令, 会将指定行或指定范围行替代为指定字符串;
+
+     - *d*   :   删除行
+
+       #+BEGIN_EXAMPLE
+       sed '3d' file.txt
+       sed '3,5d' file.txt
+       #+END_EXAMPLE
+       说明: 删除行的处理命令, 会将指定行或指定范围的行删除;
+
+     - 案例
+
+       - 优化服务器配置
+
+	 在ssh的配置文件加入相应文件:
+	 #+BEGIN_EXAMPLE
+	 Port 52113
+	 PermitRootLogin no
+	 PermitEmptyPasswords no
+	 #+END_EXAMPLE
+	 #+BEGIN_SRC 
+	 # sed '$a \    Port 52113\n    PermitRootLogin no\n    PermitEmptyPasswords no'
+	 #+END_SRC
+	 说明: *\* 是转义空格, 表示其后的空格生效, 便于格式化文本
+
+       - 文本处理 : 删除空行
+
+	 #+BEGIN_SRC 
+	 sed /^$d/ file.txt
+	 #+END_SRC
+
+       - 服务器日志处理 : 服务器log中找出error报错
+
+	 #+BEGIN_SRC 
+	 sed -n '/Error/p' access.log
+	 #+END_SRC
+   - *s* (替换命令) : 分隔符/,#等; 这是sed的核心功能;
+
+     #+BEGIN_EXAMPLE
+     sed 's/root/boot/' file.txt
+     #+END_EXAMPLE
+     说明: 只替换第一次匹配到的
+
+     - *g* (全局) : 替换标志
+
+       #+BEGIN_EXAMPLE
+       sed 's/root/boot/g' file.txt
+       #+END_EXAMPLE
+       说明: 替换所有匹配到的字符
+
+     - 案例 : 数据筛选 "获取eth0的ip"
+
+       #+BEGIN_EXAMPLE
+       ifconfig eth0 | sed -n '/inet/p' | sed 's/in.*r://' | sed 's/Br.*//'
+       #+END_EXAMPLE
+
+** 高级操作命令
+   - *{}* : 多个sed命令, 用 ; 分开
+   - *n* : 读取下一个输入行(用下一个命令处理)
+     - 打印奇数行
+       #+BEGIN_EXAMPLE
+       nl /etc/passwd | sed -n '{p;n}'
+       #+END_EXAMPLE
+     - 打印偶数行
+       #+BEGIN_EXAMPLE
+       nl /etc/passwd | sed -n '{n;p}'
+       #+END_EXAMPLE
+       说明: 打印奇数行和偶数行
+   - *&* : 代替固定的字符串, 简化了替换过程
+     #+BEGIN_EXAMPLE
+     sed 's/root/root123/' file.txt
+     sed 's/root/&123/' file.txt
+     #+END_EXAMPLE
+     说明: 两个表达式等价
+     - 案例 : 大小写转换 : 将用户名的首字母转换为大写/小写
+       #+BEGIN_EXAMPLE
+       sed 's/^[a-Z_-]\+/\u&/' file.txt
+       #+END_EXAMPLE
+   - *()*
+     - 案例 : 数据筛选 : 获取passwd中USER、UID和GID
+       #+BEGIN_EXAMPLE
+       获取到USER
+       sed 's/\(^[a-Z_-]\+\)://' passwd
+       获取到USER, UID
+       cat passwd | sed 's/\(^[a-Z_-]\+\):x:\([0-9]\+\).*/\1    \2/'
+       获取到USER, UID和GID
+       cat passwd | sed 's/\(^[a-Z_-]\+\):x:\([0-9]\+\):\([0-9]\+\).*/\1    \2     \3/'
+       #+END_EXAMPLE
+       说明: =\1= 获取第一个圆括号内的匹配结果
+     - 案例: 获取eth0的网上ip
+       #+BEGIN_EXAMPLE
+       ifconfig eth0|sed -n '/inet /p'|sed 's/ine.*r:\([0-9.]\+\) .*$/\1/'
+       #+END_EXAMPLE
+   - *r* : 复制指定文件并插入到匹配行
+     #+BEGIN_EXAMPLE
+     sed '1r abc.txt' 123.txt
+     #+END_EXAMPLE
+     说明: 读取abc.txt文件,并插入到123.txt文件的第一行后, 如果不指定插入行, 则在每一行后均插入; 不会改变文件内容;
+   - *w* : 复制匹配行并拷贝到指定文件里
+     #+BEGIN_EXAMPLE
+     sed 'w abc.txt' 123.txt
+     sed '1w abc.txt' 123.txt
+     #+END_EXAMPLE
+     说明: 第一种情况是将123.txt的内容完全写入abc.txt文件内, 文件内容发生改变; 第二种情况是将123.txt文件内第一行的内容写入abc.txt, 文件内容也发生变化; 这两种操作均会让abc.txt文件发生变化;
+   - *q* : 退出sed
+     #+BEGIN_EXAMPLE
+     nl passwd | sed '10q'
+     打印到第10行就退出sed
+     nl passwd | sed '/root/q'
+     匹配到第一个root就退出sed
+     #+END_EXAMPLE
+* awk
+** awk处理方式
+   - awk 一次处理一行内容
+   - awk 对每行可以切片处理
+** awk内置参数应用
+   - *$0* : 表示整个当前行
+   - *$1* *$2* : 分别表示每行第一个字段，第二个字段
+   - *-F* : 分隔符, 默认为空格
+   - *NR* : 每行的行号
+   - *NF* : 每行的字段数, 和$连用，直接打印每行的末列；
+   - *FILENAME* : 正在处理的文件名
+   - 案例
+     - 显示/etc/passwd每行的行号, 每行的列数, 对应行的用户名(分别使用print,printf打印出来)
+       #+BEGIN_EXAMPLE
+       awk -F ':' '{print "Line:"NR"\tCol:"NF"\tUSER:"$1}' passwd
+       awk -F ':' '{printf("Line:%4s Col:%s USER:%s\n", NR, NF, $1)}' passwd
+       #+END_EXAMPLE
+     - 显示/etc/passwd中用户ID大于100的行号和用户名(if...else...)
+       #+BEGIN_EXAMPLE
+       awk -F ':' '{if ($3>100) print NR"\tUSER:"$1}' passwd 
+       #+END_EXAMPLE
+     - 在服务器log中找出'Error'的发生日期
+       #+BEGIN_EXAMPLE
+       sed -n '/Error/p' passwd | awk '{print $1}'
+       awk  '/Error/{print $1}' passwd
+       #+END_EXAMPLE
+     - 把文件每隔三行合并成一行
+       #+BEGIN_EXAMPLE
+       1
+       2
+       3
+       a
+       b
+       c
+       awk '{if (NR%3!=0)ORS=" ";else ORS="\n"}1' file
+       #+END_EXAMPLE
+       说明: 每3行进行合并, 并且以空格作为分隔符;
+** 逻辑判断式
+   - 匹配正则表达式 *~* *!~*
+   - 判断逻辑表达式 *==* *!=* *<* *>*
+     #+BEGIN_EXAMPLE
+     awk -F ':' '$1~/^m.*/{print $1}' passwd
+     匹配第一个字段以m开关的行, 并打印第一个字段
+     awk -F ':' '$1!~/^m.*/{print $1}' passwd
+     不匹配第一个字段以m开关的行, 并打印第一个字段, 其实就对上面的结果取反
+     awk -F ':' '$3>100{print $1,$3}' passwd
+     awk -F ':' '$3<100{print $1,$3}' passwd
+     #+END_EXAMPLE
+** 扩展模式
+   - 格式 =BEGIN{print "start"}pattern{commands}END{print "end"}=
+
+     BEGIN段会在行处理前先行处理完成, 而END会在行处理结束后再处理; 一般可以在BEGIN段内进行一些变量的初始化工作;
+   - 案例
+     - 制表显示/etc/passwd每行的行号, 每行的列数, 对应行的用户名
+       #+BEGIN_EXAMPLE
+       awk -F ':' 'BEGIN{print "Line\tColumes\tUSER"}{print NR"\t"NF"\t"$1}' passwd 
+       #+END_EXAMPLE
+
+     - 统计当前目录下文件所占大小
+       #+BEGIN_EXAMPLE
+       ls -l | awk 'BEGIN{size=0}{size+=$5}END{print size}'
+       #+END_EXAMPLE
+
+     - 统计当前系统下的帐户总数
+       #+BEGIN_EXAMPLE
+       awk -F ':' 'BEGIN{count=0}$1!~/^$/{count++}END{print "count = " count}' passwd
+       #+END_EXAMPLE
+       说明： 需要去除passwd文件中可能存在的空行
+
+     - 统计显示UID大于100的用户名
+       #+BEGIN_EXAMPLE
+       awk -F ':' 'BEGIN{count=0}{if ($3>100) name[count++]=$1}END{for (i=0;i<count;i++) print i,name[i]}' passwd
+       #+END_EXAMPLE
+     - 统计netstat -anp状态下为LISTEN和CONNECTED的连接数量
+       #+BEGIN_EXAMPLE
+       netstat -anp | awk 'BEGIN{listen=0;connected=0}{if ($6=="LISTEN") listen++;if ($6=="CONNECTED") connected++}END{print "listen count = " listen "\nconnected count = "connected}'
+       netstat -anp|awk '$6~/CONNECTED|LISTEN/{sum[$6]++}END{for (i in sum) print i,sum[i]}'
+       #+END_EXAMPLE
+       说明: 第一行是我写的, 第二行是imooc上看到的, 第二行的实质是使用了字符串索引, 分别对CONNECTED和LISTEN进行统计, 最后遍历出来;
+** awk有和sed相似的替换功能
+   #+BEGIN_EXAMPLE
+   awk 'gsub(/www/,"abc")' /etc/passwd
+   把文件所有的www替换为abc
+   awk -F ':' 'gsub(/www/,"abc",$1){print $0}' /etc/passwd
+   替换$1中的www为abc
+   awk 'sub(/www/,"abc")' /etc/passwd
+   替换每一行第一次匹配到的www为abc
+   #+END_EXAMPLE
+* 正则表达式
+** 单字符
+   - =[abc]= 将匹配方括号内的任意一个字符
+   - =[^abc]= 将匹配除方括号内的任意一个字符
+** 字符组合
+   - 重复
+     - =*= 零次或多次匹配前面的字符或子表达式
+     - =+= 一次或多次匹配前面的字符或子表达式
+     - =?= 零次或一次匹配前面的字符或子表达式
+   - 重复特定次数 ={n:m}= n代表最小重复次数, m代表最大重复次数
+     | 重复字符 | 重复次数 |
+     |----------+----------|
+     | *        | {0,}     |
+     | +        | {1,}     |
+     | ?        | {0,1}    |
+   - 任意字符串的表示: =.*=
+
+     例如: ^r.* m.*c   注意与m..c的区别
+   - 逻辑的表示 *|*
+
+     例如: '/bin/\(false\|true\)'
+** 元字符(代表普通字符或者特殊字符)
+   - =\w= 匹配任何字类字符, 包括下划线 ([ A-Za-z0-9_])
+   - =\W= 匹配任何非字类字符 ([^ A-Za-z0-9_])
+   - =\b= 代表单词的分隔
+     #+BEGIN_EXAMPLE
+     [root@centos64-master python]# grep --color '\bx\b' /etc/passwd
+     root:x:0:0:root:/root:/bin/bash
+     bin:x:1:1:bin:/bin:/sbin/nologin
+     daemon:x:2:2:daemon:/sbin:/sbin/nologin
+     adm:x:3:4:adm:/var/adm:/sbin/nologin
+     #+END_EXAMPLE
+     正则表达式 *\bx\b* 将只匹配前后有分隔的x, 即只匹配代表密码的那一个字符
+   - =\u= =\l= =\U= =\L= 转换大小写字符, 其中u,l只转换首字母, U, L转换一串字符

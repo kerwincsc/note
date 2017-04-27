@@ -1,0 +1,11 @@
+#+TITLE: 构建高并发网站架构之最大并发数
+
+* 测试工具
+  - 专业工具 *loadrunner*
+  - apache自带工具 *ab*
+    #+BEGIN_EXAMPLE
+    ab -c 100 -n 1000 http://www.qq.com/index.php
+    #+END_EXAMPLE
+    [[http://www.ha97.com/4617.html][ApacheBench详解]]
+    测试结果中有两个指标相对重要 *Requests per second* 和 *Time per request*
+* 服务器配置预估

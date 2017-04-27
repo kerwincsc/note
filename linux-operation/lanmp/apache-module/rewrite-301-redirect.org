@@ -1,0 +1,12 @@
+#+TITLE:rewrite之域名301跳转即永久重定向
+* 域名301跳转即永久重定向
+#+BEGIN_EXAMPLE
+<VirtualHost *:80>
+    DocumentRoot "/data/www/host1"
+        <IfModule rewrite_module>
+            RewriteEngine on
+            RewriteCond {HTTP_HOST} ^www.test.com$ [NC]
+            RewriteRule ^/(.*)$ http://www.aaa.com/$1 [R=301,L]
+        </IfModule>
+</VirtualHost>
+#+END_EXAMPLE

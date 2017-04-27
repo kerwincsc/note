@@ -1,0 +1,34 @@
+#+TITLE: php安装与配置
+* php安装与配置
+** 安装
+   - 下载php5.5.38 =wget http://am1.php.net/distributions/php-5.5.38.tar.gz=
+   - 解压 =tar zxf php-5.5.38.tar.gz=
+   - 配置编译参数
+     #+BEGIN_EXAMPLE
+     ./configure \
+     --prefix=/usr/local/php \
+     --with-apxs2=/usr/local/apache2/bin/apxs \
+     --with-config-file-path=/usr/local/php/etc  \
+     --with-mysql=/usr/local/mysql \
+     --with-libxml-dir \
+     --with-gd \
+     --with-jpeg-dir \
+     --with-png-dir \
+     --with-freetype-dir \
+     --with-iconv-dir \
+     --with-zlib-dir \
+     --with-bz2 \
+     --with-openssl \
+     --with-mcrypt \
+     --enable-soap \
+     --enable-gd-native-ttf \
+     --enable-mbstring \
+     --enable-sockets \
+     --enable-exif \
+     --disable-ipv6
+     #+END_EXAMPLE
+     在这一步可能会碰到很多错误,一般都是缺少某个库文件,搜索可解决
+   - 编译安装 =make && make install=
+** 配置
+   - 拷贝配置文件 =cp php.ini-production /usr/local/php/etc/php.ini=
+** 常用操作与信息

@@ -1,0 +1,15 @@
+#+TITLE: 安装pip
+
+* windows下
+  - 下载pip包
+
+    打开 =https://pypi.python.org/pypi/pip#downloads= 下载pip的源码包pip-1.5.6.tar.gz
+
+  - 下载完成之后，解压到一个文件夹，用CMD控制台进入解压目录，输入
+    #+BEGIN_EXAMPLE
+    python setup.py install
+    #+END_EXAMPLE
+    安装好之后，我们直接在命令行输入pip，同样会显示‘pip’不是内部命令，也不是可运行的程序。因为我们还没有添加环境变量:
+    #+BEGIN_EXAMPLE
+    C:\Python34\Scripts;
+    #+END_EXAMPLE

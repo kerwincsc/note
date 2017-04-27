@@ -1,0 +1,22 @@
+#+TITLE: 构建高并发网站架构之量级术语
+
+* 什么是IP, UV, PV, DAU, MAU
+  - 访问网站的独立IP
+  - UV=UniqueVisitor网站独立访客
+  - PV=PageView页面浏览量
+  - DAU=Daily Active User日活跃用户数量
+  - MAU=monthly active users月活跃用户人数
+  - 用来衡量一个网站的大小级别
+    #+BEGIN_EXAMPLE
+    www.apelearn.com/bbs/ (1400IP, 1600UV, 7800PV)
+    bbs.miaolaoshi.com (5k IP, 5K UV, 4.2W PV)
+    www.55188.com (25w IP, 30w UV, 150w PV)
+    #+END_EXAMPLE
+* 并发连接数、吞吐量
+  - 并发连接数, 同时进来的连接数
+  - 吞吐量, 实际能够同时处理的连接数
+* 如何统计网站访问量
+  - 51.la
+  - CNZZ
+  - 百度系统
+  - 通过分析访问日志做统计 =awstat=

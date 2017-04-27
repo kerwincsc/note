@@ -1,0 +1,2 @@
+#+TITLE: 克隆虚拟机后克隆机无法上网的解决方法
+删除拷贝的虚拟机里文件/etc/udev/rules.d/70-persistent-net.rules，重新启动虚拟机即可。

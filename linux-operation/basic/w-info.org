@@ -1,0 +1,59 @@
+#+TITLE: w工具介绍
+
+* 命令所属包
+  - =yum install procps= 命令系统自带
+* 简介
+  - 显示登录在机器上的用户和他们正在进行的工作
+  - 命令格式
+    #+BEGIN_EXAMPLE
+    w - [husfV] [user]
+    #+END_EXAMPLE
+  - 命令行选项
+    #+BEGIN_EXAMPLE
+    -h   不显示头部信息, 即取消标题栏显示, 直接显示用户信息那一行
+    -u   Ignores the username while figuring out the current  process
+            and  cpu times.  To demonstrate this, do a "su" and do a "w"
+            and a "w -u". 这个用法我不明白;
+    -s   使用短格式显示, 即不显示登录时间, JCPU和PCPU时间
+    -f   切换显示FROM项，也就是远程主机名项
+    user 只显示指定用户的信息
+    #+END_EXAMPLE
+* 命令输出结果显示
+  - =w=
+    #+BEGIN_EXAMPLE
+    12:49:51 up  2:30,  2 users,  load average: 0.00, 0.00, 0.00
+    USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU WHAT
+    root     pts/0    192.168.5.1      10:24    0.00s  0.02s  0.00s w
+    root     pts/1    192.168.5.1      11:50   19:25   0.02s  0.02s -bash
+    #+END_EXAMPLE
+  - =w -s=
+    #+BEGIN_EXAMPLE
+    12:49:17 up  2:29,  2 users,  load average: 0.00, 0.00, 0.00
+    USER     TTY      FROM               IDLE WHAT
+    root     pts/0    192.168.5.1       0.00s w -s
+    root     pts/1    192.168.5.1      18:51  -bash
+    #+END_EXAMPLE
+  - =w -f=
+    #+BEGIN_EXAMPLE
+    12:50:27 up  2:31,  2 users,  load average: 0.00, 0.00, 0.00
+    USER     TTY        LOGIN@   IDLE   JCPU   PCPU WHAT
+    root     pts/0     10:24    0.00s  0.02s  0.00s w -f
+    root     pts/1     11:50   20:01   0.02s  0.02s -bash
+    #+END_EXAMPLE
+  - =w -h=
+    #+BEGIN_EXAMPLE
+    root     pts/0    192.168.5.1      10:24    0.00s  0.03s  0.00s w -h
+    root     pts/1    192.168.5.1      11:50   21:55   0.02s  0.02s -bash
+    #+END_EXAMPLE
+  - 小结
+    #+BEGIN_EXAMPLE
+    1.   USER/root   表明现在root用户登录在当前机器上
+    2.   TTY/pts/0   说明当前使用的第一个虚拟终端间接登录机器; 当直接登录机器时, 显示的是tty1
+    3.   FROM/ip     表明从哪个机器上登录进来的
+    4.   LOGIN@/time 表明在哪个时间点登录进来的
+    5.   IDLE/time   空闲了多长时间，表示用户闲置的时间。这是一个计时器，一旦用户执行任何操作，该计时器便会被重置
+    6.   JCPU/time   和该终端（tty）连接的所有进程占用的时间，这个时间里并不包括过去的后台作业时间，但却包括当前正在运行的后台作业所占用的时间
+    7.   PCPU/time   指当前进程（即在WHAT项中显示的进程）所占用的时间
+    8.   WHAT        当前正在运行进程的命令行
+    #+END_EXAMPLE
+    此外, 命令输出的第一行 =20:46:27 up  1:12,  1 user,  load average: 0.00, 0.00, 0.00= 表示: 当前时间是20:46:27, 机器已经运行了1小时12分钟, 当前有1个用户在线, 每1,5,15分钟的平均负载是多少;

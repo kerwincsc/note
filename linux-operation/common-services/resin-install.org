@@ -1,0 +1,53 @@
+* resin安装与配置
+** 安装
+  - 下载
+    =wget http://www.caucho.com/download/resin-4.0.36.tar.gz=
+    个人不建议这样下载,因为慢的令人发指;
+  - 编译安装
+    =./configure --prefix=/usr/local/resin --with-java=/usr/local/jdk1.8.0_111=
+    =make=
+    =make install=
+** 配置
+   - 修改监听端口
+     进入配置文件 =vim ./resin/conf/resin.properties=
+
+     将 =app.http          :8080= 改成 =app.http          :80=
+
+   - 配置虚拟主机
+     进入配置文件 =vim ./resin/conf/resin.xml=
+     
+     在这块后面
+     #+BEGIN_EXAMPLE
+     <!-- the default host, matching any host name -->
+     <host id="" root-directory=".">
+      <!--
+         - webapps can be overridden/extended in the resin.xml
+        -->
+      <web-app id="/" root-directory="webapps/ROOT"/>
+
+     </host>
+     #+END_EXAMPLE
+     添加
+     #+BEGIN_EXAMPLE
+     <!-- the default host, matching any host name -->
+     <host id="" root-directory=".">
+      <!--
+         - webapps can be overridden/extended in the resin.xml
+        -->
+      <web-app id="/" root-directory="webapps/ROOT"/>
+
+     </host>
+
+     <!-- my config -->
+     <host id="www.123.com" root-directory=".">
+        <web-app id="/" root-directory="/tmp/resin" />
+     </host>
+     #+END_EXAMPLE
+     xml文件对闭合非常敏感,一般如果对配置进行了改动后,重启失败的,基本都是未闭合;
+   
+** 常用操作和信息
+   - 启动脚本位置 =/etc/init.d/resin=
+     - 启动resin =/etc/init.d/resin start=
+       启动前要注意,关闭占用java的程序
+     - 重启resin =/etc/init.d/resin restart= 
+   - 服务监听   6600   6800   8080

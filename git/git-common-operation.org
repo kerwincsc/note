@@ -1,0 +1,205 @@
+#+TITLE: Git 分布式版本管理工具
+#+AUTHOR: kerwin chen
+* 什么是版本管理工具
+* Git和SVN比较
+  - SVN是集中管理[1], Git是分布式管理[2]
+
+* Git的安装
+  - 在CentOS上
+    =yum install -y epel-release; yum install -y git=
+  - 在Ubuntu上
+    =sudo apt-get intall git=
+  - 安装完成后, 作如下配置
+    #+BEGIN_EXAMPLE
+    git config --global user.name "Your Name"
+    git config --global user.email "csc@125.com"
+    #这行是用来指定提交时, 使用vim编辑提交时的备注,前提是本机要有这个编辑器
+    git config --global core.editor vim
+    #+END_EXAMPLE
+    配置完成后, 本用户的目录下就会生成 : gitconfig
+    
+* Git的基本操作
+  - 创建仓库并推送文件
+    - 创建一个代码库
+      - 创建一个目录 =mkdir testgit=
+      - 将其初始化为代码库 =cd testgit; git init=
+    - 从工作目录将目标文件提交到暂存区,即WorkingDirectory到Stage =git add <file>=
+    - 恢复某个已修改的文件,即从Stage恢复到WorkingDirectory =git checkout -- <file>=
+    - 将暂存区文件提交到本地仓库, 并增加描述
+      #+BEGIN_EXAMPLE
+      git commit -m "some information"
+      #+END_EXAMPLE
+    - 比较文件的差异 =git diff=
+    - 从本地仓库回退到暂存区,即从History回退到Stage =git reset HEAD <file>=
+  - 版本变更
+    - 查看历史提交记录 =git log=
+    - 逐行查看提交记录历史 =git log --pretty=oneline=
+    - 变更到指定版本 =git reset --hard commit-number=
+      根据提交历史中的提交编号,回到对应的版本中去
+
+      如果回到了一个较旧的版本中去, 再想回到较新的版本中就无法用 =git log pretty=oneline= 来查看提交编号, 这时可以使用 =git reflog= 来查看历史提交版本号, 再用 =git reset --hard= 回退回去即可
+  - 文件恢复
+    - 文件已做修改但未add
+      #+BEGIN_EXAMPLE
+      git checkout -- <file>
+      #+END_EXAMPLE
+
+    - 文件已add但未commit
+      #+BEGIN_EXAMPLE
+      git reset HEAD <file> ;; 从暂存区回退到工作区
+      git checkout -- <file> ;; 
+      #+END_EXAMPLE
+
+    - 文件已commit
+      
+      这种情况下,只能根据文件提交的版本号回退到对应的版本 =git reset --hard <版本号>=
+  - 文件删除
+    - git工作目录下直接删除 =rm -f 1.txt=
+
+      这种情况下, 修改未提交到暂存区(stage), 根据提示可以使用 =git checkout -- <deleted-file>= 从暂存区恢复到上次修改;
+
+      如果是真的想删除目标文件, 只能再次 =git rm <file>= 并提交到本地仓库中;
+
+    - 使用 =git rm <file>= 删除
+
+      这个命令, 会同时删除工作区和暂存区中的对应文件, 但是本地仓库中仍然存在此文件, 我们仍然可以通过 =git reset HEAD <file>= 来恢复到暂存区中, 然后再 =git checkout -- <file>= 恢复到工作区中;
+
+      这种情况下, 其实只要提交一次就可以了;
+  - 创建远程仓库
+
+    这部分可以选择在github上操作, 或者在oschina的git上操作;
+
+    - 本地创建远程仓库 =git remote add origin git@github.com:kerwincsc/studygit.git=
+
+    - 在本地创建完文件后,推送到远程仓库 =git push -u origin master=
+  - 克隆远程仓库
+    - 切换到要创建克隆仓库的目录 =cd /home/kerwin=
+
+    - 克隆 =git clone git@github.com:aminglinux//lanmp.git=
+  - 使用分支
+    - 分支管理的常用命令
+      - git branch //查看分支
+
+      - git branch aming //创建分支 :: 这时候再用git branch查看, 会看到有两个分支master和aming, 当前使用的分支前面会有一个星号
+
+      - git checkout aming //切换到aming分支下
+
+	在aming分支下做的任何操作将不会影响master分支
+
+      - 分支的合并 =git branch aming=
+
+	这里的aming分支, 将被合并到当前分支上来, 也就是说, 在你操作合并分支之前, 先要切换到合并分支上来, 然后上述执行命令将被合并分区合并到当前分区上来, 简单说来, 就是如果你想将aming分支合并到master分支上来, 就要先切换到master分支上来, 再进行合并的操作;
+
+      - 分支的冲突
+
+	如果同时修改了master分支和aming分支上的同一份文件, 那么在master分支上 =git merge aming= 时, 就会提示2个文件冲突了, 这时, git会将冲突部分同时写入这个文件, 此时, 只要将文件内容修改成被合并分支上的内容, 并进行add和commit后, 再进行合并即可;
+
+	如果master分支上的内容, 是我想要的内容, 那么只要将其改为想要的内容, 然后倒着合并, 即将master分支合并到aming分支即可;
+
+	合并分支有一个原则, 那就是要把最新的分支合并到旧的分支, 也就是说merge后面跟的分支名字一定是最新的分支;
+
+      - 分支的删除
+	- =git branch -d aming= 删除前, 如果分支未合并, 就会进行提示, 如果合并了, 就会直接删除
+
+	- =git branch -D aming= 强制删除分支, 无论它是不是合并了=
+
+      - 分支的使用原则
+
+	- master分支非常重要, 线上发布代码用这个分支, 平时我们开发代码不要在这个分支上;
+
+	- 创建一个dev分支, 专门用作开发, 只有当发布到线上之前, 才会把dev分支合并到master
+
+	- 开发人员应该在dev的基础上再分支成个人分支, 在个人分支里面开发代码, 然后合并到dev分支
+  - 现场保留
+
+    当你正在编辑一个脚本script.sh时, 突然接到要求: 改动一个文件file.expect, 并提交;
+
+    在一般情况下, 我们都会保存退出当前文件, 然后按照要求改动相应文件add后commit; 这时候, 使用 =git status= 会看到script.sh处于未add状态或者add后, 出现未提交状态;
+
+    对付这种情况, 我们可以使用现场保留, 去掉文件未add或未commit, 在查看状态时出现未add或未commit提示;
+
+    =git stash= 对于未add的文件, 取消其未add的状态; 对于未commit的文件, 取消其未commit的状态;
+
+    =git stash list= 列出所有存在的stash列表
+
+    =git stash apply stash@{1}= 还原最近一个的现场
+  - 远程分支管理
+    - 查看远程库信息 =git remote -v=
+
+    - 查看远程分支 =git ls-remote origin=
+
+    - 从本地推送分支 =git push origin branch-name=
+
+      如果推送失败, 先用git pull抓取远程的新提交
+
+    - 在本地创建和远程分支对应的分支 =git checkout -b branch-name origin/branch-name=
+      本地和远程分支的名称最好一致;
+
+      如果创建失败, 要先 =git fetch= 一下, 获取最新远程分支的名称
+
+    - 从远程抓取分支, 使用git pull, 如果有冲突, 要先处理冲突;
+  - 用标签管理版本号
+
+    标签类似于快照功能, 可以先给版本库打一个标签, 记录某个时刻库的状态, 也可以随时恢复到该状态;
+
+    - 给当前分支打标签 =git tag tag-name=
+      - 切换到想要打标签的分支 =git checkout master=
+      - 给master打一个标签v1.0 =git tag v1.0=
+    - 查看所有的标签 =git tag=
+
+    tag是针对commit来打标签的, 所以可针对历史的commit来打标签;
+    - 先查看历史的commit =git log --pretty=oneline --abbrev-commit= , 最后面的参数表示显示版本号的缩写
+    - 针对历史commit打标签 =git tag tag-name version-number=
+
+      如 =git tag v1.0 46d4c1e=
+    - 也可以在打标签时,对标签进行描述
+      #+BEGIN_EXAMPLE
+      git tag -a tag-name -m "decription-message" version-number
+      #+END_EXAMPLE
+    - 推送指定标签到远程 =git push origin tag-name=
+    - 推送所有标签 =git push --tag origin=
+    - 标签的删除 =git tag -d tag-name=
+
+      标签的删除比较有意思. 如果确实要删除一个标签, 那么, 要同时删除本地标签和远程标签;
+      - =git tag -d tag-name=
+      - =git push origin :refs/tags=
+  - 别名设置与取消
+    - 把commit设置成ci =git config --global alias.ci commit=
+    - 把 *log --pretty=oneline* 设置成lg
+      #+BEGIN_EXAMPLE
+      git config --global alias.lg "log --pretty=oneline"
+      #+END_EXAMPLE
+    - 查看已设定的别名 =git config --list | grep alias=
+    - 取消别名 =git config --global --unset alias.ci=
+    - 查询log小技巧
+      #+BEGIN_EXAMPLE
+      git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset - %C(yellow)%d%Creset%s%Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit"
+      #+END_EXAMPLE
+* Git服务器的搭建
+  - 安装git =yum install -y git=
+  - 添加git用户,并设置shell为/usr/bin/git-shell, 为了不让用户远程登录 =useradd -s /usr/bin/git-shell git; cd /home/git=
+  - 进入家目录, 是为了放置密钥
+    - mkdir .ssh
+    - vim .ssh/authorized_keys
+    - chown -R git .ssh
+    - chmod 700 .ssh
+    - 密钥文件都要设置权限, 只能让git用户可读可写, 要改变文件属主; 如果是设置文件夹, 就是700权限
+  - 定好存储git仓库的目录, 比如 /data/gitroot
+    - mkdir /data/gitroot
+    - cd /data/gitroot
+    - git init --bare sample.git
+
+      这步会创建一个裸仓库, 裸仓库没有工作区, 因为服务器上的Git仓库纯粹是为了共享, 所以不让用户直接登录到服务器上去改工作区, 并且服务器上的Git仓库通常都以.git结尾
+    - chown -R git.git sample.git
+
+      以上操作是在git服务器上做的, 平时git服务器是不需要开发人员登录修改代码的, 它仅仅是充当一个服务器的角色, 就像github一样, 平时都是我们自己的PC上做的;
+  - 把公钥放到git服务器上/home/git/.ssh/authorized_keys文件里
+  - 在客户端上克隆远程仓库 =git clone git@ip:/data/gitroot/sample.git=
+
+    此时就可以在当前目录下生成一个sample的目录, 这个就是我们克隆的远程仓库了. 进入到这里面, 可以开发一些代码, 然后push到远程;
+* Footnotes
+
+[1] 必须要有一台服务端, 代码仓库是在服务端上, 客户端(个人电脑)需要从服务端上同步代码到自己电脑上, 开发完要推送到服务端. 这种架构依赖网络, 传输也比较慢;
+
+[2] 可以没有服务端, 所有个人电脑都可以有完整的代码仓库, 代码的更新、推送、分支、合并都可以在自己电脑上完成. 它支持多人协作, 不过需要有一个公共的git服务器作为支撑;
+

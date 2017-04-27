@@ -1,0 +1,7 @@
+#+TITLE: 222.73.239.89   zr0191
+
+* 计划任务表
+   - =10 1 * * 6 /etc/init.d/snmpd restart=
+
+     每周六的1:10重启snmpd服务
+   - =0 */1 * * * bash /usr/local/cmdb_agent/run.sh=

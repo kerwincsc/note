@@ -1,0 +1,45 @@
+#+TITLE: 设定grub密码
+
+* 明文直接加密
+  - 加密之禁止编辑启动菜单
+  #+BEGIN_EXAMPLE
+  vim /etc/grub.conf
+  在hiddemenu下面新增一行，输入：
+  password=密码
+  然后：wq保存退出
+  #+END_EXAMPLE
+  进行这种加密后, 在不知道密码的情况下, 是无法通过单用户模式进入系统的. 但是仍然可以通过菜单下的两个入口, 正常进入系统;
+  - 加密之禁止进行启动引导
+    #+BEGIN_EXAMPLE
+    title CentOS (2.6.32-642.11.1.el6.x86_64)
+    password=111111
+    root (hd0,0)
+    #+END_EXAMPLE
+    在title行下增加一行 =password=******= , 这时不输入密码则无法进入系统;
+
+* 加密密码
+  - grub-md5-crypt
+    #+BEGIN_EXAMPLE
+    生成md5密码
+    [root@centos64-client ~]# grub-md5-crypt 
+    Password: 
+    Retype password: 
+    $1$If13F/$GxE.M5Jd5EKOaXdDlh.PH.
+
+    加入md5密码的认证
+    vim /etc/grub.conf
+    password -md5 $1$If13F/$GxE.M5Jd5EKOaXdDlh.PH.
+    #+END_EXAMPLE
+  - grub-crypt
+    - 默认使用sha-512加密 =grub-crypt=
+    - 也可以指定加密方式 =grub-crypt --sha-256=
+    - 或 =grub-crypt --md5=
+#+BEGIN_EXAMPLE
+加密方式
+password --encrypted 密文
+#+END_EXAMPLE
+  - grub-md5-crypt 和 grub-crypt --md5 的区别
+
+    使用 *grub-md5-crypt* 加密后, 配置认证时, 必须使用 =password -md5 密文=
+
+    使用 *grub-crypt --md5* 加密后, 配置认证时, 必须使用 =password --encrypted 密文=

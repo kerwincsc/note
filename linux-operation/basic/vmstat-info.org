@@ -1,0 +1,38 @@
+#+TITLE: vmstat工具介绍
+* 命令所属包
+  - =yum install procps=
+* 简介
+  vmstat可以用来显示进程、内存、交换区、I/O以及CPU的状态. 其语法格式如下:
+  #+BEGIN_EXAMPLE
+  vmstat [时间间隔] [显示的记录行数]
+  #+END_EXAMPLE
+
+* 命令输出结果含义详解
+  #+BEGIN_EXAMPLE
+  [root@centos64 ~]# vmstat
+  procs -----------memory---------- ---swap-- -----io---- --system-- -----cpu-----
+  r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs   us sy id wa st
+  0  0      0 872924   9860  61944    0    0     7     0   11    9  0  0 100  0  0
+  #+END_EXAMPLE
+  #+BEGIN_SRC 
+  process/r:   进程正在等待CPU(运行队列的大小)
+  process/b:  进程在不中断地睡眠
+  memory/swpd:  虚拟内存的使用量
+  memory/free:  空闲内存的数量
+  memory/buff:  用作缓冲区的内存数量
+  memory/cache: 用作缓存的内存数量
+  swap/si:  进程从交换区滚入内存(载入)内存 --- swap input
+  swap/so:  进程滚出到交换区上, 但是仍然处于运行状态 --- swap output
+  io/bi:  载入内存的数据块数 --- block input
+  io/bo:  写入硬盘的数据块数 --- block output
+  system/in:  每秒钟的中断次数
+  system/cs:  每秒钟的环境切换次数 --- Context Switch
+  cpu/us:  执行用户代码所使用的CPU时间
+  cpu/sy:  执行系统代码所使用的CPU时间
+  cpu/id:  CPU空闲时间; 在内核2.5.41之前, 包含了IO等待时间
+  cpu/wa:  CPU等待IO的时间; 在内核2.5.41之前, 包含在cpu/id中
+  cpu/st:  Time stolen from a virtual machine. Prior to Linux 2.6.11, unknown, 这个不懂
+  #+END_SRC
+  环境切换次数(Context Switch)解释: 因为Linux和unix系统都是多用户系统, 所以多个用户共享一个CPU(为了简化问题, 只考虑一个CPU), CPU以分时的方式分配给每一个用户, 比如说时间片是100毫秒, 也就是每个用户每次最多可以使用100毫秒的CPU. 这样如果一个进程(如进程A)很大, 在指定的时间片内不能完成, 等时间片用完之后, 系统就要将CPU的所有权分配给下一个用户的进程(如进程B). 这时系统要将进程A的环境参数(如局部变量等)存入一个特殊的被称为堆栈的内在区域(也称为压入堆栈),之后还要将进程B的环境参数从堆栈的内存区域中取出(从堆栈中弹出). 以上将前一个进程的环境参数压入堆栈和将后一个进程的环境参数从堆栈中弹出的操作(可能还有一些其他的相关操作)就是所谓的环境切换.
+
+  假设进程A是一个进行Oracle数据库备份的进程. 它可能要运行几十分钟甚至更长, 现在你可以想像环境切换的次数大的惊人. *由于频繁地进行环境切换会消耗大量的系统资源, 此时就要帮助Oracle数据库管理员重新配置Oracle数据库, 使这样执行时间超长的进程独占自己使用的内存区以避免环境的切换.*

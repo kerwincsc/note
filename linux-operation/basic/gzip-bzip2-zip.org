@@ -1,0 +1,40 @@
+#+TITLE: 压缩命令使用记录
+
+* tar命令
+** tar常见参数
+   #+BEGIN_EXAMPLE
+   -c      create建立压缩档案
+   -x      解压压缩档案
+   -z      是否需要用gzip压缩
+   -j      是否需要用bzip2压缩
+   -v      显示压缩过程的详细信息
+   -f      置顶文档名, 在f后面立即接文件名, 不能再加参数
+   #+END_EXAMPLE
+** 利用tar通过网络拷贝数据
+   - #cd /data   //data目录下有我们要拷贝的目标文件目录 test
+   - # tar cvf  -  test| ssh 10.0.1.11 "cd /copy1/; tar xvf  -"  //首先将要拷贝的目录test打包,"-" 代表标准输出, 然后再ssh 到目标主机 10.0.1.11 ，运行相应的命令。其中tar xvf  - 意思是，将前面的标准输出内容作为解包的对象
+** tar解压至指定目录 -C
+   - # tar zxvf test.tar.gz -C /home/kerwin/
+** 打包时, 排除指定文件或目录 --exclude
+   - [root@silence ~]# tar -zcvf txt.tar.gz --exclude 1.txt --exclude 2.txt silence/
+   - *-X* 也可以排除 =tar -cvzf test.tar.gz test/ -X /home/swaroop/excludes.txt=
+   
+     *-X* 表示含在指定文件名列表中的文件会被排除在备份之外。例如，你可以在文件中指定*~，从而不让备份包括所有以~结尾的文件.
+** 修复chmod命令缺失x权限
+   #+BEGIN_EXAMPLE
+   $tar --mode 0755 -cf chmod.tar /bin/chmod
+   $tar xvf chmod.tar
+   #+END_EXAMPLE
+* zip命令
+
+* gzip命令
+  - 不能直接压缩目录
+
+* bzip2命令
+  - 不能直接压缩目录
+
+* xz命令
+
+* 7z命令
+  - yum install -y p7zip p7zip-plugins
+  - 当出现 *error: Zip file too big (greater than 4294959102 bytes)* 安装7z的包

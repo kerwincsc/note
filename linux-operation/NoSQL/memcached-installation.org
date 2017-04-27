@@ -1,0 +1,58 @@
+#+TITLE: CentOS7下,memcached的安装与基本操作
+* 安装epel扩展源
+  - =yum install -y epel-release=
+* 安装memcached
+  - =yum install -y libevent memcached libmemcached=
+* 配置文件解析 =/etc/sysconfig/memcached=
+  #+BEGIN_EXAMPLE
+  PORT="11211"
+  指定端口为11211
+  USER="memcached"
+  指定用户为memcached
+  MAXCONN="1024"
+  指定最大连接数
+  CACHESIZE="64"
+  表明用多少兆内存进行数据缓存
+  OPTIONS=""
+  #+END_EXAMPLE
+* 启动参数解析
+  - *-d* 选项是启动一个守护进程
+  - *-m* 分配给memcache使用的内存数量, 单位是兆, 默认是64MB
+  - *-u* 指定运行memcache的用户, 如果当前为root的话, 需要使用此参数指定用户
+  - *-l* 指定监听的服务器IP地址
+  - *-p* 设置memcache监听的端口, 默认是11211;
+  - *-c* 是最大运行的并发连接数, 默认是1024;
+  - *-P* 是设置保存memcache的pid文件; 运行后在指定位置产生pid文件, 用以防止进程启动多个副本;
+* 查看memcached运行状态
+  - =memcached-tool 127.0.0.1:11211 stats=
+    - memcached-tool是memcached包自带的工具;
+    - 平时主要查看 *cmd_get* *cmd_set* *get_hits* ; 通过get_hits和cmd_get计算命中率;
+  - =echo stats|nc 127.0.0.1 11211=
+    需要安装nc工具 =yum install -y nc=
+  - =memstat --servers=127.0.0.1:11211=
+    如果安装libmemcached了, 就可以使用此命令
+* 基本操作
+** 在命令行中进行操作
+    - 终端连接memcached =telnet 127.0.0.1:11211=
+    - 增删改查语法规则  =<command name> <key> <flags> <exptime> <bytes>\r\n<data block>\r\n= [1]
+      - add
+	- add key1 12 10 2<Enter>ab<Enter>
+      - delete
+	- delete key1<Enter>
+      - set
+	- set key1 12 20 3<Enter>abc<Enter>
+      - get
+	- get key1
+
+* Footnotes
+
+[1] \r\n在windows下是Enter键;
+  - <command name> 可以是"set", "add", "replace" ;
+    - *set* 表示按照相应的<key>存储该数据, 没有的时候增加, 有的时候覆盖;
+    - *add* 表示按照相应的<key>添加该数据, 但是如果该<key>已经存在则会操作失败;
+    - *replace* 表示按照相应的<key>替换数据, 但是如果该<key>不存在则操作失败;
+  - <key> 客户端需要保存数据的key;
+  - <flags> 是一个16位的无符号的整数(以十进制的方式表示). 该标志将和需要存储的数据一起存储, 关在客户端get数据时返回; 客户可以将标志用做特殊用途, 此标志对服务器来说是不透明的;
+  - <exptime> 过期时间. 若为0, 表示存储的数据永远不过期(但可被服务器算法: LRU等替换). 如果非0(unix时间或者距离此时的秒数), 当过期后, 服务器可以保证用户得不到该数据(以服务器时间为标准).
+  - <bytes> 需要存储的字节数, 当用户希望存储空数据时, <bytes>可以为0;
+  - <data block> 需要存储的内容, 输入完成后, 最后客户端需要加上"\r\n"(直接点击Enter)作为"命令头"的结束标志;

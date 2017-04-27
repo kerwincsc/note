@@ -1,0 +1,40 @@
+* NFS部署和优化
+** 什么是NFS
+   NFS == Network File System
+   
+** NFS的常见应用场景
+** NFS部署
+   - 服务端
+     - yum install nfs-utils rpcbind
+     - vim /etc/exports
+       #+BEGIN_EXAMPLE
+       1. 简易配置
+       /mnt 192.168.0.111[1](rw,sync)
+       在这种配置下, 如果要使客户端能够正常写入文件, 就必须将/mnt目录的权限改为777, 否则就会提示权限不足;
+       这个配置下, 新建文件的属主与属组为nfsnobody; 
+       #+END_EXAMPLE
+       #+BEGIN_EXAMPLE
+       2. 带用户权限的配置
+       /mnt 192.168.0.111(rw,sync,all_squash,anonuid=501, anongid=501)
+       这里, 将创建的文件的用户映射为服务端的501对应的用户;
+       我在客户端创建文件时, 所有的属主和属组都为501;
+       #+END_EXAMPLE
+       #+BEGIN_EXAMPLE
+       /mnt 192.168.0.111(rw,sync,no_root_squash)
+       no_root_squash：登入 NFS 主机使用分享目录的使用者，如果是 root 的话，那么对于这个分享的目录来说，他就具有 root 的权限！这个项目『极不安全』，不建议使用！ 
+       root_squash：在登入 NFS 主机使用分享之目录的使用者如果是 root 时，那么这个使用者的权限将被压缩成为匿名使用者，通常他的 UID 与 GID 都会变成 nobody 那个系统账号的身份。
+       #+END_EXAMPLE
+       
+     - 启动rpcbind服务 :: /etc/init.d/rpcbind start
+     - 启动NFS服务 :: /etc/init.d/nfs start
+   以上是在服务端的配置,且两个服务的启动顺序不能换,不然会出错;
+   - 挂载端
+     - yum install nfs-utils
+     - showmount -e 192.168.0.249[2]
+     - mount -t nfs -onolock,nfsvers=3 192.168.0.249:/mnt /opt
+* Footnotes
+
+[1] 这是地址是客户机地址,即要使用NFS的机器, 也可以是一个网段, 比如192.168.1.0/24;
+
+[2] 服务端地址
+
