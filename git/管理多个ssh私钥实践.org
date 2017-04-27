@@ -1,0 +1,45 @@
+#+TITLE: 管理多个ssh私钥实践(以github为例)
+
+* 需求场景
+
+  当你有多个Git源需要连接时，就需要管理多个本地ssh私钥[1]
+
+  - 首先，当你连接新的git数据源时候，生成.ssh就不能放在~/.ssh目录中了，需要另外生成在其他地方(什么地方无所谓，方便管理就行)
+
+    以github为例
+    #+BEGIN_EXAMPLE
+    ssh-keygen -t rsa -C xxxxx@gmail.com(申请github账号时候用的邮箱)
+    #+END_EXAMPLE
+    生成的地址可以修改:
+    #+BEGIN_EXAMPLE
+    /Users/twer/.ssh/id_rsa/id_rsa
+    #+END_EXAMPLE
+    说明: 其实也可以不修改生成的地址, 只要修改掉生成的文件名就行了
+
+    - 然后将新生成的ssh秘钥地址加入到ssh配置文件中去
+
+      #+BEGIN_EXAMPLE
+      ssh-add ~/.ssh/id_rsa
+      ssh-add ~/.ssh/id_rsa_github
+      #+END_EXAMPLE
+
+    - 如果执行ssh-add时提示"Could not open a connection to your authentication agent", 可以现执行命令 =ssh-agent bash=
+
+    - 执行完成后确认是否加入成功 =ssh-add -l=
+
+      [[file:images/ssh-add.png]]
+
+    - 确认加入后, 即可将公钥加入到github的公钥对中去了
+
+      [[file:images/sshkey-setting.png]]
+
+      [[file:images/sshkey-add.png]]
+
+    - 确认是否连接成功 =ssh -T git@github.com=
+
+      这样，即可下载github数据了 =it clone git@github.com:china10s/PBFBaseTools.git /dirname=
+
+* Footnotes
+
+[1] [[http://www.china10s.com/blog/?p=226]]
+
