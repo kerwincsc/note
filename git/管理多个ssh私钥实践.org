@@ -26,7 +26,7 @@
     - 如果执行ssh-add时提示"Could not open a connection to your authentication agent", 可以现执行命令 =ssh-agent bash=
 
     - 执行完成后确认是否加入成功 =ssh-add -l=
-
+      
       [[file:images/ssh-add.png]]
 
     - 确认加入后, 即可将公钥加入到github的公钥对中去了
