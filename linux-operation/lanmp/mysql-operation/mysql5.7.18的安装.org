@@ -1,0 +1,6 @@
+* mysql5.7.18的安装
+  - rpm安装方式
+    - 至少需要下载如下四个rpm包 =libs= =client= =common= =server= 进行安装, 安装顺序根据出错信息进行调整
+    - mysql5.7后的安装, 都会生成随机密码, 要求在登录后进行修改, 登录密码可由命令 =grep 'temporary password' /var/log/mysqld.log= 在生成的日志里找到
+    - 利用临时密码登录系统后, 要立刻修改密码, 如果不修改密码, 几乎所有的操作都无法进行, 而且密码不符合安全策略也不行
+    - 在非生产系统中, 可以修改默认密码策略 =set global validate_password_policy = 0= , 然后再修改指定密码长度 =set global validate_password_length = 3;= 来设置简单密码( =set password = password('123456');= )用于登录;
