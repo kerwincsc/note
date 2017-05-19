@@ -2,7 +2,163 @@
 #+DATE: 2017.05.12
 
 * 国内期货机构
-  - IP: 
+  - 183.136.164.107
+    - 任务计划程序
+      - CMDB Agent Cron Job
+	每隔1小时, 启动程序 =C:\cmdb_agent\cron.bat=
+	#+BEGIN_EXAMPLE
+	echo offset path=%path%;c:\salt\bin;c:\salt\bin\scriptspython c:\cmdb_agent\cmdb_agent.py
+	#+END_EXAMPLE
+      - 按时关闭OMDD交易
+
+	在每天的8:15运行 =D:\JgInterface\按时关闭OMDD交易.bat=
+	#+BEGIN_EXAMPLE
+	@echo off
+
+	taskkill /f /im NewFutureIf_OMDD.exe 1>>c:\APPerror2.txt 2>&1
+
+	rem 结束NewFutureIf_OMDD.exe进程
+
+	cls
+	@echo %date% >> c:\APPerror2.txt
+	@echo %time% >> c:\APPerror2.txt
+
+	:menu
+	echo.
+	echo                   *              \\\!///
+	echo                  ***               - -
+	echo                 *****            ( @ @ )
+	echo         *   *  ****************************************
+	echo        *** ***  *# #*                                 *
+	echo         *   *   *   *   ～～～东方财富网～～～         *
+	echo         *   *   * # *      WWW.18.COM.CN              *
+	echo         ***********************************************
+	echo.
+	echo              为工作而工作，注意休息。谢谢支持！
+	:menu
+	
+	exit
+	#+END_EXAMPLE
+	脚本说明: 结束NewFutureIf_OMDD.exe进程
+      - 期货定时重启
+
+	每天的19:30启动程序 =D:\JgInterface\合并任务.bat=
+	#+BEGIN_EXAMPLE
+	D:
+	cd JgInterface
+	start 启动抓取任务.bat
+	ping 127.1 -n 15 >nul
+	rem 延时15秒
+	start 按时关闭三大期货.bat	
+	exit
+	#+END_EXAMPLE
+      - 重启人民币外汇交易
+
+	每天的0:30, 启动程序 =D:\JgInterface\按时关闭人民币外汇交易.bat=
+	#+BEGIN_EXAMPLE
+	@echo off
+	taskkill /f /im NewFutureIf_FOREX.exe 1>>c:\APPerror2.txt 2>&1
+	rem 结束NewFutureIf_FOREX.exe进程
+	cls
+	@echo %date% >> c:\APPerror2.txt
+	@echo %time% >> c:\APPerror2.txt
+	#+END_EXAMPLE
+	说明: 结束NewFutureIf_FOREX.exe进程, 并写入指定日志
+
+    - 应用程序与对应的进程: 可在 =D:/JgInterface= 下找到
+
+      | 应用程序                     | 进程                | 程序位置                            |
+      |------------------------------+---------------------+-------------------------------------|
+      | FutureIf_172.17.21.233:40034 | NewFutureIf_HS      | D:/JgInterface                      |
+      | FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | 同上                                |
+      | FutureIf_172.17.24.33:40043  | NewFutureIf_CSI     | 同上                                |
+      | NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | 同上                                |
+      | NewFutureIf_CZCE             | NewFutureIf_CZCE    | 同上                                |
+      | NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | 同上                                |
+      | NewFutureIf_DCE              | NewFutureIf_DCE     | 同上                                |
+      | NewFutureIf_FOREX            | NewFutureIf_OANDA   | 同上                                |
+      | NewFutureIf_OMDD             | NewFutureIf_OMDD    | 同上                                |
+      | NewFutureIf_SHFE             | NewFutureIf_SHF     | 同上                                |
+      | 上金所数据接收程序           | FutureIf_SGE        | 同上                                |
+      | 互联网数据源---管理界面      | VssUI               | D:\netvssdataSource\NetVssSource2.3 |
+  - 183.136.164.100
+    - 任务计划程序
+      - CMDB Agent Cron Job
+	每隔1小时, 启动程序 =C:\cmdb_agent\cron.bat=
+	#+BEGIN_EXAMPLE
+	echo offset path=%path%;c:\salt\bin;c:\salt\bin\scriptspython c:\cmdb_agent\cmdb_agent.py
+	#+END_EXAMPLE
+      - 按时关闭OMDD交易
+
+	在每天的8:15运行 =D:\JgInterface\按时关闭OMDD交易.bat=
+	#+BEGIN_EXAMPLE
+	@echo off
+
+	taskkill /f /im NewFutureIf_OMDD.exe 1>>c:\APPerror2.txt 2>&1
+
+	rem 结束NewFutureIf_OMDD.exe进程
+
+	cls
+	@echo %date% >> c:\APPerror2.txt
+	@echo %time% >> c:\APPerror2.txt
+
+	:menu
+	echo.
+	echo                   *              \\\!///
+	echo                  ***               - -
+	echo                 *****            ( @ @ )
+	echo         *   *  ****************************************
+	echo        *** ***  *# #*                                 *
+	echo         *   *   *   *   ～～～东方财富网～～～         *
+	echo         *   *   * # *      WWW.18.COM.CN              *
+	echo         ***********************************************
+	echo.
+	echo              为工作而工作，注意休息。谢谢支持！
+	:menu
+	
+	exit
+	#+END_EXAMPLE
+	脚本说明: 结束NewFutureIf_OMDD.exe进程
+      - 期货定时重启
+
+	每天的19:30启动程序 =D:\JgInterface\合并任务.bat=
+	#+BEGIN_EXAMPLE
+	D:
+	cd JgInterface
+	start 启动抓取任务.bat
+	ping 127.1 -n 15 >nul
+	rem 延时15秒
+	start 按时关闭三大期货.bat	
+	exit
+	#+END_EXAMPLE
+      - 重启人民币外汇交易
+
+	每天的0:30, 启动程序 =D:\JgInterface\按时关闭人民币外汇交易.bat=
+	#+BEGIN_EXAMPLE
+	@echo off
+	taskkill /f /im NewFutureIf_FOREX.exe 1>>c:\APPerror2.txt 2>&1
+	rem 结束NewFutureIf_FOREX.exe进程
+	cls
+	@echo %date% >> c:\APPerror2.txt
+	@echo %time% >> c:\APPerror2.txt
+	#+END_EXAMPLE
+	说明: 结束NewFutureIf_FOREX.exe进程, 并写入指定日志
+    - 应用程序与对应的进程: 可在 =D:/JgInterface= 下找到
+
+      | 应用程序                     | 进程                | 程序位置                            |
+      |------------------------------+---------------------+-------------------------------------|
+      | FutureIf_172.17.21.233:40034 | NewFutureIf_HS      | D:/JgInterface                      |
+      | FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | 同上                                |
+      | NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | 同上                                |
+      | NewFutureIf_CSI_CSI2         | NewFutureIf_CSI     | 同上                                |
+      | NewFutureIf_CZCE             | NewFutureIf_CZCE    | 同上                                |
+      | NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | 同上                                |
+      | NewFutureIf_DCE              | NewFutureIf_DCE     | 同上                                |
+      | NewFutureIf_FOREX            | NewFutureIf_OANDA   | 同上                                |
+      | NewFutureIf_OMDD             | NewFutureIf_OMDD    | 同上                                |
+      | NewFutureIf_SHFE             | NewFutureIf_SHF     | 同上                                |
+      | 上金所数据接收程序           | FutureIf_SGE        | 同上                                |
+      | 互联网数据源---管理界面      | VssUI               | D:\netvssdataSource\NetVssSource2.4 |
 
 * 晨星美股
 
