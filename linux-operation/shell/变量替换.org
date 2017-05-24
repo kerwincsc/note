@@ -1,0 +1,108 @@
+#+TITLE: SHELL中的变量替换
+
+**** 变量替换典型示例
+
+     #+BEGIN_EXAMPLE
+     : ${VAR:="some default"}
+     #+END_EXAMPLE
+
+     说明:
+
+       此条命令不会产生输出;
+
+       此例的详解在下方可以找到, 此处仅为了记录这种设置变量的用法;
+
+**** *:=* 句法
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username:=$LOGNAME}"
+     #+END_EXAMPLE
+     在使用 *:=* 进行比较时, username 变量已经被定义了, 但是它的值为空. 因此, 这里对echo命令使用了变量LOGNAME的值, 即设置变量username的值为LOGNAME的值;
+
+     有了这个特殊的语法, 只有当变量username已被定义, 且有一个实际的非空值时, 变量username才会不被设置为变量LOGNAME的值; 换句话说, *当username变量未定义, 或者定义成 username=""这样的空值时, 其值将被设置为LOGNAME的值* ;
+
+     也可以这么理解, 当出现以上的句法时, shell将进行判断: 如果上文已出现username的定义, 且其值非空, 则不进行变量替换; 否则, 就正常进行变量替换;
+
+**** *=* 句法
+
+     下面的语句和 *:=* 句法非常类似, 但是没有冒号;
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username=$LOGNAME}"
+     #+END_EXAMPLE
+
+     和前面一样, 变量username已经被定义, 但是它的值为空. 在这个句法中, 命令将会输出"echo"之后语句的执行结果. 因为变量username虽然为空值, 但是已经被定义了, 所以除了一个回车不会再有其他输出. =只有当username变量完全没有被定义时, 才会将其设置为变量LOGNAME的值= ;
+
+     使用场景: 当脚本或者函数需要依赖于某些定义变量时, 就要使用这种语法. 它主要应用于登录或者cron脚本中. 如果一个特定的环境变量还没有定义, 就可以给它赋予脚本所需的值;
+
+**** *:-* 句法
+
+     在这个命令中, 因为变量 username 虽然已经被定义但是为空值,  echo 语句将使用LOGNAME变量的值;
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username:-$LOGNAME}"
+     #+END_EXAMPLE
+
+     这里的 username 变量的值保持不变. 这个命令和使用=句法命令的不同之处是, 在此命令被执行前, 仅仅在代码中的 "${}" 句法中作替换. 也就是说, echo 命令将输出 LOGNAME变量的值, 但是这个值不会被赋给 username 变量;
+
+**** *-* 句法
+
+     当删除掉上述的 *:-* 中的冒号, 即变成 *-* 时, 因为 username 变量已经被定义, 输出将为空; 如果未定义, 就会使用LOGNAME变量的值. 还有一点也与 *:-* 语法相同, 即 username 的值未被改变
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username-$LOGNAME}"
+     #+END_EXAMPLE
+
+     当脚本评价或检查系统环境时, :-句法和-句法都可以使用. 这两种检查基本上是相反的; 它们用默认值替换变量, 或者甚至于不依赖 username 变量是否被定义. 如果脚本中既需要一组被定义的变量, 也需要一些不该被定义的变量, 那么在脚本执行任务之前组合这两种句法, 肯定可以实现正确的设置;
+
+**** *:?* 句法
+
+     在使用 *:?* 句法时, 如果 username 变量已经被定义为非空值, 在echo命令中就会使用 username 变量的值; 如果 username 变量已经被定义但却没有一个真正的值(也就是说为空)或者完全未被定义, 那么在 echo 命令中就会使用LOGNAME的值, *并且脚本退出运行* ;
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username:?$LOGNAME}"
+     #+END_EXAMPLE
+
+     如果把问号之后的参数改为某种错误字符串, 那么这个语句就会在代码调试和查找未定义变量时变得很有用; 这段代码不仅仅输出字符串, 而且会显示代码在脚本中所在行的位置 =test:行25: username: username not defined= ;
+
+**** *?* 句法
+
+     从 *:?* 句法中去掉冒号使得 username 变量不必一定为非空值. 如果 username 只被设置为一个空值, 那么将使用这个空值. 相反地, 如果 username 变量没有被定义, 则同前述的 *:?* 句法, 执行LOGNAME替换, 脚本退出运行, 并显示退出时所在代码行在脚本中的位置;
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username?$LOGNAME}"
+     #+END_EXAMPLE
+
+     在脚本调试过程中, 需要检查变量是否已经被定义或者是否非空的时候, *:?* 和 *?* 句法是非常有用的. 这个代码最大的优点是脚本会从出错行退出, 而且会显示出错行行号. 在要显示的文本中加上类似于"is undefined"或者"has a null value"信息, 可以更清楚地说明脚本中的问题;
+
+**** *:+* 句法
+
+     和前面的例子相比, 这个句法有相反的作用. 这是因为, 只有当变量已被定义而不是未定义的时候, "${}" 表达式才执行替换;
+
+     #+BEGIN_EXAMPLE
+     username="mars"
+     echo "${username:+$LOGNAME}"
+     #+END_EXAMPLE
+
+     因为这里的 username 变量已被定义而且非空, 所以使用 LOGNAME 的值. 如果 username 变量未定义, 或者已经定义但是为空, 则将使用空值. 在任何情况下, username 的值都不会改变;
+
+     即只有当 username 未被定义时, echo 会使用 LOGNAME 的值; 只要 username 被定义, 哪怕其为空值, echo 出来的也是空值;
+
+**** *+* 句法
+
+     如果删掉前例 *:+* 中的冒号, 一旦变量 username 被定义, "${}" 表达式都将使用 LOGNAME 的值; 进行这个替换时, username 不需要有一个实际的值(即非空值). 如果 username 变量未被定义, 将被替换为空值;
+
+     #+BEGIN_EXAMPLE
+     username=""
+     echo "${username+$LOGINAME}"
+     #+END_EXAMPLE
+
+     ":+" 、 "+" 句法的用法很多是和 ":-" 、 "-" 句法的用法相同的.
+
+     最主要的区别是 ":+" 、 "+" 示例检查的是一个已定义的变量, 而不是未定义的变量. 这类似于加法、减法是一枚硬币的两面.
