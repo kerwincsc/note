@@ -1,0 +1,74 @@
+#+TITLE: Linux系统的稳定性检测
+
+**** 检测CPU
+
+     - 使用专用软件cpuburn-in对CPU进行压力测试
+
+       - =wget http://cpuburnin.com/downloads/cpuburn-in.tar.gz=
+
+       - =tar zxvf cpuburn-in.tar.gz=
+
+       - =# cpuburn-in times=
+
+	 这里的times是测试时间, 以分钟为单位;
+
+	 times分钟后, 如果显示 *Test Complete. No errors were found after running 672033 tests.* 信息, 则可以保障CPU没有故障
+
+**** 检测内存
+
+***** 内存故障的症状
+
+      - 当同时装载大量的程序时, 不时有某个程序无明显原因地死掉;
+      - 当打开文件时, 不时地显示文件被毁坏, 稍后再打开时, 文件看起来又好了;
+      - 当使用tarball(tar zxvf)命令时, tar频频报告tarball已经毁坏. 过些天再尝试提取tarball时, tar不报任何错误. 相似的问题也会发生在gzip和bzip2上
+
+***** 命令行工具 memtester
+
+      现在使用较多的内存测试工具是memtester, 该工具捕获内存错误和一直处于很高或者很低的坏位, 其测试的主要项目有随机值, 异或, 减法, 乘法, 除法以及或运算. 通过给定大小和次数, 可以测试内存;
+
+      下载和安装方法如下:
+      #+BEGIN_EXAMPLE
+      wget http://pyropus.ca/software/memtester/old-versions/memtester-4.3.0.tar.gz
+      tar zxvf memtester-4.3.0.tar.gz
+      cd memtester-4.3.0
+      make all
+      #+END_EXAMPLE
+      运行该软件, 在当前的目录下会生成其可执行文件
+      #+BEGIN_EXAMPLE
+      # ./memtester ram-size [runs]
+      #+END_EXAMPLE
+      注: ram-size 表明要测试的内存的大小, 单位是MB; runs 为测试次数
+
+      测试结果如下:
+      #+BEGIN_EXAMPLE
+      memtester version 4.3.0 (64-bit)
+      Copyright (C) 2001-2012 Charles Cazabon.
+      Licensed under the GNU General Public License version 2 (only).
+      
+      pagesize is 4096
+      pagesizemask is 0xfffffffffffff000
+      want 10MB (10485760 bytes)
+      got  10MB (10485760 bytes), trying mlock ...locked.
+      Loop 1/2:
+      Stuck Address       : ok         
+      Random Value        : ok
+      Compare XOR         : ok
+      Compare SUB         : ok
+      Compare MUL         : ok
+      Compare DIV         : ok
+      Compare OR          : ok
+      Compare AND         : ok
+      Sequential Increment: ok
+      Solid Bits          : ok         
+      Block Sequential    : ok         
+      Checkerboard        : ok         
+      Bit Spread          : ok         
+      Bit Flip            : ok         
+      Walking Ones        : ok         
+      Walking Zeroes      : ok         
+      8-bit Writes        : ok
+      16-bit Writes       : ok
+
+      .....后面还有很多行, 就不一一复制过来了
+      #+END_EXAMPLE
+      说明: 测试会一直进行, 直到用户终止. 测试完成后, 在目录会生成memtest.log文件, 可以查看系统内存的测试结果;
