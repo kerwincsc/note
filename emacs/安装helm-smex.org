@@ -1,0 +1,17 @@
+**** 安装helm-smex
+
+     - 安装
+
+       扩展包管理器的源后 =M+x package-install <RET> helm-smex=
+
+       下载完成后, 继续
+
+     - 配置
+       #+BEGIN_EXAMPLE
+       (require 'helm-smex)
+       (global-set-key [remap execute-extended-command] #'helm-smex)
+       (global-set-key (kbd "M-X") #'helm-smex-major-mode-commands)
+       #+END_EXAMPLE
+       将原有的键<M-x>的功能绑定到helx-smex
+
+     - 使用 =M-x 命令=

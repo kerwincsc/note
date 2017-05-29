@@ -1,0 +1,19 @@
+**** 安装window-numbering
+
+     - 安装
+
+       扩展包管理器的源后 =M+x package-install <RET> window-numbering=
+
+       下载完成后, 继续
+
+     - 配置
+       #+BEGIN_EXAMPLE
+       (require 'window-numbering)
+       (window-numbering-mode 1)
+       #+END_EXAMPLE
+
+     - 使用
+
+       #+BEGIN_EXAMPLE
+       M+1,2,3....9    切换不同窗口
+       #+END_EXAMPLE
