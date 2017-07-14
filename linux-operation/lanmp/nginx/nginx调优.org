@@ -1,0 +1,29 @@
+**** nginx调优
+***** 安全
+
+      - 隐藏Nginx版本号, [[http://blog.csdn.net/leopard_89/article/details/50778477][隐藏服务器名称]]
+
+	1. 编辑nginx.conf配置文件, 在http {—}里加上 =server_tokens= off; 如:
+	   #+BEGIN_EXAMPLE
+	   http {
+	     ……省略
+	     sendfile on;
+	     tcp_nopush on;
+	     keepalive_timeout 60;
+	     p_nodelay on;
+	     server_tokens off;
+	     ……省略
+	   }
+	   #+END_EXAMPLE
+
+	2. 编辑php-fpm配置文件，如fastcgi.conf或fcgi.conf(这个配置文件名也可以自定义的，根据具体文件名修改)
+	   #+BEGIN_EXAMPLE
+	   找到：
+	   fastcgi_param SERVER_SOFTWARE nginx/$nginx_version;
+	   改为：
+	   fastcgi_param SERVER_SOFTWARE nginx;
+	   #+END_EXAMPLE
+
+	3. 重新加载nginx配置 =# /etc/init.d/nginx reload=
+
+***** 性能
