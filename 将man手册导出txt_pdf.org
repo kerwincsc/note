@@ -1,0 +1,19 @@
+* man手册导出成txt,pdf,html的三种方法
+
+** 导出为txt
+
+   =man -t bash | col -b > bash_man.txt=
+** 导出为pdf
+
+   =man -t bash | ps2pdf - bash_man.pdf=
+
+   这里如何没有 =ps2pdf= 命令, 则 =yum install ghostscript -y=
+** 导出为html
+
+   =man -t --html=/usr/bin/firefox bash=
+
+   =cp /tmp/hmanLSa2jh/bash.html /home/talen/Documents=
+
+   这个默认是使用elinks在终端下打开man页面,也可以自己指定浏览器
+
+   经过尝试, 我本人只成功了前两种方法, [[http://www.360doc.com/content/14/0923/10/1123425_411686821.shtml][原文地址]]
