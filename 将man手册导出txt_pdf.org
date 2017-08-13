@@ -1,5 +1,3 @@
-#+OPTIONS: toc:t
-
 * man手册导出成txt,pdf,html的三种方法
 
 ** 导出为txt
