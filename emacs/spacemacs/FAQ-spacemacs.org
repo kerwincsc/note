@@ -1,0 +1,15 @@
+** 2.3 在指定major-mode下禁止一个包
+
+   通过移除被Spacemacs增加的hook实现这个要求. 比如, 在python缓冲区中移除 +flycheck+ 的支持, 可以在你的点文件(dotfile)中找到函数 =dotspacemacs/user-config= , 然后增加如下代码:
+   #+BEGIN_SRC emacs-lisp
+     (remove-hook 'python-mode-hook 'flycheck-mode)
+   #+END_SRC
+
+** 2.4 在指定的major-mode下禁止company包
+
+   如果你打算配置auto-mode替代company, 可以在指定模式下手动禁止company. 还有一个更简单的方式, 在你的点配置文件里的 =dotspacemacs/user-config= 函数中使用 =spacemacs|disable-company= 宏. 下面的代码块禁止在 =python-mode= 中使用 +company+ :
+   #+BEGIN_SRC emacs-lisp
+     (spacemacs|disable-company python-mode)
+   #+END_SRC
+
+** 2.5 改变指定缓冲区的规则?

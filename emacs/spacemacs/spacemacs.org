@@ -1,0 +1,5 @@
+* spacemacs配置
+
+** 配置文件的解读
+
+   - 配置文件为 =.spacemacs= =.spacemacs.d/=

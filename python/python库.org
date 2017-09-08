@@ -1,0 +1,16 @@
+* PYTHON基本库学习
+** 系统库
+*** os
+
+    |                |                      |
+    |----------------+----------------------|
+    | os.chdir(path) | cd path              |
+    | os.fchdir(fd)  | 根据文件描述符来操作 |
+    | os.getcwd()    | pwd                  |
+    |                |                      |
+    
+*** sys
+** requests
+** json
+** 进程线程
+*** threading
