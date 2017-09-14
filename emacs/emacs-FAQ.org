@@ -1,0 +1,26 @@
+#+TITLE: Emacs FAQ
+
+* emacs-lisp
+  - _set_ 和 _setq_ 的区别
+
+       #+BEGIN_SRC emacs-lisp
+       ;; set给变量设置一个值, 需要quote(引用)第一个参数
+       ;; set每次只能给一个变量设定值
+       (set 'a "set a value of variable")
+       ;; setq给变量设置值时, 作为参数的变量不需要被引用
+       ;; setq同时可以多个参数赋值
+       (setq a "to first variable" b "to second variable ")
+       #+END_SRC
+
+  - _setq_ 和 _setq-default_ 之间的区别
+    
+    #+BEGIN_QUOTE
+    setq设置当前缓冲区内的变量值, setq-default设置的是全局变量的值
+    #+END_QUOTE
+    
+
+* 其它
+  - =~/.emacs.d/init.el= 与 =~/.emacs= 的区别
+
+    1. 使用前者可以更好地所有Emacs相关文件整合在一个目录内(干净的HOME,易于网盘备份)
+    2. 更好的版本控制
