@@ -1,0 +1,21 @@
+#+TITLE: python进阶
+
+* 数据结构
+
+* 字符串
+
+* 迭代协议
+
+* 文件I/O
+
+* 数据处理
+
+* 类和对象
+
+* 并发编程
+
+* 装饰器
+
+  原文[[http://www.imooc.com/article/16227][python装饰器进阶之一]]
+
+  原文[[http://www.imooc.com/article/16248][python装饰器进阶之二]]

@@ -1,0 +1,2 @@
+* iTerm使用说明
+** [[file:mac下采用zsh代替bash.org][使用zsh代替原有的bash]]
