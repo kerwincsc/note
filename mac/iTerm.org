@@ -1,2 +1,5 @@
 * iTerm使用说明
 ** [[file:mac下采用zsh代替bash.org][使用zsh代替原有的bash]]
+
+   包含主题的选择
+** [[http://m.blog.csdn.net/lablenet/article/details/73900461][MacOS - iTerm2 + Oh my ZSH+ Powerline 打造个性终端最终版]]

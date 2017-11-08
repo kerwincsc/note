@@ -1,0 +1,100 @@
+* Tmux 终端命令行介绍
+
+** 命令介绍
+
+   Tmux ("Terminal Multiplexer"的简称), 是一款优秀的终端复用软件，类似 GNU screen，但比screen更出色。tmux来自于OpenBSD，采用BSD授权。使用它最直观的好处就是, 通过一个终端登录远程主机并运行tmux后，在其中可以开启多个控制台而无需再“浪费”多余的终端来连接这台远程主机, 还有一个好处就是当终端关闭后该shell里面运行的任务进程也会随之中断，通过使用tmux就能很容易的解决这个问题;
+
+** 使用场景
+
+   1. 关闭终端,再次打开时原终端里面的任务进程依然不会中断;
+
+   2. 处于异地的两人可以对同一会话进行操作，一方的操作另一方可以实时看到;
+
+   3. 可以在单个屏幕的灵活布局下开出很多终端，然后就能协作地使用它们;
+
+** 命令用法
+
+   1. 运行tmux：
+
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux
+      #+END_EXAMPLE
+
+   2. 新建会话： =# tmux  new  -s  SESSION-NAME=
+
+      (注：SESSION-NAME表示会话名称，可以为字母或数字)
+
+      也可以不用指定会话名称 ( 不推荐): +# tmux  new+
+   
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux new -s second-tmux
+      #+END_EXAMPLE
+
+   3. 查看已创建的会话
+
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux ls
+      #+END_EXAMPLE
+
+   4. 进入一个已知会话: =# tmux a -t SESSION-NAME= 或 =# tmux attach -t SESSION-NAME=
+
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux ls
+      0: 1 windows (created Wed Aug 30 11:15:29 2017) [61x16]
+      second-tmux: 1 windows (created Wed Aug 30 11:23:51 2017) [85x16]
+
+      [root@ames ~]# tmux a -t second-tmux
+      #+END_EXAMPLE
+
+   5. 暂时离开当前会话:
+
+      (该命令会从当前会话中退出去, 因此才会有稍后重新接入会话这么一说)
+
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux detach
+      #+END_EXAMPLE
+
+   6. 关闭会话: =# tmux kill-session -t SESSION-NAME=
+
+      (在会话内部或外部执行均可)
+
+      #+BEGIN_EXAMPLE
+      [root@ames ~]# tmux ls
+      0: 1 windows (created Wed Aug 30 11:15:29 2017) [61x16]
+      second-tmux: 1 windows (created Wed Aug 30 11:40:24 2017) [85x16]
+
+      [root@ames ~]# tmux kill-session -t second-tmux
+
+      [root@ames ~]# tmux ls
+      0: 1 windows (created Wed Aug 30 11:15:29 2017) [61x16]
+      #+END_EXAMPLE
+
+      注: 1. 单独运行tmux命令，即开启一个tmux会话; 2. 不能在tmux会话里面再新建会话，会报错："sessions should be nested with care, unset $TMUX to force"
+
+** 分屏操作
+
+   很多情况下, 需要在一个会话中运行多个命令，执行多个任务,我们可以在一个会话的多个窗口里组织他们。
+
+   1. 分屏：分为水平分屏和垂直分屏
+
+      - 水平分屏: 快捷键：先按 ctrl+b, 放开后再按%
+
+      - 垂直分屏: 快捷键：先按 ctrl+b, 放开后再按 "
+
+      - 分屏后的窗口中的光标互相切换: 快捷键：先按ctrl+b, 放开后再按下o
+
+   2. 切换tmux会话终端: 快捷键：先按ctrl+b, 放开后再按s
+
+   3.  终端内显示时间: 快捷键：先按ctrl+b, 放开后再按t; 退出时间界面：按q键
+
+** 其他快捷键操作
+
+   - 终止一个终端窗口(需确认): 快捷键：exit 或 先按ctrl+b, 放开后再按 &
+
+   - 在当前窗口的基础上再打开一个新的窗口: 快捷键：先按ctrl+b, 放开后再按c
+
+   - 暂时退出当前会话: 快捷键：先按ctrl+b, 放开后再按 d
+
+   - 查看面板编号: 快捷键：先按ctrl+b, 放开后再按q
+
+   - 关闭所有分屏后的窗口，即合并为一个窗口: 快捷键：先按ctrl+b, 放开后再按!
