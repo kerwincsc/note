@@ -1,0 +1,71 @@
+echo输出空行的方法
+#+BEGIN_EXAMPLE
+@echo off
+
+echo=
+echo,
+echo;
+
+echo+
+echo/
+echo[
+echo]
+
+echo:
+echo.
+echo\
+
+pause
+#+END_EXAMPLE
+这十种方法可以分为三组，每组的效率依次递减. [[http://www.jb51.net/article/30987.htm][猛戳找原文]]
+
+
+=echo,= 插入空行会不会对%errorlevel%的值产生影响
+
+findstr
+findstr是否支持正则? 支持
+
+start
+
+call
+
+goto
+
+net
+
+sc
+
+set
+
+set添加变量 set var_name=var_value
+
+set删除变量 set var_name=
+
+set下设置的变量只对当前窗口有效, 关闭后自动消失
+使用call和start时, set设置的变量是否会被传递下去?
+实验
+#+BEGIN_SRC cmd
+set var=123
+start
+echo %var%
+#+END_SRC
+结论: 使用start启动另一个cmd时, set设置的变量会被继承下去
+
+set命令添加变量时, 即使传给变量的字符串中有空格, 也不需要加引号: =set VAR=I'm variable=
+
+- 判断指定服务是否已启动
+
+  net start :: 显示正在运行的服务
+
+  net start | findstr /i <服务名>
+
+  #+BEGIN_EXAMPLE
+  @echo off
+  net start | findstr /i <Service_Name>
+  if %errorlevel% neq 0 (
+      echo Service is not running
+  ) else (
+      echo Service is running
+  )
+  #+END_EXAMPLE
+  备注: 如果<Service_Name>中含有空格, 就需要用 =\= 进行转义;

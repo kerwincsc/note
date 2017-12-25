@@ -22,12 +22,16 @@
 	#+END_EXAMPLE
 **** 列的操作
      - 查询表中所有列 =SELECT * FROM tbl_name=
+
      - 为列设定别名 *AS*
+
        #+BEGIN_EXAMPLE
        SELECT shangping_id AS id, shangpingming AS name FROM tbl_name;
        说明: 别名可以使用中文, 但是得用双引号括起来(其实用引号引起就可以了, 不分单双)
        #+END_EXAMPLE
+
      - 从结果中删除重复行 *DISTINCT*
+
        #+BEGIN_EXAMPLE
        SELECT DISTINCT column_name FROM tbl_name;
        在使用DISTINCT时, NULL也被视为一类数据;

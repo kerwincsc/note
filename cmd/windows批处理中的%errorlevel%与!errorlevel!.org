@@ -1,0 +1,23 @@
+# windows批处理中的%errorlevel%与!errorlevel!
+
+bat脚本中常用%errorlevel%表达上一条命令的返回值，用于判断。比如：
+#+BEGIN_EXAMPLE
+cmd1
+if %errorlevel% == 1 （
+    cmd2
+）  //如果cmd1返回的错误码值等于1时，将执行cmd2操作
+#+END_EXAMPLE
+
+一般上一条命令的执行结果返回的值只有两个，0表示”成功”、1表示”失败”，实际上，errorlevel 返回值可以在0~255 之间;
+
+在for循环中或if语句中多条命令都需要获取返回值等情况下，用errorlevel显得无效，第二条命令开始errorlevel的值都不会变。此处涉及批处理中的变量延迟问题，并不是errorlevel无效，而是对errorlevel变量的引用采用的是没开启变量延迟情况下的百分号%;
+
+开启变量延迟的设置: =setlocal EnableDelayedExpansion= ,即延迟环境变量扩展，告诉解释器在遇到复合语句的时候，不要将其作为一条语句同时处理，而是一条一条地去解释。但是这时如果仍然用百分号%来引用变量是不起作用的，必须用感叹号!，如 =!errorlevel!= ;
+#+BEGIN_EXAMPLE
+setlocal enabledelayedexpansion
+cmd1
+if !errorlevel! == 1 (
+  cmd2
+  echo !errorlevel!
+)
+#+END_EXAMPLE
