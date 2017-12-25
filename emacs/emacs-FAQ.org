@@ -1,0 +1,39 @@
+#+TITLE: Emacs FAQ
+
+* emacs-lisp
+
+** _set_ 和 _setq_ 的区别
+
+       #+BEGIN_SRC emacs-lisp
+       ;; set给变量设置一个值, 需要quote(引用)第一个参数
+       ;; set每次只能给一个变量设定值
+       (set 'a "set a value of variable")
+       ;; setq给变量设置值时, 作为参数的变量不需要被引用
+       ;; setq同时可以多个参数赋值
+       (setq a "to first variable" b "to second variable ")
+       #+END_SRC
+
+** _setq_ 和 _setq-default_ 之间的区别
+    
+    #+BEGIN_QUOTE
+    setq设置当前缓冲区内的变量值, setq-default设置的是全局变量的值
+    #+END_QUOTE
+
+** load, load-file, autoload, require
+
+   *load* : 搜索 load-path 中的路径并打开第一个所找到的匹配文件名的文件,此方法用于你预先不知道文件路径的时候;
+
+   *load-file* : 用于打开某一个指定的文件，用于当你不想让 Emacs 来去决定加载某个配置文件，自已手动加载时（ .el 或者.elc 文件）;
+
+   *autoload* : 用于仅在函数调用时加载文件，使用此方法可以大大节省编辑器的启动时间;
+
+   *require* : 加载还未被加载的插件. 首先它会查看变量 features 中是否存在所要加载的 符号如果不存在则使用上面提到的 load 将其载入;
+
+
+    
+
+* 其它
+  - =~/.emacs.d/init.el= 与 =~/.emacs= 的区别
+
+    1. 使用前者可以更好地所有Emacs相关文件整合在一个目录内(干净的HOME,易于网盘备份)
+    2. 更好的版本控制

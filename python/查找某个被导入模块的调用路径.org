@@ -1,0 +1,22 @@
+* Python中查找某个导入的模块的调用路径
+
+  查询导入的os模块路径 =import os=
+
+** 利用模块的自带的属性
+
+   print(os.__file__)
+
+** 利用模块
+   - inspect模块
+
+     import inspect # 导入inspect模块
+     
+     print(inspect.getfile(os)) # 这个会返回os.pyc, 如果有的话
+
+     print(inspect.getsourcefile(os)) # 这个会返回os.py
+
+   - imp模块
+
+     import imp
+
+     print(imp.find_module('os')) # 和上面的不同, 这里输入的是字符串

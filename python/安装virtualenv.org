@@ -1,0 +1,8 @@
+* 安装virtualenv
+** 在Linux上安装
+   - pip install virtualenv
+
+* 可能遇到的问题
+
+  - 提示没有pip命令 :: yum install python-pip
+  - 版本过低 :: pip install --upgrade pip

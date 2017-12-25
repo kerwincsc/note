@@ -1,0 +1,458 @@
+#+TITLE: Emacs Lisp学习记录
+* 介绍
+* Lisp数据类型(Lisp Data Types) Emacs Lisp里对象的数据类型
+#<<test>>
+* 数字
+** 整数基础
+
+ 整数的取值范围依赖于不同的机器. 最小的范围在 −536, 870, 912 到 536, 870, 911(这是30比特的情况下, 即 -2**29 ~ 2**29 - 1 ), 但是大部机器提供一个更大范围的整数.
+
+ Lisp Reader 以一个可选的开始标志和结束标志的数字序列读取一个整数. 超出Emacs范围的整数将被当成是浮点数.
+
+ #+BEGIN_EXAMPLE
+ 1     ; 代表整数 1
+ 1.     ; 同上
+ +1     ; 同上
+ -1     ; 代表整数 -1
+ # 下面这个取决于不同的机器, 就如同一开始说的那样;
+ 9000000000000000000 ; 代表浮点数 9e18
+ 0     ; 0
+ -0     ; 0
+ #+END_EXAMPLE
+
+ 基数不同于10的整数的语法, 使用后面跟着一个指定进制的字母的'#'井号来表示: 'b'代表二进制, 'o'代表八进制, 'x'代表十六进制, 或者以 ='RADIXr'= 来指定进制的基数. 对于以指定字母表示基数的进制而言, 这种方法就没什么意义了. 因此, '#bINTEGER'读取一个二进制的整数, 并且 '#RADIXrINTEGER'读取一个'RADIX'进制的整数. RADIX的值可以是2~36. 例如:
+ #+BEGIN_EXAMPLE
+ #b101100 ⇒ 44
+ #o54 ⇒ 44
+ #x2c ⇒ 44
+ #24r1k ⇒ 44
+ #+END_EXAMPLE
+
+ 查看数字的二进制形式有助于理解各种各样的操作整数的函数, 特别是按位运算符(参见 按位运算符).
+
+ 在30比特的二进制里, 十进制整数 5 看起来像这样: =0000...000101 (30 bits total)= 
+ ('...'代表足够填写30比特位的字符; 在本例中, 代表20个0比特. 后面的例子也使用'...'符号使二进制整数更容易阅读.)
+
+ 整数 =-1= 的二进制看起来像这个: =1111...111111 (总共30个比特位)=
+
+ -1 被表示为30个1. (这叫做'二进制补码'标记法.)
+
+ -1 减 4 返回负整数 -5. 在二进制中, 十进制4就是100. 因此, -5 看起来就像这个: =1111...111011 (30 bits total)=
+
+ 在这个实现中, 30比特中最大的二进制整数以十进制表示就是 536, 870, 911. 二进制中, 它看起来是这样的: =0111...111111 (总共30个比特位)=
+
+ 当你给536, 870, 911加1时, 这个值是-536, 870, 912, 因为算法函数不检查整数是否超出了范围:
+ #+BEGIN_SRC emacs-lisp
+  (+ 1 537870911)
+  => -537870912
+  => 1000...000000 (总共30个比特位)q
+ #+END_SRC
+ 备注: 实际上我的电脑上没有得出这个结果, 相信大部分人都不会得到这个结果, 因为现在的电脑基本上都是64位的了;
+
+ 在本节中描述的许多函数接受标识代替数字作参数. (参见 标识)因为这些函数的实参可能是数字(numbers), 也可能是标识(markers), 所以我们通常给这些参数命名为 =NUMBER-OR-MARKER= . 当参数值是一个标识时, 它的位置值将被使用并且它的缓冲区被忽略.
+
+ -- 变量: most-positive-fixnum
+
+  这个变量的值是Emacs Lisp能处理的最大的整数值. 在32位机器上, 代表值为 2**29 - 1 并且 在64位机器上, 代表值为2**61 - 1
+
+ -- 变量: most-negative-fixnum
+
+  这个变量的值是Emacs Lisp能处理的最小的值. 它是一个负数. 在32位机器上, 值为 -2**29, 在64位机器上, 值为2**61 - 1;
+
+
+  在Emacs Lisp中, 文本字符以整数进行表示. 在0到'(max-char)'之间的任意一个整数被看作是一个有效的字符. 详见 字符编码
+** 浮点数基础 
+** 随机数
+* TODO 9 求值(Evaluation)
+
+ 在Emacs Lisp中, 通过"Lisp交互式解释器"(一个接收Lisp对象作为输入并且计算它的"值作为一个表达式"的程序)执行表达式的"*求值*". 它如何求值取决于对象的数据类型, 根据本节描述的规则. 解释器自动运行, 对你的程序的一部分求值, 但也能通过显式调用Lisp原始的函数'*eval*'求值.
+
+** 求值简介
+
+ Lisp解释器, 或是求值器, 是Emacs用来计算给定表达式的值的部分. 当一个写入Lisp解释器的函数被调用时, 求值器通过计算函数体的表达式来计算函数的值. 因此, 运行任何Lisp程序实际上意味着运行Lisp解释器.
+
+ 一个准备求值的Lisp对象被称为一个"形式(form)"或者"表达式(expression)"[fn:1]. 这个形式是一个数据对象而不仅仅是文本的事实是类Lisp语言和典型的程序语言之间的一个根本区别. 任何对象都能被求值, 但是事实上只有数字(numbers), 符号(symbols), 列表(lists)和字符串(strings)经常被求值.
+
+ 在后面的章节, 我们将详述每一种形式的求值意味着什么.
+
+ 读取一个Lisp形式然后对它求值是很常见的, 但是读取和求值是两个单独的活动, 并且任意一个均能单独执行. 读取(read)本身不对任何东西求值; 它将Lisp对象的打印表示法转换成对象本身.这取决于'读取(read)'的调用者指定这个对象是否是一个被求值的形式(form), 或者用作完全不同的用途.
+
+ 求值是一个递归过程, 并且对一个表达式求值通常会包含那个表达式的求值部分. 例如, 当你对一个"函数调用(function call)"表达式, 如'=(car x)='求值时, Emacs首先对参数(子表达式'x')求值. 在对参数求值之后, Emacs"执行(executes)"函数('car'), 并且如果函数是用Lisp写成的, 通过对函数的"body"(即函数体)求值执行生效(但是在这个例子中, 'car'不是Lisp函数, 它是一个以C实现的原生函数).参考[[Functions][函数]], 获取更多函数和函数调用的信息.
+
+ 求值发生在一个被称为"环境(environment)"的上下文中, 它由当前的值和绑定的所有Lisp变量组成(参考[[Variables][变量]])[fn:2]. 无论何时, 如果一个表达式引用一个变量而没有为它创建新的绑定, 那么该变量就会评估当前环境变量给的值. 通过绑定变量对一个表达式求值, 也有可能临时改变当前的环境变量(参考[[Local Variables][局部变量]]).
+
+ 对一个表达式求值也有可能做出永久的更改, 这些更改被称为"副作用(side effects)". 一个产生副作用的表达式例子就是'=(setq foo 1q)='
+
+ 不要将命令键解释误解成是在求值. 编辑器命令使用活动的键映射将键盘的输入循环转化成一个命令(一个可调用的交互式函数), 然后使用"交互式地调用(call-interactively)"来执行那个命令. 如果命令是以Lisp写的, 执行命令通常包含求值; 但是, 此步骤不被当作命令键解释的一部分. 参考[[Command Loop][命令循环]]
+
+** 9.2 各种各样的表达式(Forms)
+
+ 一个将要被求值的对象被称为'form'(或者一个"表达式(expression)"). Emacs如何对一个表达式求值取决于它的数据类型. Emacs有三个不同种类的求值不同的表达式: 符号, 列表和其它类型. 这节以自求值表达式这个其它类型开始一个接一个地描述三种类型.
+
+*** 9.2.1 自求值表达式
+ #<<Self-Evaluating Froms>>
+
+ "自求值表达式"是非列表表达式或非符号表达式的其它表达式. 自求值表达式向自身求值: 求值结果就是同一个被求值的对象. 因此, 数字25自求值为25, 字符串'"foo"'自求值为'"foo"'.同样地, 对一个向量求值不会引起向量的元素的求值---它返回内容不变的相同向量.
+
+ #+BEGIN_SRC emacs-lisp
+ '123    ; 未求值的数字
+   => 123
+ 123    ; 像之前一样求值---结果相同
+   => 123
+ (eval '123)  ; 手动求值---结果相同
+   => 123
+ (eval (eval '123)) ; 求值两次, 什么也没改变
+ #+END_SRC
+ 
+ 在Lisp代码中写数字, 字符, 字符串甚至向量都是很正常的, 要充分利用它们自求值的特点. 但是, 缺少读取语法的类型很少这么做, 因为没有办法用文本写出来. 用Lisp程序构造出包含这些类型的表达式是可能的. 如下所例:
+
+ #+BEGIN_SRC emacs-lisp
+ ;; 构建一个包含缓冲区对象的表达式.
+ (setq print-exp (list 'print (current-buffer)))
+   => (print #<buffer eval.texi>)
+ ;; Evaluate it.
+ (eval print-exp)
+   => #<buffer eval.texi>
+   => #<buffer eval.texi>
+ #+END_SRC
+*** 9.2.2 符号表达式
+ #<<Symbol Forms>>
+ 当一个符号被求值时, 它被当作一个变量处理. 结果就是变量的值, 如果有的话. 假如作为变量的符号没有值, 那么Lisp解释器就会报错. 关于变量使用的更多信息, 参考[[Variables][变量]]
+
+ 在接下来的例子中, 我们用'setq'来设定符号的值. 然后我们对这个符号求值, 并且找回'setq'储存的值.
+
+ #+BEGIN_SRC emacs-lisp
+ (setq a 123)
+  => 123
+ (eval 'a)
+  => 123
+ a
+  => 123
+ #+END_SRC
+
+ 符号'nil'和't'被特殊处理, 这样'nil'的值总是'nil', 't'的值总是't'; 你无法把它们设置或绑定为任何值. 因此, 这两个符号表现得像是自求值表达式, 尽管'eval'像处理其它符号一样处理它们. 名字以':'开头的符号也以同样的方式自求值; 同样地, 它的值通常不能被改变. 参考[[Constant Variables][常量]]
+*** 9.2.3 列表表达式的归类
+
+ 一个非空的列表表达式根据它第一个元素可以是一个函数调用, 一个宏调用或者其它特殊表达式. 这三种表达式以下面描述的不同的方式被求值. 剩余的列表元素为函数, 宏或者其它特殊表达式构成参数
+
+ 对一个非空的列表表达式求值的第一步是检查它的第一个元素. 这个元素独自地确定这个列表是什么表达式以及列表剩余元素如何处理. 在某些Lisp方言中, 如Scheme, 第一个元素是不被求值的.
+*** 9.2.4 符号函数间接寻址
+
+ 如果列表的第一个元素是一个符号, 那么求值器检查符号的函数单元, 并且使用它的内容代替初始符号. 如果它的内容又是一个符号, 这个被称做"符号函数间接寻址"的程序被重复, 直到它获取一个非符号(即获取到函数). 参考 =Function Names=, 寻找更多符号函数间接寻址信息.
+
+ 在一个符号的功能单元指向同一个符号的情况下, 这个程序的一个可能的结果是一个无限循环. 不然的话, 我们最终会获得一个非符号, 它应该是一个函数或者其它合适的对象.
+
+ 更确切地来说, 我们现在应该有了一个Lisp函数(一个lambda表达式), 一个字节码函数, 一个原始函数, 一个Lisp宏, 一个特殊的表达式或者一个自动加载对象. 这些类型中的每一个是被描述在下面部分的一个实例. 如果对象不是这些类型其中之一, Emacs发出一个'非法函数'错误的信号.
+
+ 接下来的例子用图说明了符号间接寻址程序. 我们使用'fset'来设定一个符号的函数单元, 使用'symbol-function'来获取函数单元的内容(参考 Function Cells). 特别指出, 我们把符号'car'储存进'first'函数单元, 并且把符号'first'储存到'erste'函数单元.
+
+ #+BEGIN_SRC emacs-lispn
+ ;; 建立函数单元连接
+ ;; -------------  -----  -------  -------
+ ;; | #<subr car> | <-- | car | <-- | first | <-- | erste |
+ ;; -------------  -----  -------  -------
+ (symbol-function 'car)
+  => #<subr car>
+ (fset 'first 'car)
+  => car
+ (fset 'erste 'first)
+  => first
+ (erste '(1 2 3))  ; 调用通过'erste'引用的函数.
+ #+END_SRC
+
+ 相比之下, 下面的例子没有使用符号函数间接寻址来调用函数, 因为第一个元素是一个匿名Lisp函数, 不是一个符号.
+
+ #+BEGIN_SRC emacs-lisp
+ ((lambda (arg) (erste arg))
+  '(1 2 3))
+   => 1
+ #+END_SRC
+
+ 执行函数本身将会对它的函数体求值; 这确实包含了符号函数间接寻址, 当调用'erste'时.
+
+ 这个表达式很少使用, 并且现在已经过时了. 你应该以下面的形式替代:
+ #+BEGIN_SRC emacs-lisp
+ (funcall (lambad (arg) (erste arg))
+    '(1 2 3))
+ #+END_SRC
+ 或者这样就行
+ #+BEGIN_SRC emacs-lisp
+ (let ((arg '(1 2 3))) (erste arg))
+ #+END_SRC
+
+ 内建函数"indirect-function"提供一个简单的方式来明确运行符号函数间接寻址.
+
+ -- 函数: _indirect-function function &optional noerror_
+
+ 这个函数将FUNCTION有函数的意义的那部分返回. 如果FUNCTION是一个符号, 那么它会寻找FUNCTION的函数定义并且以那个值重新开始(查找). 如果FUNCTION不是一个符号, 那么这将返回FUNCTION本身.
+
+ 如果最终的符号是未绑定的, 那么这个函数将返回'nil'. 如果在符号链中有循环, 它将发出一个'cyclic-function-indirection'的错误信号.
+
+ 可选参数NOERROR已过时, 为了向后兼容而存在并且没有任何影响.
+
+ 这里将告诉你如何在Lisp中定义'indirect-function'
+
+ #+BEGIN_SRC emacs-lisp
+ (defun indirect-function (function)
+  (if (symbalp function)
+   (indirect-function (symbol-function function))
+   function))
+ #+END_SRC
+
+*** 9.2.5 函数表达式的求值
+
+ 如果被求值的列表的第一个元素是Lisp函数对象, 字节码对象或者原始函数对象, 那么那个列表就是一个"function call(函数调用)". 例如, 这里就是一个函数'+'的调用:
+ #+BEGIN_SRC emacs-lisp
+ (+ 1 x)
+ #+END_SRC
+
+ 对一个函数求值的第一步就是从左往右对列表中剩余的元素求值. 结果就是每一个列表元素的实际参数值. 下一步是以参数列表去调用函数, 实际上是使用函数'apply'(参见 Calling Functions). 如果这个函数是用Lisp写成的, 参数被用来绑定函数的形参(参见 Lambda Expressions); 然后函数体中的表达式被依次求值, 并且最后的函数体表达式的值成为函数调用的值.
+*** 9.2.6 Lisp宏求值(Lisp Macro Evaluation)
+
+ 如果被求值列表的第一个元素是宏对象, 那么这个列表就是一个'宏调用(macro call)'. 当一个宏调用被求值时, 列表的剩余元素最初不会被求值. 反而, 这些元素本身被用作宏的参数. 宏定义计算一个替换表达式, 叫做宏的"扩展式", 以替代原来的表达式进行计算. 这个扩展可以是表达式中的任意一种: 自求值常量, 符号, 或者一个列表. 如果这个扩展本身是宏调用, 这个扩展程序将会重复, 直到出现其它类型的表达式结果.
+
+ 通过对扩展式求值, 结束宏调用的一般求值. 但是宏扩展式不一定会马上被求值, 或者根本不会被求值, 因为其它程序也会扩展宏调用, 并且它们可能会也可能不会对扩展式求值.
+
+ 正常来说, 作为计算宏扩展式一部分的参数表达式不会被求值, 反而会作为扩展的一部分出现, 所以当扩展式被求值时他们才会被计算.
+
+ 例如, 下方给定的宏定义:
+ #+BEGIN_SRC emacs-lisp
+ (defmacro cadr (x)
+  (list 'car (list 'cdr x)))
+ #+END_SRC
+
+ 扩展式, 如'(cadr (assq 'handler list))'是一个宏调用, 并且它的扩展式是:
+ #+BEGIN_SRC emacs-lisp
+ (car (cdr (assq 'handler list)))
+ #+END_SRC
+
+ 请注意, 参数'(assq 'handler list)'出现在了扩展式中.
+
+ 参考 Macros, 寻找更多关于Emacs Lisp宏的描述.
+*** 9.2.7 特殊表达式
+
+ 一个"special form(特殊表达式)"是一个被特殊标记了的原始函数, 这样一来, 它的参数就不会被全部求值. 大多数的特殊表达式定义了控制结构或者做变量绑定---函数不能做到的事.
+
+ 每一个特殊表达式有它自己的规则, 如哪个参数被求值, 哪个参数不求值就可以被使用.某个特定参数是否被求值可能取决于对其它参数求值的结果.
+
+ 如果某个表达式的第一个符号是特殊表达式, 这个表达式应该遵循那个特殊表达式的规则; 不然的话, Emacs的行为就不是定义明确的(虽然它不会崩溃). 例如, '=((ambda (x) x . 3) 4)='包含了一个以'lambda'开始的子表达式, 但它不是个形式明确的'lambda'表达式, 所以Emacs有可能会报错, 或者返回3或4或'nil', 或者以其他方式行事.
+
+ -- Function: _special-form-p object_
+
+ 这个断言测试它的参数是否是一个特殊表达式, 并且当是特殊表达式时, 返回't', 不是时, 返回'nil'.
+
+ 这是一个以字母表顺序排列的, 在Emacs Lisp里的, 所有的以一个指向各自详细介绍位置的特殊表达式的列表.
+
+ |---------------------------+----------------------------|
+ | 'and'      | 参考 Combining Conditions |
+ | 'catch'     | 参考 Catch and Throw  |
+ | 'cond'     | 参考 Conditionals   |
+ | 'condition-case'   | 参考 Handling Errors  |
+ | 'defconst'    | 参考 Defining Variables |
+ | 'devar'     | 参考 Defining Variables |
+ | 'function'    | 参考 Anonymous Functions |
+ | 'if'      | 参考 Conditionals   |
+ | 'interactive'    | 参考 Interactive Call  |
+ | 'lambda'     | 参考 Lambda Expressions |
+ | 'let' 'let*'    | 参考 Local Variables  |
+ | 'or'      | 参考 Combining Conditions |
+ | 'prog1' 'prog2' 'progn' | 参考 Sequencing   |
+ | 'quote'     | 参考 Quoting    |
+ | 'save-current-buffer'  | 参考 Current Buffer  |
+ | 'save-excursion'   | 参考 Excursions   |
+ | 'save-restriction'  | 参考 Narrowing    |
+ | 'setq'     | 参考 Setting Variables  |
+ | 'setq-default'   | 参考 Creating Buffer-Local |
+ | 'track-mouse'    | 参考 Mouse Tracking  |
+ | 'unwind-protect'   | 参考 Nonlocal Exits  |
+ | 'while'     | 参考 Iteration    |
+ 
+ Common Lisp小贴士: 这里是GNU Emacs Lisp和Common Lisp中一些特殊表达式的比较. 'setq', 'if'和'catch'均在Emacs Lisp和Common Lisp中存在. 'save-excursion'是Emacs Lisp中的特殊表达式, 在Common Lisp中并不存在. 'throw'是Common Lisp中的特殊表达式(因为它必须能够抛出多个值), 但是在Emacs Lisp中这就是个函数(没有多个值).
+*** 9.2.8 自动加载
+
+ '自动加载(autoload)'特性允许你去调用一个函数定义还没有被加载到Emacs里的函数或宏. 它指定哪个文件包含了定义. 当一个自动加载对象作为一个符号的函数定义出现, 调用那个作为函数的符号将自动加载指定文件; 然后它调用从那个文件加载的真正的定义. 为以一个符号的函数定义出现的自动加载对象做准备的方法在Autoload中有描述.
+** 9.3 引用(Quoting)
+* 待整理内链接
+ 
+*** 命令循环
+ #<<Command Loop>>
+
+*** 局部变量
+ #<<Local Variables>>
+
+*** 变量
+ #<<Variables>>
+
+*** 函数
+ #<<Functions>>
+
+*** 常量
+ #<<Constant Variables>>
+* 变量全名约定
+
+** 13.3 宏(Macro)和字节编译(Byte Compilation)
+
+ 你可能会问我们为什么要不厌其烦地计算一个宏的扩展, 然后再对这个扩展求值. 为什么宏主体(macro body)不能直接产生期望的结果呢？原因与编译有关. 
+
+ 当一个宏调用出现在正在编译的Lisp程序中时, Lisp编译器像解释器一样调用宏定义, 并接收一个扩展。但是, 它并不对这个扩展进行求值, 它编译这个扩展, 就好像它本来就在这个程序中. 因此, 编译后的代码给这个宏产生值和预期的副作用, 但以编译后的最高速度执行。如果宏主体自己计算了值和副作用, 这将不会生效--它们将在编译时计算, 这是无用的。
+
+ 为了使编译后的宏指令调用生效, 宏指令必须被定义在Lisp中, 当对它们调用时被编译. 编译器有一个特别的特性帮你去做这个: 如果一个被编译的文件包含一个 /defmacro/ 形式, 宏指令被临时地定义用来编译那个文件的剩余部分.
+
+ 字节编译(byte-compiling)一个文件也会在这个文件的最顶层执行所有的 /require/ 调用, 因而在编译期间通过依赖那些定义它们的文件, 你可以确保必要的宏指令定义是可获得的. 当某人 /运行/ 编译的程序时, 为了避免载入宏定义文件, 在 /require/ 调用周围写上 /eval-when-compile/ .
+
+** 13.4 定义宏
+
+  Lisp宏对象是一个列表, 此列表的 *car* 是 /macro/, 并且列表的 *cdr* 是一个函数. 宏的展开通过对来自宏调用的未求值的参数的列表应用函数(以 /apply/)进行操作.
+
+  像使用一个匿名函数使用一个匿名Lisp宏是有可能的, 但从来不这么做, 因为向泛函数传递匿名函数是没有意义的, 例如 /mapcar/. 实际上, 所有的Lisp宏都有名字, 而且它们差不多都用 /defmacro/ 宏定义.
+
+  - Macro: *defmacro* /name args [doc] [declare] body.../
+
+    /defmacro/ 定义符号名(它不应该被引用)作为一个宏, 它看起来像这样:
+
+    #+BEGIN_SRC emacs-lisp
+    (macro lambda args . body)
+    #+END_SRC
+
+    (注意, 这个列表的 /cdr/ 是一个lambda表达式.)这个宏对象被储存在 /name/ 的函数单元内. /args/ 的含义与函数中的相同, 并且关键字 /&rest/ 和 /&optional/ 也能使用. 无论是 /name/ 还是 /args/ 都不应该被引用. /defmacro/ 的返回值没有被定义.
+
+    /doc/, 如果存在, 则应该是指定宏的文档字符串的字符串. /declare/, 如果存在, 应该是一个为宏指定元数据的 /declare/ 形式. 注意, 宏不能有交互式的声明, 因为它们不能被交互地调用.
+
+
+  宏常常需要从一个常量和非常量部分的混合构建一个巨大的列表结构. 为了简单化, 可以使用 "=`=". 例如:
+
+  #+BEGIN_SRC emacs-lisp
+    (defmacro t-becomes-nil (variables)
+      `(if (eq ,variables t)
+           (setq ,variables nil)))
+
+    (t-becomes-nil foo)
+         == (if (eq foo t) (setq foo nil))  
+  #+END_SRC
+
+** 13.5 使用宏的常见问题
+
+   宏展开可能产生违反直觉的结果. 本节描述了一些可能导致麻烦的重要后果，以及避免麻烦的规则.
+
+*** 13.5.1 错误的时间(在扩展中操作, 不是在宏中)
+
+    编写宏时最常见的问题是在扩展宏时过早地做一些真正的工作，而不是在扩展本身. 例如, 一个真正的包有这样的宏定义:
+    #+BEGIN_SRC emacs-lisp
+      (defmacro my-set-buffer-multibyte (arg)
+        (if (fboundp 'set-buffer-multibyte)
+            (set-buffer-multibyte arg)))
+    #+END_SRC
+    有了这个错误的宏定义，程序在解释时工作正常，但编译时失败. 在编译期间, 这个叫做 /set-buffer-multibyte/ 的宏定义是错误, 而且在编译包运行期间什么也不做. 编程人员真正想要地是定义是这样的:
+    #+BEGIN_SRC emacs-lisp
+      (defmacro my-set-buffer-multibyte (arg)
+        (if (fboundp 'set-buffer-multibyte)
+            `(set-buffer-multibyte ,arg)))
+    #+END_SRC
+    当编译程序确实在运行时, 在合适的时机, 这个宏的扩展成一个 *set-buffer-multibyte* 的调用, 这个调用将会被执行.
+*** 13.5.2 对宏的参数重复求值
+
+    当定义一个宏时, 你必须注意在展开执行时参数被求值的次数. 接下来的宏(用于加快迭代)阐明了问题. 这个宏允许我们编写一个 /for-loop/ 结构.
+    #+BEGIN_SRC emacs-lisp
+      (defmacro for (var from init to final do &rest body)
+        "Execute a simple \"for\" loop.
+        For example, (for i from 1 to 10 do (print i))."
+        (list 'let (list (list var init))
+              (cons 'while
+                    (cons (list '<= var final)
+                          (append body (list (list 'inc var)))))))
+           
+      (for i from 1 to 3 do
+        (setq square (* i i))
+        (princ (format "\n%d %d" i square)))
+      ==>
+      (let ((i 1))
+        (while (<= i 3)
+          (setq square (* i i))
+          (princ (format "\n%d %d" i square))
+          (inc i)))
+
+           -|1       1
+           -|2       4
+           -|3       9
+      ⇒ nil
+    #+END_SRC
+    这个宏的参数 /from/, /to/, and /do/ 是语法糖; 它们被全部忽略. 这个思想就是说, 在宏调用的那些位置中你可以编写噪声字(例如, /from/, /to/ 和 /do/).
+
+    这是通过使用反引号被简化的相同定义:
+    #+BEGIN_SRC emacs-lisp
+          (defmacro for (var from init to final do &rest body)
+             "Execute a simple \"for\" loop.
+           For example, (for i from 1 to 10 do (print i))."
+             `(let ((,var ,init))
+                (while (<= ,var ,final)
+                  ,@body
+                  (inc ,var))))
+    #+END_SRC
+
+    这两种形式的定义(带有反引号和不带反引号的)都有缺陷，每次迭代都要对 /final/ 进行求值. 如果 /final/ 是常量, 这就不是问题. 如果它是一个较为复杂的形式, 比方说 /(long-complex-calculation x)/, 这个形式能显著地减慢执行速度. 如果 /final/ 有副作用, 执行它超过一次就可能出错.
+
+    一个设计良好的宏定义采取措施来避免这个问题, 通过生成一个扩展, 它精确地计算一次参数表达式, 除非重复求值是宏预期目的的一部分. 以下是 /for/ 宏的一个正确扩展:
+    #+BEGIN_SRC emacs-lisp
+          (let ((i 1)
+                 (max 3))
+             (while (<= i max)
+               (setq square (* i i))
+               (princ (format "%d      %d" i square))
+               (inc i)))
+    #+END_SRC
+    以下是创建这个扩展的宏定义:
+    #+BEGIN_SRC emacs-lisp
+          (defmacro for (var from init to final do &rest body)
+             "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+             `(let ((,var ,init)
+                    (max ,final))
+                (while (<= ,var max)
+                  ,@body
+                  (inc ,var))))
+    #+END_SRC
+    不幸的是, 这个修复引入了另一个问题, 在下面的章节中描述.
+*** 13.5.3 宏扩展中的本地变量
+
+    在上一节中, /for/ 宏的定义被修复了, 如下所示, 使 /扩展/ 对宏参数进行适当次数地求值:
+
+    #+BEGIN_SRC emacs-lisp
+          (defmacro for (var from init to final do &rest body)
+             "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+             `(let ((,var ,init)
+                    (max ,final))
+                (while (<= ,var max)
+                  ,@body
+                  (inc ,var))))
+    #+END_SRC
+
+    新定义的宏指令 /for/ 有一个新问题: 它引入一个新的本地变量 /max/ , 这不是用户所期望的. 这将在如下所示的例子中引起麻烦:
+
+    #+BEGIN_SRC emacs-lisp
+          (let ((max 0))
+             (for x from 0 to 10 do
+               (let ((this (frob x)))
+                 (if (< max this)
+                     (setq max this)))))
+    #+END_SRC
+
+    宏 /for/ 主体内引用的变量 /max/, 应该指的是用户的 /max/ 绑定, 但实际上访问了由 /for/ 产生的绑定.
+
+    纠正这个问题的方式是使用一个未占用的符号取代 /max/, 这个未占用的符号能够被绑定并且能够像其他符号一样被引用, 但因为它是由宏 /for/ 所创建, 所以我们知道它不可能出现在用户的程序中. 因为它是未占用的, 所以用户没法把它放进随后的程序中. 它将永远不会出现除了宏 /for/ 中. 下例是以这种方式工作的 /for/ 定义:
+
+    #+BEGIN_SRC emacs-lisp
+      (defmacro for (var from init to final do &rest body)
+             "Execute a simple for loop: (for i from 1 to 10 do (print i))."
+             (let ((tempvar (make-symbol "max")))
+               `(let ((,var ,init)
+                      (,tempvar ,final))
+                  (while (<= ,var ,tempvar)
+                    ,@body
+                    (inc ,var)))))
+    #+END_SRC
+
+    它创建了一个未占用的符号 /max/, 并且把它放在扩展中, 代替出现在普通表达式里通常已被占用的符号 /max/
+* Footnotes
+
+[fn:2] 这个“环境”的定义并不是特意包含所有可能影响程序结果的数据.
+
+[fn:1] 它有时也被称为“S表达式”或“sexp”, 但我们一般不在本手册中使用这一术语.

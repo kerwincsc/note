@@ -1,0 +1,40 @@
+* Mac下采用zsh代替bash
+
+** mac上快速切换到zsh
+
+   #+BEGIN_EXAMPLE
+   # 先切换到 /bin/zsh
+   chsh -s /bin/zsh
+   #+END_EXAMPLE
+
+** 默认的zsh配置不太友好，我们下载一个github上别人配置好的文件
+
+   #+BEGIN_EXAMPLE
+   # 备份
+   cp ~/.zshrc ~/.zshrc.orig
+   # 替换
+   cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+   #+END_EXAMPLE
+
+** 重启terminal
+
+   [[file:image/zsh1.png][效果图]]
+
+** 选一个合适的zsh主题
+
+   #+BEGIN_QUOTE
+   注意：采用zsh替代bash后，以前~/.bashrc之类的配置应该写入~/.zshrc中
+   #+END_QUOTE
+
+   在~/.oh-my-zsh/themes目录中，有大量的主题可供选择，根据不同的爱好，可以自行选择，然后在~/.zshrc中配置即可
+
+   打开~/.zshrc，添加一行
+
+   #+BEGIN_EXAMPLE
+   # 我自己选择的主题
+   ZSH_THEME="af-magic"
+   #+END_EXAMPLE
+
+** 重启终端
+
+   [[file:image/zsh2.png][效果图]]

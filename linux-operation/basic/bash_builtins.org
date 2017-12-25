@@ -1,0 +1,15 @@
+* BASH内建工具
+** history
+
+   常见用法: 不加任何选项, 直接查看历史命令
+
+   - 技巧
+
+     - 查看各命令被执行的具体时间
+       
+       #+BEGIN_SRC shell
+       # 临时添加, 适合用在公司服务器上
+       export HISTTIMEFORMAT="%F %T  "
+       #+END_SRC
+       要想永久添加, 可以将上面的语句写入 =.bashrc | .bash_profile | /etc/bashrc | /etc/profile= 内
+
