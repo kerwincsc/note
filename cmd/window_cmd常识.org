@@ -1,24 +1,5 @@
-echo输出空行的方法
-#+BEGIN_EXAMPLE
-@echo off
 
-echo=
-echo,
-echo;
-
-echo+
-echo/
-echo[
-echo]
-
-echo:
-echo.
-echo\
-
-pause
-#+END_EXAMPLE
-这十种方法可以分为三组，每组的效率依次递减. [[http://www.jb51.net/article/30987.htm][猛戳找原文]]
-
+** 待验证疑问
 
 =echo,= 插入空行会不会对%errorlevel%的值产生影响
 
@@ -52,7 +33,41 @@ echo %var%
 结论: 使用start启动另一个cmd时, set设置的变量会被继承下去
 
 set命令添加变量时, 即使传给变量的字符串中有空格, 也不需要加引号: =set VAR=I'm variable=
+** 小技巧
 
+*** 打开指定窗口大小的cmd
+
+    #+BEGIN_EXAMPLE
+    :: 设定打开的命令行窗口大小
+    mode con cols=80 lines=25
+    #+END_EXAMPLE
+
+*** TODO 在指定位置打开cmd窗口
+
+    暂时无法实现, 好像无法用纯bat命令实现
+*** echo输出空行的方法
+    
+    #+BEGIN_EXAMPLE
+    @echo off
+        
+    echo=
+    echo,
+    echo;
+                
+    echo+
+    echo/
+    echo[
+    echo]
+        
+    echo:
+    echo.
+    echo\
+        
+    pause
+    #+END_EXAMPLE
+    这十种方法可以分为三组，每组的效率依次递减. [[http://www.jb51.net/article/30987.htm][猛戳找原文]]
+
+** 脚本案例
 - 判断指定服务是否已启动
 
   net start :: 显示正在运行的服务
