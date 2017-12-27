@@ -1,0 +1,28 @@
+* 四种方法打印变量子串长度的性能测试
+
+** 变量自带的获取长度的方法 =echo ${#parameter}=
+
+   #+BEGIN_SRC shell
+   time for n in (1..10000);do char=`seq -s "oldboy" 100`;echo ${#char} &>/dev/null;done
+   #+END_SRC
+
+** 利用管道加wc的方法 =echo ${parameter} | wc -L=
+
+   #+BEGIN_SRC shell
+   time for n in (1..10000);do char=`seq -s "oldboy" 100`;echo ${char} | wc -L &>/dev/null;done
+   #+END_SRC
+
+** 利用expr自带的length方法 =expr length "${char}"=
+
+   #+BEGIN_SRC shell
+   time for n in (1..10000);do char=`seq -s "oldboy" 100`;expr length "${char}" | wc -L &>/dev/null;done
+   #+END_SRC
+
+** 利用awk自带的length函数方法 =echo ${char} | awk '{print length($0)}'=
+
+   #+BEGIN_SRC shell
+   time for n in (1..10000);do char=`seq -s "oldboy" 100`;echo ${char} | awk '{print length($0)}' &>/dev/null;done
+   #+END_SRC
+
+
+根据脚本实际执行后的速度来看, 变量自带的获取长度的方法最快;

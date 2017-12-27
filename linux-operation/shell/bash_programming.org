@@ -1,6 +1,34 @@
 * shell基础
 ** 变量
    - 变量赋值不允许出现空格
+     
+** 变量子串
+
+*** 变量子串的介绍
+
+   | 表达式                       | 说明                                                                |
+   |------------------------------+---------------------------------------------------------------------|
+   | ${parameter}                 | 返回变量 parameter 的内容                                           |
+   | ${#parameter}                | 返回变量 parameter 内容的长度(按字符), 也适用于特殊变量             |
+   | ${parameter:offset}          | 在变量 parameter 中, 从位置 offset 之后开始提取子串到结尾           |
+   | ${parameter:offset:length}   | 在变量 parameter 中, 从位置 offset 之后开始提取长度为 length 的子串 |
+   | ${parameter#word}            | 从变量 parameter 的 *开头* 开始删除 *最短* 匹配的 word 子串         |
+   | ${parameter##word}           | 从变量 parameter 的 *开头* 开始删除 *最长* 匹配的 word 子串         |
+   | ${parameter%word}            | 从变量 parameter 的 *结尾* 开始删除 *最短* 匹配的 word 子串         |
+   | ${parameter%%word}           | 从变量 parameter 的 *结尾* 开始删除 *最长* 匹配的 word 子串         |
+   | ${parameter/pattern/string}  | 使用 string 代替 *第一个* 匹配的 pattern                            |
+   | ${parameter//pattern/string} | 使用 string 代替 *所有的* pattern                                   |
+
+*** 变量子串示例
+
+    - 打印变量长度
+
+      1. echo ${#parameter} 此项速度最快 [[file:compare_speed_in_four_way_to_print_substring.org][验证过程]]
+      2. echo ${parameter} | wc -L 注: 有的wc没有此选项, 比如mac
+      3. expr length ${parameter}
+      4. echo ${parameter} | awk '{print length($0)}' 其中 =($0)= 不是必须的
+
+    - 
 ** 运算符
 *** 算术运算符
 *** 关系运算符
@@ -55,5 +83,5 @@
        echo "a的值大于4且小于10"
    fi
    #+END_EXAMPLE
-
    
+

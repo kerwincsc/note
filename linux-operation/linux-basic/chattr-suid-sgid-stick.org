@@ -1,6 +1,0 @@
-* 文件的特殊属性<理解为主>
-** 命令 =chattr=
-   change attribute 更改属性;
-
-   - 用法示例
-     Usage: chattr [-RVf] [-+=AacDdeijsSu] [-v version] files...
