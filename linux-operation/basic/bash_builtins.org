@@ -13,3 +13,70 @@
        #+END_SRC
        要想永久添加, 可以将上面的语句写入 =.bashrc | .bash_profile | /etc/bashrc | /etc/profile= 内
 
+** bg|fg|jobs
+
+*** bg
+
+    #+BEGIN_QUOTE
+    bg [ _jobsepc_ ...]
+    #+END_QUOTE
+
+    在后台恢复运行每一个被暂停的作业 _jobsepc_ 的运行, 就好像它被用 =&= 启动了一样.
+
+    如果 _jobspec_ 未指定, 将会按shell意见使用最近的作业.
+
+    bg _jobspec_ 返回零, 除非运行时作业控制是禁止的, 或者运行时作业控制是允许的, 但是被指定的 _jobspec_ 一个都没有找到, 或者没有以作业控制启动.
+
+*** fg
+
+    #+BEGIN_QUOTE
+    fg [ _jobspec_ ]
+    #+END_QUOTE
+
+    恢复 _jobspec_ 到前台, 并且使它成为当前作业. 如果 _jobspec_ 未指定, 将会按shell意见使用最近的作业.
+
+    返回值有以下几种情况: 
+
+    1. 放到前台执行的命令的返回值;
+
+    2. 将返回失败:
+
+       - 作业控制被关闭时运行;
+
+       - 作业控制被打开时运行, 倘若 _jobspec_ 没有指定一个合法作业或者 _jobsepc_ 指定了一个没有以作业控制启动的作业;
+
+*** jobs
+
+    #+BEGIN_QUOTE
+    jobs [-lnprs] [ _jobspec_ ... ]
+
+    jobs -x command [ _args_ ... ]
+    #+END_QUOTE
+
+    第一种形式列出了活动的作业. 它的选项有以下意思:
+
+    #+BEGIN_EXAMPLE
+    -l     除了正常信息外, 列出进程ID
+    -n     仅显示作业的状态已发生改变的信息, 在它们的状态最后一次通知给用户之后
+    -p     仅显示作业进程组的领导者的进程ID
+    -r     仅输出运行状态（running）的任务；
+    -s     仅输出停止状态（stoped）的任务;
+    #+END_EXAMPLE
+
+    如果给定 _jobspec_ , 只输出关于那项作业的信息. 只有遇到不合法选项或者提供了不合法的 _jobspec_ , 返回状态才不为 0 ;
+
+    如果提供了 =-x= 选项, jobs 以对应的进程组ID替换任何一个在 _command_ 或 _args_ 中找到的 _jobspec_ , 并且传递 _args_ 给 _command_ 执行, 返回它的退出状态.
+
+    备注: jobs -x 用法完全看不明白.在后台恢复运行每一个被暂停的作业 _jobsepc_ 的运行, 就好像它被用 =&= 启动了一样.
+
+如果 _jobspec_ 未指定, 将会按shell意见使用最近的作业
+
+* Footnotes
+
+[fn:2] asdfaadf
+
+adfadsf
+
+adfasdf 
+
+[fn:1] test 
