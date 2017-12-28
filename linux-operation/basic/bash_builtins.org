@@ -1,17 +1,5 @@
+
 * BASH内建工具
-** history
-
-   常见用法: 不加任何选项, 直接查看历史命令
-
-   - 技巧
-
-     - 查看各命令被执行的具体时间
-       
-       #+BEGIN_SRC shell
-       # 临时添加, 适合用在公司服务器上
-       export HISTTIMEFORMAT="%F %T  "
-       #+END_SRC
-       要想永久添加, 可以将上面的语句写入 =.bashrc | .bash_profile | /etc/bashrc | /etc/profile= 内
 
 ** bg|fg|jobs
 
@@ -70,6 +58,38 @@
     备注: jobs -x 用法完全看不明白.在后台恢复运行每一个被暂停的作业 _jobsepc_ 的运行, 就好像它被用 =&= 启动了一样.
 
 如果 _jobspec_ 未指定, 将会按shell意见使用最近的作业
+** history
+
+   常见用法: 不加任何选项, 直接查看历史命令
+
+   - 技巧
+
+     - 查看各命令被执行的具体时间
+       
+       #+BEGIN_SRC shell
+       # 临时添加, 适合用在公司服务器上
+       export HISTTIMEFORMAT="%F %T  "
+       #+END_SRC
+       要想永久添加, 可以将上面的语句写入 =.bashrc | .bash_profile | /etc/bashrc | /etc/profile= 内
+
+** kill
+
+   #+BEGIN_QUOTE
+   kill [-s _sigspec_ | -n _signum_ | - _sigspec_ ] [ _pid_ | _jobspec_ ] ...
+
+   kill -l [ _sigspec_ | _exit-status_ ]
+   #+END_QUOTE
+
+   发送指定的sigspec或指定的signum信号给指定的pid的或jobspec进程.
+   sigspec 要么是一个大小写敏感的信号名, 比如 *SIGKILL* (前缀SIG带不带都行), 要么是一个信号数;
+   signum指的就是信号数.
+   如果sigspec未指定, 那么sigspec就被假定是 *SIGTERM* .
+   *-l* 的参数列出信号名. 当给定 *-l* 选项时, 如果提供了任意一个参数, 对应参数的信号名将被列出,
+   并且返回状态为0.
+   *-l* 的exit_status参数要么是一个指定信号数的数字, 要么是被一个信号终结了的进程的退出状态.
+   如果至少有一个信号被成功地发送, *kill* 将返回True; 如果发生了错误或遇到了非法选项, 它将返回False
+
+   
 
 * Footnotes
 
