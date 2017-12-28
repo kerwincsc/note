@@ -1,2 +1,7 @@
 # Windows
 *.html
+
+# Untrack temporary files of emacs which starting with .#
+# 不跟踪以.#开头的emacs临时文件
+.#*
+
