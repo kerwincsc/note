@@ -130,17 +130,102 @@
        #+END_SRC
      - =${parameter-word}=
        #+BEGIN_SRC shell
+       # 下面这种用法应该只对未赋值的变量有效
+       ## 此项是为了确保TEST未被赋值
+       unset TEST
        echo ${TEST-unset_variable}
-       #+END_SRC
-     - ={parameter:=word}=
-     - ={parameter=word}=
-     - ={parameter:?word}=
-     - ={parameter?word}=
-     - ={parameter:+word}=
-     - ={parameter+word}=
 
-     
-    
+       unset_variable
+
+       # 如果规则生效, 结果应该返回空, 而不是is_null
+       TEST=
+       echo ${TEST-is_null}
+
+       返回空
+       #+END_SRC
+
+     - =${parameter:=word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST:=replaced_value}
+
+       replaced_value
+
+       TEST=
+       echo ${TEST:=replaced_value}
+
+       replaced_value
+       #+END_SRC
+     - =${parameter=word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST=unset_value}
+
+       unset_value
+
+       TEST=
+       echo ${TEST=is_null}
+
+       返回空
+       #+END_SRC
+       备注: 此扩展变量可以解决变量没有定义的问题, 并确保没有定义的变量始终有值;
+
+     - =${parameter:+word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST:+do_nothing_if_TEST_is_unset}
+
+       返回空
+
+       TEST=
+       echo ${TEST:+do_nothing_if_TEST_is_null}
+
+       返回空
+       #+END_SRC
+     - =${parameter+word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST+do_nothing_if_TEST_unset}
+
+       返回空
+
+       TEST=
+       echo ${TEST+do_nothing_if_TEST_unset}
+
+       do_nothing_if_TEST_unset
+       #+END_SRC
+       备注: TEST为空时,
+       =echo ${TEST+do_noting_if_TEST_unset}= 返回了"do_nothing_if_TEST_unset"
+       
+     - =${parameter:?word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST:?This_variable_was_unset}
+
+       bash: TEST: This_variable_was_unset
+
+       TEST=
+       echo ${TEST:?This_variable_was_unset}
+
+       bash: TEST: This_variable_was_unset
+       #+END_SRC
+     - =${parameter?word}=
+       #+BEGIN_SRC shell
+       unset TEST
+       echo ${TEST?return_this_string_if_TEST_is_unset}
+
+       bash: TEST: return_this_string_if_TEST_is_unset
+
+       TEST=
+       echo ${TEST?return_this_string_if_TEST_is_unset}
+
+       返回空
+       #+END_SRC
+
+
+
+     备注: 替换字符串(即介绍里的word部分)可以是带空格的字符串;
+           如果使用 *双引号* 括起, 字符串的多个空格可以正常显示, 否则只显示一个空格;
 ** 运算符
 *** 算术运算符
 *** 关系运算符
