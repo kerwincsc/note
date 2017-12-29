@@ -1,0 +1,96 @@
+*** 变量子串
+
+**** 变量子串的介绍
+
+    | 表达式                       | 说明                                                                |
+    |------------------------------+---------------------------------------------------------------------|
+    | ${parameter}                 | 返回变量 parameter 的内容                                           |
+    | ${#parameter}                | 返回变量 parameter 内容的长度(按字符), 也适用于特殊变量             |
+    | ${parameter:offset}          | 在变量 parameter 中, 从位置 offset 之后开始提取子串到结尾           |
+    | ${parameter:offset:length}   | 在变量 parameter 中, 从位置 offset 之后开始提取长度为 length 的子串 |
+    | ${parameter#word}            | 从变量 parameter 的 *开头* 开始删除 *最短* 匹配的 word 子串         |
+    | ${parameter##word}           | 从变量 parameter 的 *开头* 开始删除 *最长* 匹配的 word 子串         |
+    | ${parameter%word}            | 从变量 parameter 的 *结尾* 开始删除 *最短* 匹配的 word 子串         |
+    | ${parameter%%word}           | 从变量 parameter 的 *结尾* 开始删除 *最长* 匹配的 word 子串         |
+    | ${parameter/pattern/string}  | 使用 string 代替 *第一个* 匹配的 pattern                            |
+    | ${parameter//pattern/string} | 使用 string 代替 *所有的* pattern                                   |
+
+**** 变量子串示例
+
+     - 打印变量长度
+
+       1. echo ${#parameter} 此项速度最快 [[file:compare_speed_in_four_way_to_print_substring.org][验证过程]]
+       2. echo ${parameter} | wc -L 注: 有的wc没有此选项, 比如mac
+       3. expr length ${parameter}
+       4. echo ${parameter} | awk '{print length($0)}' 其中 =($0)= 不是必须的
+
+     - 截取变量内容
+
+       1. echo ${parameter:2}     从指定位置开始截取变量子串
+          #+BEGIN_SRC shell
+          parameter="I am kerwincsc"
+          echo ${parameter:2}
+
+          am kerwincsc
+          #+END_SRC
+          注: 可以理解为删除前两个字符
+
+       2. echo ${parameter:2:4}      从指定位置开始截取指定长度的变量子串
+          #+BEGIN_SRC shell
+          parameter="I am kerwincsc"
+          echo ${parameter:2:4}
+
+          am k
+          #+END_SRC
+
+     - 删除匹配子串
+
+       1. 从变量 _开头_ 删除 *最短* 匹配
+          #+BEGIN_SRC shel
+          parameter="abcABC123ABCabc"
+          echo ${parameter#a*C}
+
+          123ABCabc
+          #+END_SRC
+
+       2. 从变量 _开头_ 删除 *最长* 匹配
+          #+BEGIN_SRC shel
+          parameter="abcABC123ABCabc"
+          echo ${parameter##a*C}
+
+          abc
+          #+END_SRC
+
+       3. 从变量 _结尾_ 删除 *最短* 匹配
+          #+BEGIN_SRC shell
+          parameter="abcABC123ABCabc"
+          echo ${parameter%a*c}
+         
+          abcABC123ABC
+          #+END_SRC
+
+       4. 从变量 _结尾_ 删除 *最长* 匹配
+          #+BEGIN_SRC shell
+          parameter="abcABC123ABCabc"
+          echo ${parameter%%a*c}
+
+          返回值为空, 因为删光了
+          #+END_SRC
+
+     - 替换匹配子串
+
+       1. 替换匹配的第一个子串
+          #+BEGIN_SRC shell
+          parameter="I am kerwin, yes, kerwin"
+          echo ${parameter/kerwin/kerwincsc}
+
+          I am kerwincsc, yes, kerwin
+          #+END_SRC
+
+       2. 替换匹配的所有子串
+          #+BEGIN_SRC shell
+          parameter="I am kerwin, yes, kerwin"
+          echo ${parameter//kerwin/kerwincsc}
+
+          I am kerwincsc, yes, kerwincsc
+          #+END_SRC
