@@ -62,6 +62,7 @@
 
    #+BEGIN_QUOTE
    declare [-aAfFGilrtux] [-p] [ _name_[= _value_ ] ...]
+
    typeset [-aAfFGilrtux] [-p] [ _name_[= _value_ ] ...]
    #+END_QUOTE
 
