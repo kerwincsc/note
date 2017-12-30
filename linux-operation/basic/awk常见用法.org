@@ -117,3 +117,9 @@
       J.Troll     07/99     4842     Brown-3     12     26     26
       L.Tansley     05/99     4712     Brown-2     12     30     28
       #+END_EXAMPLE
+* AWK指定多个分隔符
+
+  #+BEGIN_SRC shell
+  awk -F ‘[-|]’ ‘{print $3;}’ data
+  #+END_SRC
+  指定分隔符时, 使用方括号括起多个分隔符
