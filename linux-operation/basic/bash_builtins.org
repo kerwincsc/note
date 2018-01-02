@@ -61,9 +61,9 @@
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
-   declare [-aAfFGilrtux] [-p] [ _name_[= _value_ ] ...]
+   declare [-aAfFgilrtux] [-p] [ _name_[= _value_ ] ...]
 
-   typeset [-aAfFGilrtux] [-p] [ _name_[= _value_ ] ...]
+   typeset [-aAfFgilrtux] [-p] [ _name_[= _value_ ] ...]
    #+END_QUOTE
 
    声明变量或给他们赋予属性. 如果没有指定 _name_ 那么就显示变量的值.
