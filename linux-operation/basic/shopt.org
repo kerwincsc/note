@@ -32,11 +32,60 @@ shopt [-pqsu] [-o] [optname ...]
                 如果一些作业被中止了, shell总会延迟退出;
 - *checkwinsize* :: *bash* 在每一条命令后面检查窗口的大小, 并且, 如果必要的话, 会更新 *LINES* 和 *COLUMNS* 的值.
 - *cmdhist* :: *bash* 尝试在同一历史条目里保存一条多行命令的所有行. 这使得多行命令的重新编辑更加容易.
-- *compat31* :: **
+- *compat31* :: *bash* 把它的行为改变成3.1版本, 以遵守条件命令 *[[* 的 *=~* 操作符的参数引用[fn:5].
+- *compat32* :: *bash* 把它的行为改成3.2版本, 以遵守特定区域的字符串比较, 当使用条件命令 *[[* 的 *< 和 >* 操作符时.
+                bash4.1之前的版本使用ASCII码整理和字符比较; bash4.1及其之后使用当前区域的整理顺序和字符串比较;
+- *compat40* :: *bash* 更改自己的行为以适应4.0版本, 来遵守特定区域的字符串比较,
+                当使用条件命令 *[[* 的 *< 和 >* 操作符时(参考上一项) 和遵守中断命令列表的效果;
+- *compat41* :: 当在posix模式里时, *bash* 把一个在双引号参数扩展里的单引号当成是一个特殊的字符. 单引号必须匹配(一个偶数),
+                并且在单引号之间的字符串被认为是被引用的. 这是经由版本4.1的 posix模式的行为. 在以前版本的bash中, 默认的bash行为保留;
+- *direxpand* :: 当执行文件名补全时, *bash* 以单词扩展的结果取代目录名. 这改变了readline编辑缓冲区的内容;
+                 如果没有设定的话, *bash* 尝试去保存用户的输入.
+- *dirspell* :: 如果最初提供的目录名不存在, 在单词补全期间, *bash* 尝试在目录名上进行拼写检查.
+- *dotglob* :: bash在文件名扩展的结果中包括以点（.）开头的文件名
+- execfail :: 一个非交互式的shell将不会退出, 如果它不能执行一个作为内置命令 *exec* 的参数的指定文件.
+              一个交互式的shell不会退出, 假如 *exec* 执行失败;
+- expand_aliases :: 别名在别名下扩展为如上所述[fn:6]. 此选项在交互式shell中默认打开;
+- extdebug :: 打开调试器以使用预期的行为:
+  1. 内置的 *declare* 的 *-F* 选项相应地显示每一个当成参数的函数名源文件名和行号;
+     #+BEGIN_SRC shell
+     shopt -s extdebug
+     declare -F quote
+     >>> quote 143 /usr/share/bash-completion/bash_completion
+                 
+     shopt -u extdebug
+     declare -F quote
+     >>> quote
+     #+END_SRC
+
+  2. 如果通过 *DEBUG* 陷阱运行的命令返回了一个非零的值, 那么下一个命令将被跳过并且不执行;
+
+  3. 如果通过 *DEBUG* 陷阱运行的命令返回了值 2, 并且shell正在子程序中执行(通过 *.* 或者 *source* 执行的shell函数或shell脚本),
+     那么 *return* 的调用就是模拟的;
+
+  4. *BASH_ARGC* 和 *BASH_ARGV* 就像上面他们描述的那样被更新;
+
+  5. 函数跟踪被打开: 被 ( _command_ ) 调用的命令替换, shell函数和子shell继承了 *DEBUG* 和 *RETURN* 陷阱;
+
+  6. 错误追踪被打开: 被 ( _command_ ) 调用的命令替换, shell函数和子shell继承了 *ERR* 陷阱;
+- extglob :: 如果设置, 像上面描述在 *参数扩展* 部分下的可扩展的模式匹配特性将被开启;
+- extquote :: 如果设置,              此选项默认开启;
 #+END_QUOTE
 
 
 * Footnotes
+
+[fn:6] 简单说来, 打开此选项, 则可能使用别名执行命令, 反之则不行, 尽管存在那个别名也不行;
+
+[fn:5] 有如下示例:
+#+BEGIN_SRC shell
+newip='192.168.1.100'
+if [[ "$newip" =~ '^([0-9]{1,3}\.){3}[0-9]{1,3}$' ]]
+then
+    echo '找到了ip地址'
+fi
+#+END_SRC
+如果 =shopt -s compat31= ,即开启compat31, 则可以正确输出 ='找到了ip地址'= , 否则不行, 需要将正则的引号去除才能正确匹配;
 
 [fn:4] 经过尝试, 如果在执行第一个 *exit* 前, 先执行过了 jobs, 那么执行第一个exit时, 就会直接退出;
 猜测是因为bash已经确认你知道当前shell有被停止或正在运行的作业, 所以第一个exit即可立即退出shell;
