@@ -1,6 +1,23 @@
 
 * BASH内建工具
 
+** alias
+
+   #+BEGIN_QUOTE
+   alias [-p] [ _name_[= _value_ ] ...]
+   #+END_QUOTE
+
+   不带参数的 *Alias* 或者带 *-p* 选项的 *Alias* 会在标准输出以 *alias* _name_ = _value_ 的形式打印别名的列表;
+
+   当参数被提供时, 别名将被定义给每一个给定了 _value_ 的 _name_ ;
+
+   _value_ 中的尾部空格会导致当别名扩展时，将检查下一个单词是否为别名替换;
+
+   对于参数列表中每一个没有提供 _value_ 的 _name_ , 则打印别名的名称和值[fn:1];
+
+   队非给定的 _name_ 没有被定义为别名, 才会返回假, 其它均返回真[fn:2];
+
+
 ** bg|fg|jobs
 
 *** bg
@@ -70,12 +87,12 @@
 
    *-p* 选项将显示每个 _name_ 的属性和值.
    当使用带有 _name_ 参数的 *-p* 选项时, 其他选项将被忽略.
-   当使用不带有 _name_ 参数的 *-p* 选项时, 它将显示所有的,被附加选项指定了属性的,变量的属性和值.[fn:1]
+   当使用不带有 _name_ 参数的 *-p* 选项时, 它将显示所有的,被附加选项指定了属性的,变量的属性和值.[fn:3]
    如果没有其他选项提供给 *-p* , *declare* 将显示所有的shell变量的属性和值.
 
    *-f* 选项将只限显示shell函数. *-F* 选项禁止显示函数定义; 仅打印函数名和函数属性.
    在使用 *shopt* 时, 如果 *extdebug* 选项是打开的, 定义了函数的源文件的名字和行号也将被显示.
-   *-F* 隐含于 *-f* .[fn:2]
+   *-F* 隐含于 *-f* .[fn:4]
 
    *-g* 选项强制变量在全局作用域被创建或被修改, 即使是在shell函数里执行了 *declare* .
 
@@ -88,9 +105,9 @@
    - *-l*     当变量被分配一个值, 所有的大写字符串被转换成小写. 大写属性是禁止的;
    - *-r*     使 _name_ 只读. 这些变量名就不能被后面的赋值语句分配值或重置值.
    - *-t*     赋予每一个 _name_ _trace_ 属性. 跟踪函数从调用它的shell中
-              继承 *DEBUG* 和 *RETURN* 情境.[fn:3] 跟踪属性对变量而言没有特殊意义.
+              继承 *DEBUG* 和 *RETURN* 情境.[fn:5] 跟踪属性对变量而言没有特殊意义.
    - *-u*     当变量被赋予了一个值, 所有的小写字符将被转换成大写. 小写属性是禁止的.
-   - *-x*     标记 _name_ 通过环境输出给后面的命令.[fn:4]
+   - *-x*     标记 _name_ 通过环境输出给后面的命令.[fn:6]
 
    使用'+'替代'-'来关闭属性, 但是以下是例外: +a 未必是用来消毁一个数组变量, +r 不会移除只读属性.
 
@@ -149,15 +166,27 @@
    如果 _n_ 大于 *$#* 或者小于 0 , 返回值将大于0; 否则就返回 0 .
 
 ** [[file:shopt.org][shopt]]
+
 * Footnotes
 
 [fn:1] 
+示例:
+#+BEGIN_QUOTE
+[root@centos7 shell]# alias mv rm tt
+
+alias mv='mv -i'
+alias rm='rm -i'
+-bash: alias: tt: 未找到
+#+END_QUOTE
+
+[fn:2] 即使定义的别名为空;
+
+[fn:3] 
 以下是人话: 如果这个变量在声明时同时指定了值和属性, 就显示出这个变量的值和属性;
 如果没有, 就显示变量的值;
 
-[fn:2] The -F option implies -f. 原名是这样的, 我也不会翻了.
+[fn:4] The -F option implies -f. 原名是这样的, 我也不会翻了.
 
-[fn:3] 这是原句: Traced  functions inherit the DEBUG and RETURN traps from the calling shell.
+[fn:5] 这是原句: Traced  functions inherit the DEBUG and RETURN traps from the calling shell.
 
-[fn:4] 指定的变量会成为环境变量，可供shell以外的程序来使用；
-
+[fn:6] 指定的变量会成为环境变量，可供shell以外的程序来使用；
