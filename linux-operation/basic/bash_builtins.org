@@ -140,7 +140,7 @@
 
 ** kill
 
-   备注: 此命令有两个, 一个是bash自带的, 另一个是util-linux(linux工具)
+   备注: 此命令有两个, 一个是bash自带的, 另一个是util-linux包中的一个命令;
    #+BEGIN_QUOTE
    kill [-s _sigspec_ | -n _signum_ | - _sigspec_ ] [ _pid_ | _jobspec_ ] ...
 
@@ -167,7 +167,31 @@
    如果 _n_ 大于 *$#* 或者小于 0 , 返回值将大于0; 否则就返回 0 .
 
 ** [[file:shopt.org][shopt]]
+** source 和 .
 
+   #+BEGIN_QUOTE
+   source _filename_ [ _arguments_ ]
+
+   . _filename_ [ _arguments_ ]
+   #+END_QUOTE
+
+   在当前的shell环境下, 从 _filename_ 读取并执行命令,
+   并且从 _filename_ 中返回最后一条被执行的命令的退出状态;
+
+   如果 _filename_ 不包含一个斜杠,
+   在 *PATH* 里的文件名们将被用来找到包含 _filename_ 的目录;
+
+   在 *PATH* 中搜索的文件不需要是可执行的;
+
+   当 *bash* 不在 _posix_ 模式时, 如果在 *PATH* 里没有找到文件, 当前目录就将被搜索;
+
+   如果内置命令 *shopt* 的 *sourcepath* 选项被关闭, 就不会搜索 *PATH* ;
+
+   如果一些 _arguments_ 被提供了, 当 _filename_ 被执行时, 他们将变成位置参数;
+   此外位置参数是不变的;
+
+   返回状态是脚本内最后一个命令的退出状态( 如果没有命令被执行, 就是 0 ),
+   并且如果 _filename_ 未找到或者不能被读取, 就返回失败(false);
 * Footnotes
 
 [fn:1] 
