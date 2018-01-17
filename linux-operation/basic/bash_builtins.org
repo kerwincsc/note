@@ -140,6 +140,7 @@
 
 ** kill
 
+   备注: 此命令有两个, 一个是bash自带的, 另一个是util-linux(linux工具)
    #+BEGIN_QUOTE
    kill [-s _sigspec_ | -n _signum_ | - _sigspec_ ] [ _pid_ | _jobspec_ ] ...
 
