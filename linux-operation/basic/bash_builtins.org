@@ -75,6 +75,46 @@
     备注: jobs -x 用法完全看不明白.在后台恢复运行每一个被暂停的作业 _jobsepc_ 的运行, 就好像它被用 =&= 启动了一样.
 
 如果 _jobspec_ 未指定, 将会按shell意见使用最近的作业
+** bind
+   #+BEGIN_QUOTE
+   bind [-m _keymap_ ] [-lpsvPSV]
+
+   bind [-m _keymap_ ] [-q _function_ ] [-u _function_ ] [-r _keyseq_ ]
+
+   bind [-m _keymap_ ] -f _filename_
+
+   bind [-m _keymap_ ] -x _keyseq:shell-command_
+
+   bind [-m _keymap_ ] _keyseq : function-name_
+
+   bind _readline-command_
+   #+END_QUOTE
+
+   显示当前的 *readline* 键和函数绑定,
+   把一个 *readline* 函数或者宏绑定在一个键序列上或者设置一个 *readline* 变量.
+
+   当每一个非选项参数出现在 _.inputrc_ 中时, 它就是一个命令,
+   但是每一个绑定或者命令必须以独立的参数被传递; 例如, '"\C-x\C-r": re-read-init-file'.
+
+   选项如果被提供, 它将有如下含义:
+
+   - =-m keymap= 使用 _keymap_ 作为由于随后的绑定被影响的键映射.
+                     可接受的 _keymap_ 名称为 _emacs_ , _emacs-standard_ ,
+                     _emacs-meta_ , _emacs-ctlx_ , _vi_ , _vi-move_ ,
+                     _vi-command_ , 和 _vi-insert_ .
+                     _vi_ 等同于 _vi-command_ ; _emacs_ 等同于 _emacs-standard_ .
+   - =-l= 列出所有的 *readline* 函数的名称;
+   - =-p= 以 *readline* 函数名称和绑定能够被重新读取的方式显示它们;
+   - =-P= 列出当前 *readline* 函数名和绑定;
+   - =-s= 显示绑定给宏的 *readline* 键序列和他们以能够被重新读取的方式输出的字符串;
+   - =-S= 显示绑定宏的 *readline* 键序列和它们输出的字符串;
+   - =-v= 以 *readline* 变量名和值能够被重新读取的方式显示它们;
+   - =-V= 列出当前的 *readline* 变量名和值;
+   - =-f filename= 从filename中读取键绑定;
+   - =-q function= 查询调用了function的键;
+   - =-u function= 解绑所有绑定给名为function的键;
+   - =-r keyseq= 为keyseq移除任何当前的绑定;
+   - =-x keyseq:shell-command= 无论何时当keyseq被输入时, 使shell-command被执行;
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
