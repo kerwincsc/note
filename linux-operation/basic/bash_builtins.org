@@ -124,6 +124,17 @@
 
 
    除非一个无法识别的选项被给定或者一个错误发生了, 返回值将是零;
+** break
+   #+BEGIN_QUOTE
+   break [ _n_ ]
+   #+END_QUOTE
+
+   从 *for* , *while* , *until*  或者 *select* 循环退出. 如果 _n_ 被指定, 退出 _n_ 级.
+   _n_ 必须 >= 1 . 
+
+   如果 _n_ 大于闭合循环的数量, 所有的闭合循环将退出.
+
+   当 _n_ <= 0 时, 返回值为非零; 否则 *break* 返回 0 ;
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
