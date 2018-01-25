@@ -114,7 +114,16 @@
    - =-q function= 查询调用了function的键;
    - =-u function= 解绑所有绑定给名为function的键;
    - =-r keyseq= 为keyseq移除任何当前的绑定;
-   - =-x keyseq:shell-command= 无论何时当keyseq被输入时, 使shell-command被执行;
+   - =-x keyseq:shell-command= 无论何时当keyseq被输入时, 将引发shell-command被执行;
+     当shell-command被执行时,
+     shell把 *READLINE_LINE* 变量设为 *readline* 行缓冲的内容,
+     把 *READLINE_POINT* 变量设为插入点的当前位置.
+
+     如果被执行的命令改变了 *READLINE_LINE* 或者 *READLINE_POINT* 的值,
+     这些新的值将在编辑状态里反应出来.
+
+
+   除非一个无法识别的选项被给定或者一个错误发生了, 返回值将是零;
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
