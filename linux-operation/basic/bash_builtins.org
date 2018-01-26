@@ -135,6 +135,19 @@
    如果 _n_ 大于闭合循环的数量, 所有的闭合循环将退出.
 
    当 _n_ <= 0 时, 返回值为非零; 否则 *break* 返回 0 ;
+** builtin
+    #+BEGIN_QUOTE
+    builtin _shell-builtin_ [ _arguments_ ]
+    #+END_QUOTE
+
+    执行指定的shell内建(命令), 传递 _arguments_ 给它, 并且返回它的退出状态;
+
+    这很有用, 当定义了一个函数, 这个函数的名称与shell内建(命令)相同时,
+    可以保留函数内部的内建(命令)的功能性;
+    内建命令 *cd* 通常这样被重新定义;
+
+    如果 _shell-builtin_ 不是shell内建命令, 返回状态为假;
+    
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
