@@ -148,6 +148,19 @@
 
     如果 _shell-builtin_ 不是shell内建命令, 返回状态为假;
     
+** caller
+   #+BEGIN_QUOTE
+   caller [ _expr_ ]
+   #+END_QUOTE
+
+   返回任何活动的子程序调用的上下文(shell函数或者以内建的 *.* 或者 *source* 执行的脚本).
+
+   不带 _expr_ 时, *caller* 显示当前子程序调用的行号和源文件名;
+
+   如果一个非负的整数被提供以作为 _expr_ , *caller* 显示与在当前执行调用堆栈中的那个位置相对应的行号, 子程序名和源文件.
+   此额外信息可被用来打印堆栈跟踪. 当前的栈桢是桢 0 .
+
+   返回值通常为 0, 除非shell没有执行子程序调用或者在调用栈内 _expr_ 没有对应的有效位置.
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
