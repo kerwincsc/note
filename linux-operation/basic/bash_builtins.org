@@ -188,6 +188,28 @@
    新的工作目录的绝对路径名将被写到标准输出[fn:4];
 
    如果目录被成功改变, 就返回真, 否则返回假;
+** command
+   #+BEGIN_QUOTE
+   command [-pVv] _command_ [arg ...]
+   #+END_QUOTE
+
+   带 args 执行 _command_ , 这抑制了正常的shell函数查找;
+
+   只有内建命令或在 *PATH* 能够找到的命令会被执行;
+
+   如果给定了 *-p* 选项, 对于 _command_ 的搜索被执行,
+   使用一个有关 *PATH* 的默认值以保证找到所有的标准工具;[fn:9]
+
+   如果 *-V* 或 *-v* 之一被提供, _command_ 的描述将被打印出来;
+   *-v* 选项导致指示命令的单字被显示或者导致用来调用 _command_ 的文件名被显示;
+   *-V* 选项产生一个更加冗长的描述.
+
+   如果 *-V* 或者 *-v* 选项被提供, 假如 _command_ 被找到,
+   则退出状态为 0 , 假如没有找到, 则为 1 .
+
+   如果两个选项都没有被提供并且一个错误发生了勤或者找不到 _command_ ,
+   退出状态为 127 . 不然, *command* 内建命令的退出状态就是 _command_ 的退出状态;
+   
 ** declare/typeset两个命令相同
 
    #+BEGIN_QUOTE
@@ -307,6 +329,11 @@
    并且如果 _filename_ 未找到或者不能被读取, 就返回失败(false);
 
 * Footnotes
+
+[fn:9] 这句不会翻译, 先跳过去;
+If the -p option is given,
+the search for command  is  performed  using  a  default value for *PATH* 
+that is guaranteed to find all of the standard utilities.
 
 [fn:1] 
 示例:
