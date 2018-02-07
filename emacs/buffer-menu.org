@@ -1,0 +1,96 @@
+#+TITLE: Buffer Menu
+
+* 如何打开Buffer Menu Mode
+
+  - 快捷键: =C-x C-b=
+  - 命令: =buffer-menu= 或者 =list-buffers=
+
+* Buffer Menu 中的操作
+
+  | 操作     | 命令 <Buffer-menu>              | 快捷键      | 符号 | 备注                                                    |
+  |----------+---------------------------------+-------------+------+---------------------------------------------------------|
+  | 标记     | <prefix>-mark                   | m           | =>=  |                                                         |
+  | 删除     | <prefix>-delete                 | k           | =D=  |                                                         |
+  | 掩埋     | <prefix>-bury                   | b           |      | Bury[掩埋/隐藏] buffers listed on this line[fn:1]             |
+  | 保存     | <prefix>-save                   | s           | =S=  | 保存当前buffer                                          |
+  | 浏览     | <prefix>-view                   | *V*         |      | 在当前窗口浏览buffer                                    |
+  | 排序     | <prefix>-sort                   |             |      | 对*<prefix> List*下的buffer排序                         |
+  | GUI      | <prefix>-open                   | <C-f10>     |      | 用GUI界面打开*<prefix> List*                            |
+  | 选择     | <prefix>-select                 | *v*         |      | 打开当前窗口和被 *>* 标记的窗口 (最多两个)              |
+  | 取消标记 | <prefix>-unmark                 | u           |      | 取消被标记行的标记                                      |
+  | 执行     | <prefix>-execute                | x           |      | 使标记生效                                              |
+  | 独占窗口 | <prefix>-1-window               | 1           |      | 使当前行的buffer独占窗口  Update Spacemacs]
+                                     [Update Packages] [Rollback Package Update]
+                                        [Release Notes] [Search in Spacemacs]
+                
+                ╭─ Important Notes (Release 0.200.10.x) ────────────────────────────────────────────╮
+                │                                                                                   │
+                │                                   HOT FIX RELEASE                                 │
+                │                                                                                   │
+                │  - Fix Helm error when selecting a candidate from a Helm buffer (thanks to bmag)  │
+                │  - Fix window number assignation for Neotree buffer window (thanks to duianto)    │
+                │                                                                                   │
+                ╰─ Update your dotfile (SPC f e D) and packages after every update ─────────────────╯
+                
+                                           [Click here for full change log]
+
+
+
+                                 189 packages loaded in 4.292s (e:132 r:1 l:13 b:43)
+
+
+
+  Recent Files:
+      e:/kerwin/develop/python/test.py
+      e:/kerwin/note/linux-operation/basic/bash_builtins.org
+      e:/kerwin/li
+      e:/kerwin/note/emacs/buffer-menu.org
+      c:/Users/admin/Desktop/test.go
+  
+  Projects:
+      e:/kerwin/note/
+      ~/.emacs.d/
+      e:/kerwin/sphinx/
+      e:/kerwin/develop/c/tinyhttpd-0.1.0.tar/tinyhttpd-0.1.0/
+      e:/kerwin/books/
+  
+
+
+
+                                                  
+
+                                            Made with   by the community
+                              |
+  | 分享窗口 | <prefix>-2-window               | 2           |      | 使当前行的buffer出现在窗口2(原窗口2 buffer 出现在窗口1) |
+  |          | <prefix>-multi-occur            | M-s a C-o   |      |                                                         |
+  | 当前打开 | <prefix>-this-window            | RET         |      | 在当前窗口打开buffer                                    |
+  | 当前打开 | <prefix>-mouse-select           | <mouse-2>   |      | 使用鼠标中键打开, 效果与 RET 相同                       |
+  |          | <prefix>-not-modified           | ~           |      | 效果不明[fn:2]                                          |
+  |          | <prefix>-other-window           | o           |      | 在其他窗口打开当前行的buffer                            |
+  |          | /buffer-menu-other-window/      |             |      | 在其他窗口打开 *Buffer List*                            |
+  |          | <prefix>-backup-unmark          | DEL         |      |                                                         |
+  |          | <prefix>-isearch-buffers        | M-s a C-s   |      |                                                         |
+  |          | <prefix>-toggle-read-only       | %           |      |                                                         |
+  |          | <prefix>-visit-tags-table       | t           |      |                                                         |
+  |          | <prefix>-toggle-files-only      | T           |      | 开关仅显示文件模式[fn:3]                                |
+  |          | <prefix>-view-other-window      |             |      |                                                         |
+  |          | <prefix>-switch-other-window    | C-o         |      | 与 *o* 相似, 但是光标保留在原buffer                     |
+  |          | <prefix>-isearch-buffers-regexp | M-s a C-M-s |      |                                                         |
+  
+  
+
+  - 删除指定的buffers: 光标移动到指定的buffers上, 按 k (kill) , 后再按 x (execute)
+
+* Footnotes
+
+[fn:1] 
+与 *k* 不同的是, 如果此buffer当前正被窗口占用,
+那么 bury 不起作用的;
+
+[fn:2] 
+但如果 *CRM* 中的 *M* 下是星号, 按下此键刚 *** (星号) 消失;
+并且 **Messages** buffer中不会打印消息(按下 *s* 时会打印消息);
+
+[fn:3] 
+打开后仅显示文件, 而不会再显示emacs自带的, 诸如 /*scratch* *Messages*/ 等 buffers;
+
