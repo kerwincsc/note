@@ -66,7 +66,17 @@ set命令添加变量时, 即使传给变量的字符串中有空格, 也不需�
     pause
     #+END_EXAMPLE
     这十种方法可以分为三组，每组的效率依次递减. [[http://www.jb51.net/article/30987.htm][猛戳找原文]]
+*** 修改cmd默认编码
 
+    利用chcp命令进行修改
+    #+BEGIN_EXAMPLE
+    chcp [nnn]
+      nnn    指定代码页编号
+    #+END_EXAMPLE
+
+    - 使用gbk =chcp 936=
+    - 改用utf-8编码 =chcp 65001=
+    - 改用iso8859-1 =chcp 437=
 ** 脚本案例
 - 判断指定服务是否已启动
 
