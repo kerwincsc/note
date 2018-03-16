@@ -1,264 +1,264 @@
 #+AUTHOR: kerwincsc@gmail.com
 #+DATE: 2017.05.19
 
-*** ¹úÄÚÆÚ»õ»ú¹¹
+*** å›½å†…æœŸè´§æœºæž„
     - 183.136.164.107
-      - ÈÎÎñ¼Æ»®³ÌÐò
+      - ä»»åŠ¡è®¡åˆ’ç¨‹åº
 	- CMDB Agent Cron Job
 
-	  Ã¿¸ô1Ð¡Ê±, Æô¶¯³ÌÐò =C:\cmdb_agent\cron.bat=
+	  æ¯éš”1å°æ—¶, å¯åŠ¨ç¨‹åº =C:\cmdb_agent\cron.bat=
 	  #+BEGIN_EXAMPLE
 	  echo offset path=%path%;c:\salt\bin;c:\salt\bin\scriptspython c:\cmdb_agent\cmdb_agent.py
 	  #+END_EXAMPLE
 
-	- °´Ê±¹Ø±ÕOMDD½»Ò×
+	- æŒ‰æ—¶å…³é—­OMDDäº¤æ˜“
 	  
-	  ÔÚÃ¿ÌìµÄ8:15ÔËÐÐ =D:\JgInterface\°´Ê±¹Ø±ÕOMDD½»Ò×.bat=
+	  åœ¨æ¯å¤©çš„8:15è¿è¡Œ =D:\JgInterface\æŒ‰æ—¶å…³é—­OMDDäº¤æ˜“.bat=
 	  #+BEGIN_EXAMPLE
 	  taskkill /f /im NewFutureIf_OMDD.exe 1>>c:\APPerror2.txt 2>&1
-	  rem ½áÊøNewFutureIf_OMDD.exe½ø³Ì
+	  rem ç»“æŸNewFutureIf_OMDD.exeè¿›ç¨‹
 	  @echo %date% >> c:\APPerror2.txt
 	  @echo %time% >> c:\APPerror2.txt
 	  #+END_EXAMPLE
-	  ½Å±¾ËµÃ÷: ½áÊøNewFutureIf_OMDD.exe½ø³Ì
+	  è„šæœ¬è¯´æ˜Ž: ç»“æŸNewFutureIf_OMDD.exeè¿›ç¨‹
 
-	- ÆÚ»õ¶¨Ê±ÖØÆô
+	- æœŸè´§å®šæ—¶é‡å¯
 
-	  Ã¿ÌìµÄ19:30Æô¶¯³ÌÐò =D:\JgInterface\ºÏ²¢ÈÎÎñ.bat=
+	  æ¯å¤©çš„19:30å¯åŠ¨ç¨‹åº =D:\JgInterface\åˆå¹¶ä»»åŠ¡.bat=
 	  #+BEGIN_EXAMPLE
 	  D:
 	  cd JgInterface
-	  start Æô¶¯×¥È¡ÈÎÎñ.bat
+	  start å¯åŠ¨æŠ“å–ä»»åŠ¡.bat
 	  ping 127.1 -n 15 >nul
-	  rem ÑÓÊ±15Ãë
-	  start °´Ê±¹Ø±ÕÈý´óÆÚ»õ.bat	
+	  rem å»¶æ—¶15ç§’
+	  start æŒ‰æ—¶å…³é—­ä¸‰å¤§æœŸè´§.bat	
 	  #+END_EXAMPLE
 
-	- ÖØÆôÈËÃñ±ÒÍâ»ã½»Ò×
+	- é‡å¯äººæ°‘å¸å¤–æ±‡äº¤æ˜“
 
-	  Ã¿ÌìµÄ0:30, Æô¶¯³ÌÐò =D:\JgInterface\°´Ê±¹Ø±ÕÈËÃñ±ÒÍâ»ã½»Ò×.bat=
+	  æ¯å¤©çš„0:30, å¯åŠ¨ç¨‹åº =D:\JgInterface\æŒ‰æ—¶å…³é—­äººæ°‘å¸å¤–æ±‡äº¤æ˜“.bat=
 	  #+BEGIN_EXAMPLE
 	  taskkill /f /im NewFutureIf_FOREX.exe 1>>c:\APPerror2.txt 2>&1
-	  rem ½áÊøNewFutureIf_FOREX.exe½ø³Ì
+	  rem ç»“æŸNewFutureIf_FOREX.exeè¿›ç¨‹
 	  @echo %date% >> c:\APPerror2.txt
 	  @echo %time% >> c:\APPerror2.txt
 	  #+END_EXAMPLE
-	  ËµÃ÷: ½áÊøNewFutureIf_FOREX.exe½ø³Ì, ²¢Ð´ÈëÖ¸¶¨ÈÕÖ¾
+	  è¯´æ˜Ž: ç»“æŸNewFutureIf_FOREX.exeè¿›ç¨‹, å¹¶å†™å…¥æŒ‡å®šæ—¥å¿—
 
-      - Ó¦ÓÃ³ÌÐòÓë¶ÔÓ¦µÄ½ø³Ì: ¿ÉÔÚ =D:/JgInterface= ÏÂÕÒµ½
+      - åº”ç”¨ç¨‹åºä¸Žå¯¹åº”çš„è¿›ç¨‹: å¯åœ¨ =D:/JgInterface= ä¸‹æ‰¾åˆ°
 
-	| Ó¦ÓÃ³ÌÐò                     | ½ø³Ì                | ³ÌÐòÎ»ÖÃ                            |
+	| åº”ç”¨ç¨‹åº                     | è¿›ç¨‹                | ç¨‹åºä½ç½®                            |
 	|------------------------------+---------------------+-------------------------------------|
 	| FutureIf_172.17.21.233:40034 | NewFutureIf_HS      | D:/JgInterface                      |
-	| FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | Í¬ÉÏ                                |
-	| FutureIf_172.17.24.33:40043  | NewFutureIf_CSI     | Í¬ÉÏ                                |
-	| NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | Í¬ÉÏ                                |
-	| NewFutureIf_CZCE             | NewFutureIf_CZCE    | Í¬ÉÏ                                |
-	| NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | Í¬ÉÏ                                |
-	| NewFutureIf_DCE              | NewFutureIf_DCE     | Í¬ÉÏ                                |
-	| NewFutureIf_FOREX            | NewFutureIf_OANDA   | Í¬ÉÏ                                |
-	| NewFutureIf_OMDD             | NewFutureIf_OMDD    | Í¬ÉÏ                                |
-	| NewFutureIf_SHFE             | NewFutureIf_SHF     | Í¬ÉÏ                                |
-	| ÉÏ½ðËùÊý¾Ý½ÓÊÕ³ÌÐò           | FutureIf_SGE        | Í¬ÉÏ                                |
-	| »¥ÁªÍøÊý¾ÝÔ´---¹ÜÀí½çÃæ      | VssUI               | D:\netvssdataSource\NetVssSource2.3 |
+	| FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | åŒä¸Š                                |
+	| FutureIf_172.17.24.33:40043  | NewFutureIf_CSI     | åŒä¸Š                                |
+	| NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | åŒä¸Š                                |
+	| NewFutureIf_CZCE             | NewFutureIf_CZCE    | åŒä¸Š                                |
+	| NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | åŒä¸Š                                |
+	| NewFutureIf_DCE              | NewFutureIf_DCE     | åŒä¸Š                                |
+	| NewFutureIf_FOREX            | NewFutureIf_OANDA   | åŒä¸Š                                |
+	| NewFutureIf_OMDD             | NewFutureIf_OMDD    | åŒä¸Š                                |
+	| NewFutureIf_SHFE             | NewFutureIf_SHF     | åŒä¸Š                                |
+	| ä¸Šé‡‘æ‰€æ•°æ®æŽ¥æ”¶ç¨‹åº           | FutureIf_SGE        | åŒä¸Š                                |
+	| äº’è”ç½‘æ•°æ®æº---ç®¡ç†ç•Œé¢      | VssUI               | D:\netvssdataSource\NetVssSource2.3 |
 
     - 183.136.164.100
-      - ÈÎÎñ¼Æ»®³ÌÐò
+      - ä»»åŠ¡è®¡åˆ’ç¨‹åº
 	- CMDB Agent Cron Job
-	  Ã¿¸ô1Ð¡Ê±, Æô¶¯³ÌÐò =C:\cmdb_agent\cron.bat=
+	  æ¯éš”1å°æ—¶, å¯åŠ¨ç¨‹åº =C:\cmdb_agent\cron.bat=
 	  #+BEGIN_EXAMPLE
 	  echo offset path=%path%;c:\salt\bin;c:\salt\bin\scriptspython c:\cmdb_agent\cmdb_agent.py
 	  #+END_EXAMPLE
 
-	- °´Ê±¹Ø±ÕOMDD½»Ò×
+	- æŒ‰æ—¶å…³é—­OMDDäº¤æ˜“
 
-	  ÔÚÃ¿ÌìµÄ8:15ÔËÐÐ =D:\JgInterface\°´Ê±¹Ø±ÕOMDD½»Ò×.bat=
+	  åœ¨æ¯å¤©çš„8:15è¿è¡Œ =D:\JgInterface\æŒ‰æ—¶å…³é—­OMDDäº¤æ˜“.bat=
 	  #+BEGIN_EXAMPLE
 	  taskkill /f /im NewFutureIf_OMDD.exe 1>>c:\APPerror2.txt 2>&1
-	  rem ½áÊøNewFutureIf_OMDD.exe½ø³Ì
+	  rem ç»“æŸNewFutureIf_OMDD.exeè¿›ç¨‹
 	  @echo %date% >> c:\APPerror2.txt
 	  @echo %time% >> c:\APPerror2.txt
 	  #+END_EXAMPLE
-	  ½Å±¾ËµÃ÷: ½áÊøNewFutureIf_OMDD.exe½ø³Ì
+	  è„šæœ¬è¯´æ˜Ž: ç»“æŸNewFutureIf_OMDD.exeè¿›ç¨‹
 
-	- ÆÚ»õ¶¨Ê±ÖØÆô
+	- æœŸè´§å®šæ—¶é‡å¯
 
-	  Ã¿ÌìµÄ19:30Æô¶¯³ÌÐò =D:\JgInterface\ºÏ²¢ÈÎÎñ.bat=
+	  æ¯å¤©çš„19:30å¯åŠ¨ç¨‹åº =D:\JgInterface\åˆå¹¶ä»»åŠ¡.bat=
 	  #+BEGIN_EXAMPLE
 	  D:
 	  cd JgInterface
-	  start Æô¶¯×¥È¡ÈÎÎñ.bat
+	  start å¯åŠ¨æŠ“å–ä»»åŠ¡.bat
 	  ping 127.1 -n 15 >nul
-	  rem ÑÓÊ±15Ãë
-	  start °´Ê±¹Ø±ÕÈý´óÆÚ»õ.bat	
+	  rem å»¶æ—¶15ç§’
+	  start æŒ‰æ—¶å…³é—­ä¸‰å¤§æœŸè´§.bat	
 	  #+END_EXAMPLE
 
-	- ÖØÆôÈËÃñ±ÒÍâ»ã½»Ò×
+	- é‡å¯äººæ°‘å¸å¤–æ±‡äº¤æ˜“
 
-	  Ã¿ÌìµÄ0:30, Æô¶¯³ÌÐò =D:\JgInterface\°´Ê±¹Ø±ÕÈËÃñ±ÒÍâ»ã½»Ò×.bat=
+	  æ¯å¤©çš„0:30, å¯åŠ¨ç¨‹åº =D:\JgInterface\æŒ‰æ—¶å…³é—­äººæ°‘å¸å¤–æ±‡äº¤æ˜“.bat=
 	  #+BEGIN_EXAMPLE
 	  taskkill /f /im NewFutureIf_FOREX.exe 1>>c:\APPerror2.txt 2>&1
-	  rem ½áÊøNewFutureIf_FOREX.exe½ø³Ì
+	  rem ç»“æŸNewFutureIf_FOREX.exeè¿›ç¨‹
 	  @echo %date% >> c:\APPerror2.txt
 	  @echo %time% >> c:\APPerror2.txt
 	  #+END_EXAMPLE
-	  ËµÃ÷: ½áÊøNewFutureIf_FOREX.exe½ø³Ì, ²¢Ð´ÈëÖ¸¶¨ÈÕÖ¾
+	  è¯´æ˜Ž: ç»“æŸNewFutureIf_FOREX.exeè¿›ç¨‹, å¹¶å†™å…¥æŒ‡å®šæ—¥å¿—
 
-      - Ó¦ÓÃ³ÌÐòÓë¶ÔÓ¦µÄ½ø³Ì: ¿ÉÔÚ =D:/JgInterface= ÏÂÕÒµ½
+      - åº”ç”¨ç¨‹åºä¸Žå¯¹åº”çš„è¿›ç¨‹: å¯åœ¨ =D:/JgInterface= ä¸‹æ‰¾åˆ°
 
-	| Ó¦ÓÃ³ÌÐò                     | ½ø³Ì                | ³ÌÐòÎ»ÖÃ                            |
+	| åº”ç”¨ç¨‹åº                     | è¿›ç¨‹                | ç¨‹åºä½ç½®                            |
 	|------------------------------+---------------------+-------------------------------------|
 	| FutureIf_172.17.21.233:40034 | NewFutureIf_HS      | D:/JgInterface                      |
-	| FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | Í¬ÉÏ                                |
-	| NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | Í¬ÉÏ                                |
-	| NewFutureIf_CSI_CSI2         | NewFutureIf_CSI     | Í¬ÉÏ                                |
-	| NewFutureIf_CZCE             | NewFutureIf_CZCE    | Í¬ÉÏ                                |
-	| NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | Í¬ÉÏ                                |
-	| NewFutureIf_DCE              | NewFutureIf_DCE     | Í¬ÉÏ                                |
-	| NewFutureIf_FOREX            | NewFutureIf_OANDA   | Í¬ÉÏ                                |
-	| NewFutureIf_OMDD             | NewFutureIf_OMDD    | Í¬ÉÏ                                |
-	| NewFutureIf_SHFE             | NewFutureIf_SHF     | Í¬ÉÏ                                |
-	| ÉÏ½ðËùÊý¾Ý½ÓÊÕ³ÌÐò           | FutureIf_SGE        | Í¬ÉÏ                                |
-	| »¥ÁªÍøÊý¾ÝÔ´---¹ÜÀí½çÃæ      | VssUI               | D:\netvssdataSource\NetVssSource2.4 |
+	| FutureIf_172.17.23.82:40012  | NewFutureIf_FOREX   | åŒä¸Š                                |
+	| NewFutureIf_CNYOFFS          | NewFutureIf_CNYOFFS | åŒä¸Š                                |
+	| NewFutureIf_CSI_CSI2         | NewFutureIf_CSI     | åŒä¸Š                                |
+	| NewFutureIf_CZCE             | NewFutureIf_CZCE    | åŒä¸Š                                |
+	| NewFutureIf_CZCE_DCE_SHFE    | NewFutureIf_GNQH    | åŒä¸Š                                |
+	| NewFutureIf_DCE              | NewFutureIf_DCE     | åŒä¸Š                                |
+	| NewFutureIf_FOREX            | NewFutureIf_OANDA   | åŒä¸Š                                |
+	| NewFutureIf_OMDD             | NewFutureIf_OMDD    | åŒä¸Š                                |
+	| NewFutureIf_SHFE             | NewFutureIf_SHF     | åŒä¸Š                                |
+	| ä¸Šé‡‘æ‰€æ•°æ®æŽ¥æ”¶ç¨‹åº           | FutureIf_SGE        | åŒä¸Š                                |
+	| äº’è”ç½‘æ•°æ®æº---ç®¡ç†ç•Œé¢      | VssUI               | D:\netvssdataSource\NetVssSource2.4 |
 
-*** ³¿ÐÇ
-**** ÃÀ¹É
-     - µØÖ· /114.80.234.132/ ×ª /172.17.15.87/
+*** æ™¨æ˜Ÿ
+**** ç¾Žè‚¡
+     - åœ°å€ /114.80.234.132/ è½¬ /172.17.15.87/
 
-     - ²é¿´ =cxdrs= ³ÌÐòÊÇ·ñÕýÔÚÔËÐÐ
+     - æŸ¥çœ‹ =cxdrs= ç¨‹åºæ˜¯å¦æ­£åœ¨è¿è¡Œ
 
-       ³ÌÐòÎ»ÖÃ: D:\services\morningstar\cxdrs.exe
+       ç¨‹åºä½ç½®: D:\services\morningstar\cxdrs.exe
 
-     - =status.ini viewer= ³ÌÐòÀïµÄpackageÊÇ·ñÓÐ±ä¶¯, ÀïÃæ¸÷½»Ò×ËùÊÇ·ñÊÇµ±ÌìµÄÊ±¼ä
+     - =status.ini viewer= ç¨‹åºé‡Œçš„packageæ˜¯å¦æœ‰å˜åŠ¨, é‡Œé¢å„äº¤æ˜“æ‰€æ˜¯å¦æ˜¯å½“å¤©çš„æ—¶é—´
 
-       ³ÌÐòÎ»ÖÃ: D:\services\morningstar\status\×´Ì¬ÎÄ¼þ¼àÊÓÆ÷v1.06-LineEditÀ©¿í-Ìí¼Ómaxspeed.exe
+       ç¨‹åºä½ç½®: D:\services\morningstar\status\çŠ¶æ€æ–‡ä»¶ç›‘è§†å™¨v1.06-LineEditæ‰©å®½-æ·»åŠ maxspeed.exe
 
-     - ²é¿´·þÎñ =MorningStarStock= ×´Ì¬ÊÇ·ñÎª *Started* 
+     - æŸ¥çœ‹æœåŠ¡ =MorningStarStock= çŠ¶æ€æ˜¯å¦ä¸º *Started* 
 
-       Õâ¸ö·þÎñÊµ¼ÊÉÏÎªÁËÊ¹³ÌÐòD:\services\morningstar\cxdrs.exe×Ô¶¯Æô¶¯;
+       è¿™ä¸ªæœåŠ¡å®žé™…ä¸Šä¸ºäº†ä½¿ç¨‹åºD:\services\morningstar\cxdrs.exeè‡ªåŠ¨å¯åŠ¨;
 
-     - ¼Æ»®ÈÎÎñ
+     - è®¡åˆ’ä»»åŠ¡
 
-       - Ã¿Ìì¿½±´ÃÀ¹ÉÈÕÖ¾
+       - æ¯å¤©æ‹·è´ç¾Žè‚¡æ—¥å¿—
 
-	 - Ã¿Ìì 9:05 ÔËÐÐ D:\Ms_Test\LogFileCopy.exe
-**** ÃÀÆÚ
-     - µØÖ· /114.80.234.132 ×ª 172.17.15.88/
-     - ²é¿´ =CXDRS-service-future= ³ÌÐòÊÇ·ñÕýÔÚÔËÐÐ
+	 - æ¯å¤© 9:05 è¿è¡Œ D:\Ms_Test\LogFileCopy.exe
+**** ç¾ŽæœŸ
+     - åœ°å€ /114.80.234.132 è½¬ 172.17.15.88/
+     - æŸ¥çœ‹ =CXDRS-service-future= ç¨‹åºæ˜¯å¦æ­£åœ¨è¿è¡Œ
 
-       ³ÌÐòÎ»ÖÃ: D:\prorun\morningstar-service\future\CXDRS-service-future.exe
-     - =status.ini viewer= ³ÌÐòÀïµÄpackageÊÇ·ñÓÐ±ä¶¯, ÀïÃæ¸÷½»Ò×ËùÊÇ·ñÊÇµ±ÌìµÄÊ±¼ä
+       ç¨‹åºä½ç½®: D:\prorun\morningstar-service\future\CXDRS-service-future.exe
+     - =status.ini viewer= ç¨‹åºé‡Œçš„packageæ˜¯å¦æœ‰å˜åŠ¨, é‡Œé¢å„äº¤æ˜“æ‰€æ˜¯å¦æ˜¯å½“å¤©çš„æ—¶é—´
 
-       ÃÀÆÚÀïÃæµÄÊµ¼ÊÉÏÖ»Òª¹Ø×¢ pack number ºÍ Á½¸öÊ±¼ä(data time ºÍ local time) ¾ÍºÃ
+       ç¾ŽæœŸé‡Œé¢çš„å®žé™…ä¸Šåªè¦å…³æ³¨ pack number å’Œ ä¸¤ä¸ªæ—¶é—´(data time å’Œ local time) å°±å¥½
 
-       ³ÌÐòÎ»ÖÃ: D:\prorun\morningstar-service\future\status\×´Ì¬ÎÄ¼þ¼àÊÓÆ÷v1.06-LineEditÀ©¿í-Ìí¼Ómaxspeed.exe
-     - ²é¿´·þÎñ =MorningStar_Future= ×´Ì¬ÊÇ·ñÎª *Started*
+       ç¨‹åºä½ç½®: D:\prorun\morningstar-service\future\status\çŠ¶æ€æ–‡ä»¶ç›‘è§†å™¨v1.06-LineEditæ‰©å®½-æ·»åŠ maxspeed.exe
+     - æŸ¥çœ‹æœåŠ¡ =MorningStar_Future= çŠ¶æ€æ˜¯å¦ä¸º *Started*
 
-       Õâ¸ö·þÎñÊµ¼ÊÉÏÎªÁËÊ¹³ÌÐòD:\prorun\morningstar-service\future\CXDRS-service-future.exe×Ô¶¯Æô¶¯;
-     - ¼Æ»®ÈÎÎñ
+       è¿™ä¸ªæœåŠ¡å®žé™…ä¸Šä¸ºäº†ä½¿ç¨‹åºD:\prorun\morningstar-service\future\CXDRS-service-future.exeè‡ªåŠ¨å¯åŠ¨;
+     - è®¡åˆ’ä»»åŠ¡
 
        - AppRestart
 
-	 Ã¿ÖÜÒ»µ½ÖÜÎåµÄ 8:50 , ÔËÐÐ D:\ReBOOT_AppServer_20090909\½áÊøÖØÆôAPPserver.bat
+	 æ¯å‘¨ä¸€åˆ°å‘¨äº”çš„ 8:50 , è¿è¡Œ D:\ReBOOT_AppServer_20090909\ç»“æŸé‡å¯APPserver.bat
 	 #+BEGIN_EXAMPLE
-	 title ½áÊøAPPserver½ø³Ì£¬ÖØÆôAPPserver·þÎñ¡££¨·Ç¹ÜÀíÔ±½ûÖ¹ÔËÐÐ£©
+	 title ç»“æŸAPPserverè¿›ç¨‹ï¼Œé‡å¯APPserveræœåŠ¡ã€‚ï¼ˆéžç®¡ç†å‘˜ç¦æ­¢è¿è¡Œï¼‰
 	 @echo %date% >> c:\APPerror.txt
 	 @echo %time% >> c:\APPerror.txt
-	 ECHO          =-=-=-=-=-=-=-=-=-Ö´ÐÐ½áÊø½ø³Ì=-=-=-=-=-=-=-=-=
+	 ECHO          =-=-=-=-=-=-=-=-=-æ‰§è¡Œç»“æŸè¿›ç¨‹=-=-=-=-=-=-=-=-=
 	 D:\Stockway\Services\L2AppServer\appserver.exe -flush
 	 net stop L2AppServer
 	 ping 127.0.0.1 -n 30
 	 taskkill /f /im AppServer.exe 1>>c:\APPerror.txt 2>&1
-	 rem ½áÊøAppServer.exe½ø³Ì
+	 rem ç»“æŸAppServer.exeè¿›ç¨‹
 	 
-	 ECHO           ÌáÊ¾£ºÏêÏ¸Ö´ÐÐ½á¹ûÇë²é¿´C:\APPerror.txt¼ÇÂ¼ÎÄ¼þ
-	 ECHO          =-=-=-=-=-=-=-=-=ÕýÔÚÖØÆô·þÎñ=-=-=-=-=-=-=-=-=-=
+	 ECHO           æç¤ºï¼šè¯¦ç»†æ‰§è¡Œç»“æžœè¯·æŸ¥çœ‹C:\APPerror.txtè®°å½•æ–‡ä»¶
+	 ECHO          =-=-=-=-=-=-=-=-=æ­£åœ¨é‡å¯æœåŠ¡=-=-=-=-=-=-=-=-=-=
 	 ping 127.1 -n 5 >nul
-	 rem ÑÓÊ±5Ãë(Í¨¹ýping±¾µØ»Ø»·Íø¿¨ÊµÏÖ)
+	 rem å»¶æ—¶5ç§’(é€šè¿‡pingæœ¬åœ°å›žçŽ¯ç½‘å¡å®žçŽ°)
 	 net start L2AppServer 1>>c:\APPerror.txt 2>&1
-	 rem Æô¶¯L2AppServer·þÎñ
+	 rem å¯åŠ¨L2AppServeræœåŠ¡
 	 #+END_EXAMPLE
-	 ËµÃ÷: ÖØÆôAppServer·þÎñ, ²¢¼ÇÂ¼ÈÕÖ¾µ½ c:\APPerror.txt
+	 è¯´æ˜Ž: é‡å¯AppServeræœåŠ¡, å¹¶è®°å½•æ—¥å¿—åˆ° c:\APPerror.txt
 
-       - conRunAPP: Õâ¸öÈÎÎñ¼Æ»®ºÍÏÂÃæµÄÍ¬Ãû¼Æ»®ÓÐ×Å¹²Í¬µÄ×÷ÓÃ, ¼´É¾³ýÈÕÖ¾ÎÄ¼þ
+       - conRunAPP: è¿™ä¸ªä»»åŠ¡è®¡åˆ’å’Œä¸‹é¢çš„åŒåè®¡åˆ’æœ‰ç€å…±åŒçš„ä½œç”¨, å³åˆ é™¤æ—¥å¿—æ–‡ä»¶
 
-       - ½áÊøÖØÆôMorningstar_future
+       - ç»“æŸé‡å¯Morningstar_future
 
-	 Ã¿Ìì 5:40 , ÔËÐÐ D:\prorun\morningstar-service\future\½áÊøÖØÆôMorningstar_future.bat
+	 æ¯å¤© 5:40 , è¿è¡Œ D:\prorun\morningstar-service\future\ç»“æŸé‡å¯Morningstar_future.bat
 	 #+BEGIN_EXAMPLE
 	 set EXE_NAME=MorningStar_Future
 	 set DIR_PATH=D:\prorun\morningstar-service\future
 	 set DISK_ID=D:
-	 title ½áÊø%EXE_NAME%½ø³Ì£¬ÖØÆô%EXE_NAME%·þÎñ¡££¨·Ç¹ÜÀíÔ±½ûÖ¹ÔËÐÐ£©
+	 title ç»“æŸ%EXE_NAME%è¿›ç¨‹ï¼Œé‡å¯%EXE_NAME%æœåŠ¡ã€‚ï¼ˆéžç®¡ç†å‘˜ç¦æ­¢è¿è¡Œï¼‰
 	 @echo %date% >> D:\prorun\morningstar-service\future\log\APPerror.txt
 	 @echo %time% >> D:\prorun\morningstar-service\future\log\APPerror.txt
-	 ECHO          =-=-=-=-=-=-=-=-=-Ö´ÐÐ½áÊø½ø³Ì=-=-=-=-=-=-=-=-=
-	 rem Í£Ö¹mongodb·þÎñ
+	 ECHO          =-=-=-=-=-=-=-=-=-æ‰§è¡Œç»“æŸè¿›ç¨‹=-=-=-=-=-=-=-=-=
+	 rem åœæ­¢mongodbæœåŠ¡
 	 net stop %EXE_NAME%   1>>D:\prorun\morningstar-service\future\log\APPerror.txt
 	 ping -n 5 127.1 >nul
-	 rem Æô¶¯mongodb·þÎñ
+	 rem å¯åŠ¨mongodbæœåŠ¡
 	 net start %EXE_NAME%    1>>D:\prorun\morningstar-service\future\log\APPerror.txt
 	 ping -n 5 127.1 >nul
 	 #+END_EXAMPLE
-	 ËµÃ÷: ÖØÆô MorningStar_Future ·þÎñ;
-*** Á¼Ã¯
-    - µØÖ· /180.153.137.201/ Ö÷
+	 è¯´æ˜Ž: é‡å¯ MorningStar_Future æœåŠ¡;
+*** è‰¯èŒ‚
+    - åœ°å€ /180.153.137.201/ ä¸»
 
-      - ²é¿´·þÎñÆ÷ÉÏ(»·Çò½ðÈÚÊý¾Ý¼¯ÖÐ·¢²¼ÏµÍ³)³ÌÐòÔËÐÐ×´Ì¬
-	- ÏÂ±ßÀ¸ÊÇ·ñÓÐÕýÔÚ½ÓÊÜÊý¾Ý
+      - æŸ¥çœ‹æœåŠ¡å™¨ä¸Š(çŽ¯çƒé‡‘èžæ•°æ®é›†ä¸­å‘å¸ƒç³»ç»Ÿ)ç¨‹åºè¿è¡ŒçŠ¶æ€
+	- ä¸‹è¾¹æ æ˜¯å¦æœ‰æ­£åœ¨æŽ¥å—æ•°æ®
 
-	- ÊÇ·ñÓÐÊý¾ÝÔÚÌø¶¯
+	- æ˜¯å¦æœ‰æ•°æ®åœ¨è·³åŠ¨
 
-	- Èç¹û·¢ÏÖÎÊÌâÖØÆô³ÌÐò
+	- å¦‚æžœå‘çŽ°é—®é¢˜é‡å¯ç¨‹åº
 
-	- ³ÌÐòÎ»ÖÃ: d:\qhcenter\QhCenter.exe
+	- ç¨‹åºä½ç½®: d:\qhcenter\QhCenter.exe
 
-      - ²é¿´·þÎñÆ÷ÉÏLMReceiverGUI³ÌÐòÊÇ·ñÔÚÔËÐÐ: ÈÕÖ¾ÊÇ·ñÔÚÓÐÊý¾ÝÔÚ×ß
+      - æŸ¥çœ‹æœåŠ¡å™¨ä¸ŠLMReceiverGUIç¨‹åºæ˜¯å¦åœ¨è¿è¡Œ: æ—¥å¿—æ˜¯å¦åœ¨æœ‰æ•°æ®åœ¨èµ°
 
-	- ³ÌÐòÎ»ÖÃ: D:\mkdir\LiangMaoFuture\LMReceiverGUI.exe
+	- ç¨‹åºä½ç½®: D:\mkdir\LiangMaoFuture\LMReceiverGUI.exe
 
-      - ÈÎÎñ¼Æ»®
+      - ä»»åŠ¡è®¡åˆ’
 	- conRunAPP
-	  - Ã¿Ìì 6:09 PM ÔËÐÐ D:\mkdir\Clear\conRunAPP.bat
+	  - æ¯å¤© 6:09 PM è¿è¡Œ D:\mkdir\Clear\conRunAPP.bat
 	    #+BEGIN_EXAMPLE
 	    @echo ---- >>D:\mkdir\Clear\dellog.txt
 	    @echo ---- >>D:\mkdir\Clear\dellog.txt
 	    @echo ---- >>D:\mkdir\Clear\dellog.txt
-	    @echo %date% %time% ¿ªÊ¼ÇåÀí... >>D:\mkdir\Clear\dellog.txt
+	    @echo %date% %time% å¼€å§‹æ¸…ç†... >>D:\mkdir\Clear\dellog.txt
 	    ClearByTime.exe "D:\mkdir" 5 .log >>D:\mkdir\Clear\dellog.txt
-	    @echo %date% %time% ÇåÀí½áÊø... >>D:\mkdir\Clear\dellog.txt
+	    @echo %date% %time% æ¸…ç†ç»“æŸ... >>D:\mkdir\Clear\dellog.txt
 	    #+END_EXAMPLE
-	    ËµÃ÷: ClearByTime±»ÓÃÓÚÇåÀíÒ»ÖÜÇ°µÄÈÕÖ¾, Ò²¾ÍÊÇËµ, Á¼Ã¯µ±ÌìµÄÈÕÖ¾×î¶à±£ÁôÆßÌì;
+	    è¯´æ˜Ž: ClearByTimeè¢«ç”¨äºŽæ¸…ç†ä¸€å‘¨å‰çš„æ—¥å¿—, ä¹Ÿå°±æ˜¯è¯´, è‰¯èŒ‚å½“å¤©çš„æ—¥å¿—æœ€å¤šä¿ç•™ä¸ƒå¤©;
 
-	- ½áÊøÖØÆôLMReceiverGUI
-	  - Ã¿Ìì 8:00 PM ÔËÐÐ D:\mkdir\LiangMaoFuture\½áÊøÖØÆôLMReceiverGUI.bat
+	- ç»“æŸé‡å¯LMReceiverGUI
+	  - æ¯å¤© 8:00 PM è¿è¡Œ D:\mkdir\LiangMaoFuture\ç»“æŸé‡å¯LMReceiverGUI.bat
 
-	    ¾«¼òÄÚÈÝºó, ÈçÏÂËùÊ¾
+	    ç²¾ç®€å†…å®¹åŽ, å¦‚ä¸‹æ‰€ç¤º
 	    #+BEGIN_EXAMPLE
 	    set EXE_NAME=LMReceiverGUI.exe
 	    set DIR_PATH=D:\mkdir\LiangMaoFuture
 	    set DISK_ID=D:
-	    title ½áÊø%EXE_NAME%½ø³Ì£¬ÖØÆô%EXE_NAME%·þÎñ¡££¨·Ç¹ÜÀíÔ±½ûÖ¹ÔËÐÐ£©
+	    title ç»“æŸ%EXE_NAME%è¿›ç¨‹ï¼Œé‡å¯%EXE_NAME%æœåŠ¡ã€‚ï¼ˆéžç®¡ç†å‘˜ç¦æ­¢è¿è¡Œï¼‰
 	    @echo %date% >> c:\APPerror.txt
 	    @echo %time% >> c:\APPerror.txt
 	    taskkill /f /im %EXE_NAME% 1>>c:\APPerror.txt 2>&1
-	    rem ½áÊø%EXE_NAME%½ø³Ì
+	    rem ç»“æŸ%EXE_NAME%è¿›ç¨‹
 	    #+END_EXAMPLE
-	    ËµÃ÷: ÖÕ½áLMReceiverGUI.exe½ø³Ì, ²¢½«ÈÕÖ¾Ð´Èëµ½c:\APPerror.txt
+	    è¯´æ˜Ž: ç»ˆç»“LMReceiverGUI.exeè¿›ç¨‹, å¹¶å°†æ—¥å¿—å†™å…¥åˆ°c:\APPerror.txt
 
-	    ×¢: ´Ë½ø³ÌÖÕ½áºóÈçºÎÆô¶¯? <·þÎñ>ÄÚ²¢Ã»ÓÐ´ËÏî, Ò²Ã»ÓÐ¼Æ»®ÈÎÎñ´¥·¢, Ò²Ã»ÓÐ¼à¿Ø³ÌÐòÀ­Æð
+	    æ³¨: æ­¤è¿›ç¨‹ç»ˆç»“åŽå¦‚ä½•å¯åŠ¨? <æœåŠ¡>å†…å¹¶æ²¡æœ‰æ­¤é¡¹, ä¹Ÿæ²¡æœ‰è®¡åˆ’ä»»åŠ¡è§¦å‘, ä¹Ÿæ²¡æœ‰ç›‘æŽ§ç¨‹åºæ‹‰èµ·
 
-    - µØÖ· /222.73.55.239/ ±¸ Ä¿Ç°ÎÞ·¨µÇÂ¼
+    - åœ°å€ /222.73.55.239/ å¤‡ ç›®å‰æ— æ³•ç™»å½•
 
-      - ²é¿´·þÎñÆ÷ÉÏ(»·Çò½ðÈÚÊý¾Ý¼¯ÖÐ·¢²¼ÏµÍ³)³ÌÐòÔËÐÐ×´Ì¬
+      - æŸ¥çœ‹æœåŠ¡å™¨ä¸Š(çŽ¯çƒé‡‘èžæ•°æ®é›†ä¸­å‘å¸ƒç³»ç»Ÿ)ç¨‹åºè¿è¡ŒçŠ¶æ€
 
-	- ÏÂ±ßÀ¸ÊÇ·ñÓÐÕýÔÚ½ÓÊÜÊý¾Ý
+	- ä¸‹è¾¹æ æ˜¯å¦æœ‰æ­£åœ¨æŽ¥å—æ•°æ®
 
-	- ÊÇ·ñÓÐÊý¾ÝÔÚÌø¶¯
+	- æ˜¯å¦æœ‰æ•°æ®åœ¨è·³åŠ¨
 
-	- Èç¹û·¢ÏÖÎÊÌâÖØÆô³ÌÐò
+	- å¦‚æžœå‘çŽ°é—®é¢˜é‡å¯ç¨‹åº
 
-	- ³ÌÐòÎ»ÖÃ: d:\qhcenter
-* ¸Û¹É
+	- ç¨‹åºä½ç½®: d:\qhcenter
+* æ¸¯è‚¡
 
 * IDC

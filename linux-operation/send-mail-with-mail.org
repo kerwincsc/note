@@ -1,26 +1,26 @@
-* ÈçºÎÊ¹ÓÃmailÔÚshellÏÂ·¢ËÍÓÊ¼ş
-  - ´ò¿ªmailÅäÖÃÎÄ¼ş =vim /etc/mail.rc= ²¢Ôö¼ÓÈçÏÂÁ½ĞĞ
+* å¦‚ä½•ä½¿ç”¨mailåœ¨shellä¸‹å‘é€é‚®ä»¶
+  - æ‰“å¼€mailé…ç½®æ–‡ä»¶ =vim /etc/mail.rc= å¹¶å¢åŠ å¦‚ä¸‹ä¸¤è¡Œ
     #+BEGIN_EXAMPLE
     set from=domain@163.com smtp=smtp.163.com
     set smtp-auth-user=user_name smtp-auth-password=user_password smtp-auth=login
     #+END_EXAMPLE
-  - ·¢ËÍÓÊ¼ş
-    - Ö±½ÓÊ¹ÓÃshellµ±±à¼­Æ÷
+  - å‘é€é‚®ä»¶
+    - ç›´æ¥ä½¿ç”¨shellå½“ç¼–è¾‘å™¨
       #+BEGIN_EXAMPLE
       mail -s "Hello from linuxde.net by shell" admin@linuxde.net
       hello,this is the content of mail. welcome to www.linuxde.net
       #+END_EXAMPLE
-      µÚÒ»ĞĞÊÇÊäÈëµÄÃüÁî£¬-s±íÊ¾ÓÊ¼şµÄÖ÷Ìâ£¬ºóÃæµÄadmin@linuxde.netÔòÊÇÓÊ¼şµÄ½ÓÊÕÈË£¬ÊäÈëÍêÕâĞĞÃüÁîºó»Ø³µ£¬»á½øÈëÓÊ¼şÕıÎÄµÄ±àĞ´£¬ÎÒÃÇ¿ÉÒÔÊäÈëÈÎºÎÎÄ×Ö£¬±ÈÈçÉÏÃæµÄÁ½ĞĞ¡£µ±ÓÊ¼şÕıÎÄÊäÈëÍê³Éºó£¬ĞèÒª°´CTRL+D½áÊøÊäÈë£¬´ËÊ±»áÌáÊ¾ÄãÊäÈëCcµØÖ·£¬¼´ÓÊ¼ş³­ËÍµØÖ·£¬Ã»ÓĞÖ±½Ó»Ø³µ¾ÍÍê³ÉÁËÓÊ¼şµÄ·¢ËÍ¡£
-    - Ê¹ÓÃ¹ÜµÀ½øĞĞÓÊ¼ş·¢ËÍ
+      ç¬¬ä¸€è¡Œæ˜¯è¾“å…¥çš„å‘½ä»¤ï¼Œ-sè¡¨ç¤ºé‚®ä»¶çš„ä¸»é¢˜ï¼Œåé¢çš„admin@linuxde.netåˆ™æ˜¯é‚®ä»¶çš„æ¥æ”¶äººï¼Œè¾“å…¥å®Œè¿™è¡Œå‘½ä»¤åå›è½¦ï¼Œä¼šè¿›å…¥é‚®ä»¶æ­£æ–‡çš„ç¼–å†™ï¼Œæˆ‘ä»¬å¯ä»¥è¾“å…¥ä»»ä½•æ–‡å­—ï¼Œæ¯”å¦‚ä¸Šé¢çš„ä¸¤è¡Œã€‚å½“é‚®ä»¶æ­£æ–‡è¾“å…¥å®Œæˆåï¼Œéœ€è¦æŒ‰CTRL+Dç»“æŸè¾“å…¥ï¼Œæ­¤æ—¶ä¼šæç¤ºä½ è¾“å…¥Ccåœ°å€ï¼Œå³é‚®ä»¶æŠ„é€åœ°å€ï¼Œæ²¡æœ‰ç›´æ¥å›è½¦å°±å®Œæˆäº†é‚®ä»¶çš„å‘é€ã€‚
+    - ä½¿ç”¨ç®¡é“è¿›è¡Œé‚®ä»¶å‘é€
       #+BEGIN_EXAMPLE
       echo "hello,this is the content of mail.welcome to www.linuxde.net" | mail -s "Hello from linuxde.net by pipe" admin@linuxde.net
       #+END_EXAMPLE
-      Ê¹ÓÃ¹ÜµÀÖ±½ÓÇÃÈëÕâĞĞÃüÁî¼´¿ÉÍê³ÉÓÊ¼şµÄ·¢ËÍ£¬ÆäÖĞechoºóµÄÊÇÓÊ¼şÕıÎÄ¡£
-    - Ê¹ÓÃÎÄ¼ş½øĞĞÓÊ¼ş·¢ËÍ
+      ä½¿ç”¨ç®¡é“ç›´æ¥æ•²å…¥è¿™è¡Œå‘½ä»¤å³å¯å®Œæˆé‚®ä»¶çš„å‘é€ï¼Œå…¶ä¸­echoåçš„æ˜¯é‚®ä»¶æ­£æ–‡ã€‚
+    - ä½¿ç”¨æ–‡ä»¶è¿›è¡Œé‚®ä»¶å‘é€
       #+BEGIN_EXAMPLE
       mail -s "Hello from linuxde.net by file" admin@linuxde.net < mail.txt
       #+END_EXAMPLE
-      Ê¹ÓÃÉÏÃæµÄÃüÁîºó£¬ÎÒÃÇ¾Í¿ÉÒÔ°Ñmail.txtÎÄ¼şµÄÄÚÈİ×÷ÎªÓÊ¼şµÄÄÚÈİ·¢ËÍ¸øadmin@linuxde.netÁË
+      ä½¿ç”¨ä¸Šé¢çš„å‘½ä»¤åï¼Œæˆ‘ä»¬å°±å¯ä»¥æŠŠmail.txtæ–‡ä»¶çš„å†…å®¹ä½œä¸ºé‚®ä»¶çš„å†…å®¹å‘é€ç»™admin@linuxde.netäº†
 
 
-    ¿É²Î¿¼[[http://man.linuxde.net/mail][mailÃüÁîÏê½â]]
+    å¯å‚è€ƒ[[http://man.linuxde.net/mail][mailå‘½ä»¤è¯¦è§£]]

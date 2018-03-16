@@ -1,18 +1,18 @@
-#+TITLE: �ں˵���
+#+TITLE: 内核调整
 #+OPTIONS: toc:t author:kerwin
-* Ӳ����Ϣ
-  - CPU��Ϣ
+* 硬件信息
+  - CPU信息
     #+BEGIN_SRC 
     cat cat /proc/cpuinfo
     #+END_SRC
-  - �ڴ���Ϣ
+  - 内存信息
     #+BEGIN_SRC 
     cat /proc/meminfo
     #+END_SRC
-* �������
-  - ��ping
+* 网络相关
+  - 禁ping
     #+BEGIN_SRC 
     echo "0" > /proc/sys/net/ipv4/icmp_echo_ignore_all
     #+END_SRC
-* ��ע
-  - �й��ں˲����ĵ���, һ�������ͻ�ȫ����ʧ. ��ʱ, ֻ��ͨ�� *sysctl* �趨����ֵ�ᱻ��¼�� =/etc/sysctl.conf= , ϵͳ�п���ʱ�Զ�ִ�� =rc.sysinit= ����(�ű�) , �����Զ�ִ��/etc/sysctl.conf�е�����
+* 备注
+  - 有关内核参数的调整, 一旦重启就会全部消失. 这时, 只有通过 *sysctl* 设定的数值会被记录到 =/etc/sysctl.conf= , 系统中开机时自动执行 =rc.sysinit= 程序(脚本) , 它会自动执行/etc/sysctl.conf中的配置

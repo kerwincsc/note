@@ -5,3 +5,5 @@
 # 不跟踪以.#开头的emacs临时文件
 .#*
 
+# Untrack UIysses .Ulysses-favorites.plist
+*.plist

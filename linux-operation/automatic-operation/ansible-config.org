@@ -1,105 +1,105 @@
 #+TITLE: Ansible
-* ansible°²×°ÓëÈÏÖ¤
-** ansibleÌØµã
-  - ²»ĞèÒª°²×°¿Í»§¶Ë, Í¨¹ısshdÈ¥Í¨ĞÅ
-  - »ùÓÚÄ£¿é¹¤×÷, Ä£¿é¿ÉÒÔÓÉÈÎºÎÓïÑÔ¿ª·¢
-  - ²»½öÖ§³ÖÃüÁîĞĞÊ¹ÓÃÄ£¿é, Ò²Ö§³Ö±àĞ´yaml¸ñÊ½µÄplaybook
-  - Ö§³Ösudo
-  - ÓĞÌá¹©UI(ä¯ÀÀÆ÷Í¼ĞÎ»¯)http://www.ansible.com/tower, 10Ì¨Ö÷»úÒÔÄÚÃâ·Ñ
-  - ¿ªÔ´UI https://github.com/alaxli/ansible_ui ÎÄµµ http://download.csdn.net/detail/liyang23456/7741185
-** °²×°ÓëÈÏÖ¤
+* ansibleå®‰è£…ä¸è®¤è¯
+** ansibleç‰¹ç‚¹
+  - ä¸éœ€è¦å®‰è£…å®¢æˆ·ç«¯, é€šè¿‡sshdå»é€šä¿¡
+  - åŸºäºæ¨¡å—å·¥ä½œ, æ¨¡å—å¯ä»¥ç”±ä»»ä½•è¯­è¨€å¼€å‘
+  - ä¸ä»…æ”¯æŒå‘½ä»¤è¡Œä½¿ç”¨æ¨¡å—, ä¹Ÿæ”¯æŒç¼–å†™yamlæ ¼å¼çš„playbook
+  - æ”¯æŒsudo
+  - æœ‰æä¾›UI(æµè§ˆå™¨å›¾å½¢åŒ–)http://www.ansible.com/tower, 10å°ä¸»æœºä»¥å†…å…è´¹
+  - å¼€æºUI https://github.com/alaxli/ansible_ui æ–‡æ¡£ http://download.csdn.net/detail/liyang23456/7741185
+** å®‰è£…ä¸è®¤è¯
    - =yum install -y epel-release=
    - =yum install -y ansible=
-   - ±¾»úÉÏÉú³ÉÃÜÔ¿¶Ô, ²¢ÅäÖÃµ½ÆäËû»úÆ÷ÉÏÈ¥, ÅäÖÃ±¾»úÊ±, Ò²ÒªÈç´Ë×ö
-* Ô¶³ÌÖ´ĞĞÃüÁî
-  - ±à¼­ansible×Ô´øµÄhosts =vim /etc/ansible/hosts=
+   - æœ¬æœºä¸Šç”Ÿæˆå¯†é’¥å¯¹, å¹¶é…ç½®åˆ°å…¶ä»–æœºå™¨ä¸Šå», é…ç½®æœ¬æœºæ—¶, ä¹Ÿè¦å¦‚æ­¤åš
+* è¿œç¨‹æ‰§è¡Œå‘½ä»¤
+  - ç¼–è¾‘ansibleè‡ªå¸¦çš„hosts =vim /etc/ansible/hosts=
     #+BEGIN_EXAMPLE
     [testhost]
     192.168.0.248
     127.0.0.1
     #+END_EXAMPLE
-    ËµÃ÷: testhostÊÇ×éÃû, ¿ÉÒÔ¸ù¾İĞèÒª¶¨ÖÆ, ÆäÏÂ¿ÉÒÔ¸úÖ÷»úIPµØÖ·, »ò¶ÔÓ¦µÄÓòÃû, Èç¹û¸úµÄÊÇÓòÃû, ¾ÍĞèÒªÔÚ±¾»úµÄhostsÎÄ¼şÖĞ¶¨ÒåÏà¹ØÄÚÈİ, »òÕß´î½¨¹«Ë¾ÄÚ²¿µÄDNS; 127.0.0.1´ú±íµÄÊÇ±¾»ú;
-  - Ô¶³ÌÖ´ĞĞÃüÁî<w>
+    è¯´æ˜: testhostæ˜¯ç»„å, å¯ä»¥æ ¹æ®éœ€è¦å®šåˆ¶, å…¶ä¸‹å¯ä»¥è·Ÿä¸»æœºIPåœ°å€, æˆ–å¯¹åº”çš„åŸŸå, å¦‚æœè·Ÿçš„æ˜¯åŸŸå, å°±éœ€è¦åœ¨æœ¬æœºçš„hostsæ–‡ä»¶ä¸­å®šä¹‰ç›¸å…³å†…å®¹, æˆ–è€…æ­å»ºå…¬å¸å†…éƒ¨çš„DNS; 127.0.0.1ä»£è¡¨çš„æ˜¯æœ¬æœº;
+  - è¿œç¨‹æ‰§è¡Œå‘½ä»¤<w>
     #+BEGIN_EXAMPLE
     ansible testhost -m command -a 'w'
     #+END_EXAMPLE
-    ÕâÑù¾Í¿ÉÒÔÅúÁ¿Ö´ĞĞÃüÁîÁË. ÕâÀïµÄtesthostÊÇÖ÷»ú×éÃû, µ±È»Ò²¿ÉÒÔÖ±½ÓĞ´Ò»¸öIP, -m ºóÃæÊÇÄ£¿éÃû×Ö, -a ºóÃæÊÇÃüÁî;
+    è¿™æ ·å°±å¯ä»¥æ‰¹é‡æ‰§è¡Œå‘½ä»¤äº†. è¿™é‡Œçš„testhostæ˜¯ä¸»æœºç»„å, å½“ç„¶ä¹Ÿå¯ä»¥ç›´æ¥å†™ä¸€ä¸ªIP, -m åé¢æ˜¯æ¨¡å—åå­—, -a åé¢æ˜¯å‘½ä»¤;
 
-    »¹ÓĞÒ»¸öÄ£¿éshell¿ÉÒÔÊµÏÖÏàÍ¬¹¦ÄÜ
+    è¿˜æœ‰ä¸€ä¸ªæ¨¡å—shellå¯ä»¥å®ç°ç›¸åŒåŠŸèƒ½
     #+BEGIN_EXAMPLE
     ansible testhost -m shell -a 'w'
     #+END_EXAMPLE
-    Èç¹û³öÏÖÒÔÏÂ´íÎóÌáÊ¾:
+    å¦‚æœå‡ºç°ä»¥ä¸‹é”™è¯¯æç¤º:
     #+BEGIN_EXAMPLE
     "msg":"Aborting, target uses selinux but python bindings(libselinux-python) aren't installed!"
     #+END_EXAMPLE
-    ¿ÉÒÔ³¢ÊÔ°²×° =yum install -y libselinux-python= À´½â¾ö;
-* ¿½±´Ä¿Â¼»òÕßÎÄ¼ş
-  - ¿½±´Ä¿Â¼
+    å¯ä»¥å°è¯•å®‰è£… =yum install -y libselinux-python= æ¥è§£å†³;
+* æ‹·è´ç›®å½•æˆ–è€…æ–‡ä»¶
+  - æ‹·è´ç›®å½•
     #+BEGIN_EXAMPLE
     ansible testhosts -m copy -a "src=/etc/ansible dest=/tmp/ansibletest owner=root group=roor mode=644"
     #+END_EXAMPLE
-    ËµÃ÷: Ô´Ä¿Â¼»á·Åµ½Ä¿±êÄ¿Â¼ÏÂÃæÈ¥, Èç¹ûÄ¿±êÖ¸¶¨µÄÄ¿Â¼²»´æÔÚ, Ëü»á×Ô¶¯´´½¨. Èç¹û¿½±´µÄÊÇÎÄ¼ş, destÖ¸¶¨µÄÃû×ÖºÍÔ´Èç¹û²»Í¬, ²¢ÇÒËü²»ÊÇÒÑ¾­´æÔÚµÄÄ¿Â¼, Ïàµ±ÓÚ¿½±´¹ıÈ¥ºóÓÖÖØÃüÃû. µ«Ïà·´, Èç¹ûdestÊÇÄ¿±ê»úÆ÷ÉÏÒÑ¾­´æÔÚµÄÄ¿Â¼, Ôò»áÖ±½Ó°ÑÎÄ¼ş¿½±´µ½¸ÃÄ¿Â¼ÏÂÃæ;
-  - ¿½±´ÎÄ¼ş
+    è¯´æ˜: æºç›®å½•ä¼šæ”¾åˆ°ç›®æ ‡ç›®å½•ä¸‹é¢å», å¦‚æœç›®æ ‡æŒ‡å®šçš„ç›®å½•ä¸å­˜åœ¨, å®ƒä¼šè‡ªåŠ¨åˆ›å»º. å¦‚æœæ‹·è´çš„æ˜¯æ–‡ä»¶, destæŒ‡å®šçš„åå­—å’Œæºå¦‚æœä¸åŒ, å¹¶ä¸”å®ƒä¸æ˜¯å·²ç»å­˜åœ¨çš„ç›®å½•, ç›¸å½“äºæ‹·è´è¿‡å»ååˆé‡å‘½å. ä½†ç›¸å, å¦‚æœdestæ˜¯ç›®æ ‡æœºå™¨ä¸Šå·²ç»å­˜åœ¨çš„ç›®å½•, åˆ™ä¼šç›´æ¥æŠŠæ–‡ä»¶æ‹·è´åˆ°è¯¥ç›®å½•ä¸‹é¢;
+  - æ‹·è´æ–‡ä»¶
     #+BEGIN_EXAMPLE
     ansible testhosts -m copy -a "src=/etc/passwd dest=/tmp/ansibletest"
     #+END_EXAMPLE
-* Ô¶³ÌÖ´ĞĞ½Å±¾
-  Óësaltstack²»Í¬, AnsibleÎŞ·¨Ö±½ÓÊ¹¿Í»§¶ËÖ´ĞĞ·şÎñ¶ËÒÑÓĞµÄ½Å±¾; Ansible±ØĞë½«½Å±¾ÏÂ·¢µ½¿Í»§¶Ë;
-  - ·şÎñ¶ËÅäÖÃ½Å±¾ =vim /tmp/test.sh=
+* è¿œç¨‹æ‰§è¡Œè„šæœ¬
+  ä¸saltstackä¸åŒ, Ansibleæ— æ³•ç›´æ¥ä½¿å®¢æˆ·ç«¯æ‰§è¡ŒæœåŠ¡ç«¯å·²æœ‰çš„è„šæœ¬; Ansibleå¿…é¡»å°†è„šæœ¬ä¸‹å‘åˆ°å®¢æˆ·ç«¯;
+  - æœåŠ¡ç«¯é…ç½®è„šæœ¬ =vim /tmp/test.sh=
     #+BEGIN_EXAMPLE
     #!/bin/bash
     d=`date`
     echo d > /tmp/test.txt
     #+END_EXAMPLE
-  - ½«·şÎñ¶Ë½Å±¾ÏÂ·¢µ½¿Í»§¶Ë
+  - å°†æœåŠ¡ç«¯è„šæœ¬ä¸‹å‘åˆ°å®¢æˆ·ç«¯
     #+BEGIN_EXAMPLE
     ansible 192.168.0.248 -m copy -a "src=/tmp/test.sh dest=/tmp/"
     #+END_EXAMPLE
-  - ÔÚ·şÎñ¶ËÔËĞĞÒÑÏÂ·¢µ½¿Í»§¶ËµÄ½Å±¾
+  - åœ¨æœåŠ¡ç«¯è¿è¡Œå·²ä¸‹å‘åˆ°å®¢æˆ·ç«¯çš„è„šæœ¬
     #+BEGIN_EXAMPLE
     ansible 192.168.0.248 -m shell -a "/bin/bash /tmp/test.sh"
     #+END_EXAMPLE
-    Ò²¿ÉÒÔÕâÃ´Ğ´
+    ä¹Ÿå¯ä»¥è¿™ä¹ˆå†™
     #+BEGIN_EXAMPLE
     ansible 192.168.0.248 -m shell -a "/tmp/test.sh"
     #+END_EXAMPLE
-    ËµÃ÷: ÕâÃ´Ğ´µÄÇ°ÌáÊÇÎÄ¼ştest.shÓĞÖ´ĞĞÈ¨ÏŞ, ¿ÉÒÔÔÚ¿½±´µ½¿Í»§¶ËÊ±ĞŞ¸ÄÈ¨ÏŞÖ¸¶¨ *mode=0755* ¼´¿É;
-  - shellÄ£¿é»¹Ö§³ÖÔ¶³ÌÖ´ĞĞÃüÁî²¢ÇÒ´ø¹ÜµÀ
+    è¯´æ˜: è¿™ä¹ˆå†™çš„å‰ææ˜¯æ–‡ä»¶test.shæœ‰æ‰§è¡Œæƒé™, å¯ä»¥åœ¨æ‹·è´åˆ°å®¢æˆ·ç«¯æ—¶ä¿®æ”¹æƒé™æŒ‡å®š *mode=0755* å³å¯;
+  - shellæ¨¡å—è¿˜æ”¯æŒè¿œç¨‹æ‰§è¡Œå‘½ä»¤å¹¶ä¸”å¸¦ç®¡é“
     #+BEGIN_EXAMPLE
     ansible testhost -m shell -a "cat /etc/passwd|wc -l"
     #+END_EXAMPLE
-* ÅäÖÃÈÎÎñ¼Æ»®
-  - Ìí¼ÓÒ»¸öÈÎÎñ¼Æ»®
+* é…ç½®ä»»åŠ¡è®¡åˆ’
+  - æ·»åŠ ä¸€ä¸ªä»»åŠ¡è®¡åˆ’
     #+BEGIN_EXAMPLE
     ansible testhost -m cron -a "name='test_cron' job='/bin/touch /tmp/1212.txt' weekday=6"
     #+END_EXAMPLE
-  - É¾³ıÒ»¸öÈÎÎñ¼Æ»®
+  - åˆ é™¤ä¸€ä¸ªä»»åŠ¡è®¡åˆ’
     #+BEGIN_EXAMPLE
     ansible testhost -m cron -a "name='test_cron' state=absent"
     #+END_EXAMPLE
-  - ÆäËûµÄÊ±¼ä±íÊ¾
+  - å…¶ä»–çš„æ—¶é—´è¡¨ç¤º
     #+BEGIN_EXAMPLE
-    ·ÖÖÓ minute Ğ¡Ê± hour ÈÕÆÚ day ÔÂ·İ month
+    åˆ†é’Ÿ minute å°æ—¶ hour æ—¥æœŸ day æœˆä»½ month
     #+END_EXAMPLE
 
-* °²×°rpm°ü/¹ÜÀí·şÎñ
-  - °²×°rpm°ü
+* å®‰è£…rpmåŒ…/ç®¡ç†æœåŠ¡
+  - å®‰è£…rpmåŒ…
     #+BEGIN_EXAMPLE
     ansible testhost -m yum -a "name=httpd"
     #+END_EXAMPLE
-  - ¹ÜÀí·şÎñ
+  - ç®¡ç†æœåŠ¡
     #+BEGIN_EXAMPLE
     ansible testhost -m service -a "name=httpd state=started enable=yes"
     #+END_EXAMPLE
-    ËµÃ÷: nameºóÊÇ·şÎñÃû; stateÊÇ·şÎñµÄ×´Ì¬:ÔËĞĞ,Í£Ö¹,ÖØÆô,ÖØÔØÅäÖÃ; enable¾ö¶¨ÊÇ·ñ¿ª»úÆô¶¯;
-* AnsibleÎÄµµµÄÊ¹ÓÃ
-  - ÁĞ³öËùÓĞµÄÄ£¿é =ansible-doc -l=
-  - ²é¿´Ö¸¶¨Ä£¿éµÄÎÄµµ =ansible-doc cron=
-* playbookµÄÊ¹ÓÃ
-** ½éÉÜ
-   Ïàµ±ÓÚ°ÑÄ£¿éĞ´Èëµ½ÅäÖÃÎÄ¼şÖĞ, ±ãÓÚ´ó¹æÄ£²¿Êğ,¸´ÔÓÅäÖÃ;
-** ³õÊÔ
+    è¯´æ˜: nameåæ˜¯æœåŠ¡å; stateæ˜¯æœåŠ¡çš„çŠ¶æ€:è¿è¡Œ,åœæ­¢,é‡å¯,é‡è½½é…ç½®; enableå†³å®šæ˜¯å¦å¼€æœºå¯åŠ¨;
+* Ansibleæ–‡æ¡£çš„ä½¿ç”¨
+  - åˆ—å‡ºæ‰€æœ‰çš„æ¨¡å— =ansible-doc -l=
+  - æŸ¥çœ‹æŒ‡å®šæ¨¡å—çš„æ–‡æ¡£ =ansible-doc cron=
+* playbookçš„ä½¿ç”¨
+** ä»‹ç»
+   ç›¸å½“äºæŠŠæ¨¡å—å†™å…¥åˆ°é…ç½®æ–‡ä»¶ä¸­, ä¾¿äºå¤§è§„æ¨¡éƒ¨ç½²,å¤æ‚é…ç½®;
+** åˆè¯•
    - =vim /etc/ansible/test.yml=
      #+BEGIN_EXAMPLE
      ---
@@ -109,7 +109,7 @@
          - name: test_playbook
            shell: touch /tmp/lishiming.txt
      #+END_EXAMPLE
-** Ñ­»·
+** å¾ªç¯
    #+BEGIN_EXAMPLE
    ---
    -  hosts: testhost
@@ -121,8 +121,8 @@
             - 1.txt
             - 2.txt
    #+END_EXAMPLE
-   ËµÃ÷: Ä¿Ç°Ö»ÄÜËµÊÇ¹Ì¶¨Ğ´·¨, ÓÃÀ´ĞŞ¸Ä¿Í»§¶ËÉÏµÄ1.txtºÍ2.txtµÄÊôĞÔ, Èç¹û¿Í»§¶ËÊÇ²»´æÔÚ¶ÔÓ¦ÎÄ¼ş, ½«»á±¨´í;
-** Ìõ¼şÅĞ¶Ï
+   è¯´æ˜: ç›®å‰åªèƒ½è¯´æ˜¯å›ºå®šå†™æ³•, ç”¨æ¥ä¿®æ”¹å®¢æˆ·ç«¯ä¸Šçš„1.txtå’Œ2.txtçš„å±æ€§, å¦‚æœå®¢æˆ·ç«¯æ˜¯ä¸å­˜åœ¨å¯¹åº”æ–‡ä»¶, å°†ä¼šæŠ¥é”™;
+** æ¡ä»¶åˆ¤æ–­
    #+BEGIN_EXAMPLE
    ---
    - hosts: testhost
@@ -133,7 +133,7 @@
          shell: touch /tmp/when.txt
          when: facter_ipaddress == "192.168.0.248"
    #+END_EXAMPLE
-   ËµÃ÷: Ö»ÓĞµ±facter_ipaddressÎª192.168.0.248, ²Å»áÔÚ¿Í»§¶ËÏÂ´´½¨/tmp/when.txt
+   è¯´æ˜: åªæœ‰å½“facter_ipaddressä¸º192.168.0.248, æ‰ä¼šåœ¨å®¢æˆ·ç«¯ä¸‹åˆ›å»º/tmp/when.txt
 ** handlers
    #+BEGIN_EXAMPLE
    ---
@@ -147,24 +147,24 @@
        - name: test handlers
          shell: echo "11111" >> /tmp/aaa.txt
    #+END_EXAMPLE
-   ËµÃ÷: µ±´ı¿½±´ÎÄ¼şÓë¿Í»§¶ËÉÏÒ»ÑùÊ±, ¾Í²»»áÔÙ´Î¿½±´, Ò²¾ÍÊÇfalse, ¾Í²»»áÖ´ĞĞÏÂÃæµÄtest handlers;
-* ÊµÕ½°²×°nginx
-  Ë¼Â·: ÏÈÔÚÒ»Ì¨»úÆ÷ÉÏ±àÒë°²×°ºÃnginx¡¢´ò°ü, È»ºóÔÙÓÃansible·Ö·¢ÏÂÈ¥
-  - ½øÈëansibleÅäÖÃÎÄ¼şÄ¿Â¼ =vim /etc/ansible=
-  - ´´½¨Ò»¸önginx_installµÄÄ¿Â¼, ·½±ã¹ÜÀí =mkdir nginx_install; cd nginx_install=
+   è¯´æ˜: å½“å¾…æ‹·è´æ–‡ä»¶ä¸å®¢æˆ·ç«¯ä¸Šä¸€æ ·æ—¶, å°±ä¸ä¼šå†æ¬¡æ‹·è´, ä¹Ÿå°±æ˜¯false, å°±ä¸ä¼šæ‰§è¡Œä¸‹é¢çš„test handlers;
+* å®æˆ˜å®‰è£…nginx
+  æ€è·¯: å…ˆåœ¨ä¸€å°æœºå™¨ä¸Šç¼–è¯‘å®‰è£…å¥½nginxã€æ‰“åŒ…, ç„¶åå†ç”¨ansibleåˆ†å‘ä¸‹å»
+  - è¿›å…¥ansibleé…ç½®æ–‡ä»¶ç›®å½• =vim /etc/ansible=
+  - åˆ›å»ºä¸€ä¸ªnginx_installçš„ç›®å½•, æ–¹ä¾¿ç®¡ç† =mkdir nginx_install; cd nginx_install=
   - =mkdir -p roles/{common,install}/{handles,files,meta,tasks,templates,vars}=
     #+BEGIN_EXAMPLE
-    ËµÃ÷: rolesÄ¿Â¼ÏÂÓĞÁ½¸ö½ÇÉ«:
-        common ÎªÒ»Ğ©×¼±¸²Ù×÷;
-        installÎª°²×°nginx²Ù×÷. Ã¿¸ö½ÇÉ«ÏÂÃæÓÖÓĞ¼¸¸öÄ¿Â¼:
-            handlersÏÂÃæÊÇµ±·¢Éú¸Ä±äÊ±ÒªÖ´ĞĞµÄ²Ù×÷, Í¨³£ÓÃÔÚÅäÖÃÎÄ¼ş·¢Éú¸Ä±ä,ÖØÆô·şÎñ;
-            filesÎª°²×°Ê±ÓÃµ½µÄÒ»Ğ©ÎÄ¼ş;
-            metaÎªËµÃ÷ĞÅÏ¢, ËµÃ÷½ÇÉ«ÒÀÀµµÈĞÅÏ¢;
-            tasksÀïÃæÊÇºËĞÄµÄÅäÖÃÎÄ¼ş;
-            templatesÍ¨³£´æÒ»Ğ©ÅäÖÃÎÄ¼ş, Æô¶¯½Å±¾µÈÄ£°åÎÄ¼ş;
-            varsÏÂÎª¶¨ÒåµÄ±äÁ¿;
+    è¯´æ˜: rolesç›®å½•ä¸‹æœ‰ä¸¤ä¸ªè§’è‰²:
+        common ä¸ºä¸€äº›å‡†å¤‡æ“ä½œ;
+        installä¸ºå®‰è£…nginxæ“ä½œ. æ¯ä¸ªè§’è‰²ä¸‹é¢åˆæœ‰å‡ ä¸ªç›®å½•:
+            handlersä¸‹é¢æ˜¯å½“å‘ç”Ÿæ”¹å˜æ—¶è¦æ‰§è¡Œçš„æ“ä½œ, é€šå¸¸ç”¨åœ¨é…ç½®æ–‡ä»¶å‘ç”Ÿæ”¹å˜,é‡å¯æœåŠ¡;
+            filesä¸ºå®‰è£…æ—¶ç”¨åˆ°çš„ä¸€äº›æ–‡ä»¶;
+            metaä¸ºè¯´æ˜ä¿¡æ¯, è¯´æ˜è§’è‰²ä¾èµ–ç­‰ä¿¡æ¯;
+            tasksé‡Œé¢æ˜¯æ ¸å¿ƒçš„é…ç½®æ–‡ä»¶;
+            templatesé€šå¸¸å­˜ä¸€äº›é…ç½®æ–‡ä»¶, å¯åŠ¨è„šæœ¬ç­‰æ¨¡æ¿æ–‡ä»¶;
+            varsä¸‹ä¸ºå®šä¹‰çš„å˜é‡;
     #+END_EXAMPLE
-  - ÔÚcommonÏÂtasksÄ¿Â¼ÄÚ´´½¨main.yml =vim /etc/ansible/nginx_install/roles/common/tasks/main.yml=
+  - åœ¨commonä¸‹tasksç›®å½•å†…åˆ›å»ºmain.yml =vim /etc/ansible/nginx_install/roles/common/tasks/main.yml=
     #+BEGIN_EXAMPLE
     - name: Install initialization require software
       yum: name={{ item }} state=installed
@@ -173,8 +173,8 @@
         - pcre-devel
         - openssl-devel
     #+END_EXAMPLE
-    ËµÃ÷: commonÄ¿Â¼ÏÂµÄtasksÄÚµÄÈÎÎñÖ÷ÒªÊÇÎªÁË×ö°²×°nginxµÄÇ°ÆÚ×¼±¸; ¸Ãmain.ymlÊÇÅäÖÃÎÄ¼şÖĞµÄÈë¿ÚÎÄ¼ş, Æä¹¦ÄÜ°²×°nginxµÄÒÀÀµÎÄ¼şzlib-devel, pcre-devel, openssl-devel;
-  - ÔÚinstallÏÂtasksÄ¿Â¼ÄÚ´´½¨copy.yml =vim /etc/ansible/nginx_install/roles/install/tasks/copy.yml=
+    è¯´æ˜: commonç›®å½•ä¸‹çš„taskså†…çš„ä»»åŠ¡ä¸»è¦æ˜¯ä¸ºäº†åšå®‰è£…nginxçš„å‰æœŸå‡†å¤‡; è¯¥main.ymlæ˜¯é…ç½®æ–‡ä»¶ä¸­çš„å…¥å£æ–‡ä»¶, å…¶åŠŸèƒ½å®‰è£…nginxçš„ä¾èµ–æ–‡ä»¶zlib-devel, pcre-devel, openssl-devel;
+  - åœ¨installä¸‹tasksç›®å½•å†…åˆ›å»ºcopy.yml =vim /etc/ansible/nginx_install/roles/install/tasks/copy.yml=
     #+BEGIN_EXAMPLE
     - name: Copy Nginx Software
       copy: src=nginx.tar.gz dest=/tmp/nginx.tar.gz owner=root group=root
@@ -185,11 +185,11 @@
     - name: Copy Nginx Config
       template: src=nginx.conf dest={{ nginx_basedir }}/conf/ owner=root group=root mode=0644
     #+END_EXAMPLE
-    ËµÃ÷: copy.ymlµÄÓÃ´¦ÔÚÅäÖÃÎÄ¼ş¿ÉÒÔ¿´µ½ºÜÃ÷°×:
-    - Í¨¹ıcopyÄ£¿é¸´ÖÆ´ò°üºÃµÄnginxÑ¹ËõÎÄ¼şµ½¿Í»§¶ËÖ¸¶¨Ä¿Â¼ÏÂ/tmp/, ²¢Ö¸¶¨ÆäÊôÖ÷Êô×éÎªroot
-    - Í¨¹ıshellÄ£¿é½«Ñ¹ËõÎÄ¼ş½âÑ¹µ½Ö¸¶¨Ä¿Â¼/user/local
-    - Í¨¹ıtemplateÄ£¿é½«templatesÄ¿Â¼ÏÂµÄnginxºÍnginx.confÎÄ¼ş¸´ÖÆµ½¶ÔÓ¦¿Í»§¶ËÄ¿Â¼ÏÂ, nginx_basedirÊÇÒ»¸öÔ¤¸æ¶¨ÒåºÃµÄ±äÁ¿, ÆäÖĞvarsÄ¿Â¼ÏÂµÄmain.yml
-  - ÔÚinstallÏÂtasksÄ¿Â¼ÄÚ´´½¨install.yml =vim /etc/ansible/nginx_install/roles/install/tasks/install.yml=
+    è¯´æ˜: copy.ymlçš„ç”¨å¤„åœ¨é…ç½®æ–‡ä»¶å¯ä»¥çœ‹åˆ°å¾ˆæ˜ç™½:
+    - é€šè¿‡copyæ¨¡å—å¤åˆ¶æ‰“åŒ…å¥½çš„nginxå‹ç¼©æ–‡ä»¶åˆ°å®¢æˆ·ç«¯æŒ‡å®šç›®å½•ä¸‹/tmp/, å¹¶æŒ‡å®šå…¶å±ä¸»å±ç»„ä¸ºroot
+    - é€šè¿‡shellæ¨¡å—å°†å‹ç¼©æ–‡ä»¶è§£å‹åˆ°æŒ‡å®šç›®å½•/user/local
+    - é€šè¿‡templateæ¨¡å—å°†templatesç›®å½•ä¸‹çš„nginxå’Œnginx.confæ–‡ä»¶å¤åˆ¶åˆ°å¯¹åº”å®¢æˆ·ç«¯ç›®å½•ä¸‹, nginx_basediræ˜¯ä¸€ä¸ªé¢„å‘Šå®šä¹‰å¥½çš„å˜é‡, å…¶ä¸­varsç›®å½•ä¸‹çš„main.yml
+  - åœ¨installä¸‹tasksç›®å½•å†…åˆ›å»ºinstall.yml =vim /etc/ansible/nginx_install/roles/install/tasks/install.yml=
     #+BEGIN_EXAMPLE
     - name: Create Nginx User
       user: name={{ nginx_user }} state=present createhome=no shell=/sbin/nologin
@@ -200,18 +200,18 @@
     - name: Delete Nginx Compression Files
       shell: rm -rf /tmp/nginx.tar.gz
     #+END_EXAMPLE
-    ËµÃ÷: 
-    - ÔÚ¿Í»§¶ËÏÂ´´½¨{{ nginx_user }}, ÆäÖµÒÑÔÚvarsÖĞ¶¨Òå
-    - Æô¶¯nginx·şÎñ
-    - °Ñnginx·şÎñ¼ÓÈëµ½¿ª»úÆô¶¯ÏîÉÏÈ¥
-    - É¾³ı´ò°üÎÄ¼ş
-  - ÔÚinstallÏÂ¶¨ÒåÈë¿ÚÎÄ¼ş =vim /etc/ansible/nginx_install/roles/install/tasks/main.yml=
+    è¯´æ˜: 
+    - åœ¨å®¢æˆ·ç«¯ä¸‹åˆ›å»º{{ nginx_user }}, å…¶å€¼å·²åœ¨varsä¸­å®šä¹‰
+    - å¯åŠ¨nginxæœåŠ¡
+    - æŠŠnginxæœåŠ¡åŠ å…¥åˆ°å¼€æœºå¯åŠ¨é¡¹ä¸Šå»
+    - åˆ é™¤æ‰“åŒ…æ–‡ä»¶
+  - åœ¨installä¸‹å®šä¹‰å…¥å£æ–‡ä»¶ =vim /etc/ansible/nginx_install/roles/install/tasks/main.yml=
     #+BEGIN_EXAMPLE
     - include: copy.yml
     - include: install.yml
     #+END_EXAMPLE
-    ËµÃ÷: ÅäÖÃtasksÄ¿Â¼µÄÈë¿ÚÎÄ¼ş;
-  - ÅäÖÃÕû¸ö°²×°»·¾³µÄÈë¿ÚÎÄ¼ş =vim /etc/ansible/nginx_install/install.yml=
+    è¯´æ˜: é…ç½®tasksç›®å½•çš„å…¥å£æ–‡ä»¶;
+  - é…ç½®æ•´ä¸ªå®‰è£…ç¯å¢ƒçš„å…¥å£æ–‡ä»¶ =vim /etc/ansible/nginx_install/install.yml=
     #+BEGIN_EXAMPLE
     - hosts: 192.168.0.248
       remote_user: root

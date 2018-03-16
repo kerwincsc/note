@@ -1,10 +1,10 @@
-#+TITLE:  Ê¹ÓÃkickstartÎŞ´ÓÖµÊØ×Ô¶¯°²×°centos
+#+TITLE:  ä½¿ç”¨kickstartæ— ä»å€¼å®ˆè‡ªåŠ¨å®‰è£…centos
 
-* 1. Æô¶¯·şÎñÆ÷ÉÏµÄ²Ù×÷
-  - dhcp·şÎñÆ÷µÄ°²×°
+* 1. å¯åŠ¨æœåŠ¡å™¨ä¸Šçš„æ“ä½œ
+  - dhcpæœåŠ¡å™¨çš„å®‰è£…
     - =yum install -y dhcp=
-    - °²×°dhcp·şÎñÆ÷Ö÷ÒªÊÇÓÃÀ´¸ø¾ÖÓòÍøÄÚ´ı°²×°»úÆ÷·ÖÅäIPµØÖ·µÄ
-    - ±à¼­dhcpµÄÅäÖÃÎÄ¼ş =vim /etc/dhcp/dhcpd.conf=
+    - å®‰è£…dhcpæœåŠ¡å™¨ä¸»è¦æ˜¯ç”¨æ¥ç»™å±€åŸŸç½‘å†…å¾…å®‰è£…æœºå™¨åˆ†é…IPåœ°å€çš„
+    - ç¼–è¾‘dhcpçš„é…ç½®æ–‡ä»¶ =vim /etc/dhcp/dhcpd.conf=
       #+BEGIN_EXAMPLE
       # DHCP Server Configuration file.
       #   see /usr/share/doc/dhcp*/dhcpd.conf.example
@@ -18,18 +18,18 @@
       default-lease-time 21600;
       max-lease-time 43200;
 
-      next-server 192.168.5.251; # TFTP serverµÄIPµØÖ·;
-      filename "pxelinux.0"; #pxelinuxÆô¶¯ÎÄ¼şÎ»ÖÃ;
+      next-server 192.168.5.251; # TFTP serverçš„IPåœ°å€;
+      filename "pxelinux.0"; #pxelinuxå¯åŠ¨æ–‡ä»¶ä½ç½®;
 
       subnet 192.168.5.0 netmask 255.255.255.0 {
         range dynamic-bootp 192.168.5.200 192.168.5.253;
 
       }
       #+END_EXAMPLE
-    - Æô¶¯dhcp·şÎñÆ÷ =systemctl start dhcpd=
-  - TFTP·şÎñÆ÷µÄ°²×°
+    - å¯åŠ¨dhcpæœåŠ¡å™¨ =systemctl start dhcpd=
+  - TFTPæœåŠ¡å™¨çš„å®‰è£…
     - =yum install -y tftp-server=
-    - ±à¼­ÅäÖÃÎÄ¼ş =vim /etc/xinetd.d/tftp=
+    - ç¼–è¾‘é…ç½®æ–‡ä»¶ =vim /etc/xinetd.d/tftp=
       #+BEGIN_EXAMPLE
       service tftp
       {
@@ -38,42 +38,42 @@
         wait                    = yes
         user                    = root
         server                  = /usr/sbin/in.tftpd
-        # ÕâÀïÖ¸¶¨TFTP·şÎñÆ÷¸ùÄ¿Â¼, Ä¬ÈÏÂ·¾¶Îª/var/lib/tftpboot,
-        # ĞŞ¸Äºó, ¼ÇµÃÊ¹ÓÃps aux|grep tftp, ²é¿´ÊÇ·ñÈÔÈ»Ö¸ÏòÄ¬ÈÏÄ¿Â¼, ÎÒÓöµ½¹ı;
+        # è¿™é‡ŒæŒ‡å®šTFTPæœåŠ¡å™¨æ ¹ç›®å½•, é»˜è®¤è·¯å¾„ä¸º/var/lib/tftpboot,
+        # ä¿®æ”¹å, è®°å¾—ä½¿ç”¨ps aux|grep tftp, æŸ¥çœ‹æ˜¯å¦ä»ç„¶æŒ‡å‘é»˜è®¤ç›®å½•, æˆ‘é‡åˆ°è¿‡;
         server_args             = -s /tftpboot 
-        disable                 = no # Ô­±¾ÕâÊÇÊÇyes, ËùÒÔ¸Ä³Éno¼´¿É;
+        disable                 = no # åŸæœ¬è¿™æ˜¯æ˜¯yes, æ‰€ä»¥æ”¹æˆnoå³å¯;
         per_source              = 11
         cps                     = 100 2
         flags                   = IPv4
       }
       #+END_EXAMPLE
-    - Æô¶¯TFTP·şÎñÆ÷ =systemctl start tftp=
+    - å¯åŠ¨TFTPæœåŠ¡å™¨ =systemctl start tftp=
 
-      ÔÚcentos7ÖĞ, s¿ÉÒÔÖ±½ÓÒÔÌ×½Ó×ÖÎÄ¼şÆô¶¯ =systemctl start tftp.socket=;
+      åœ¨centos7ä¸­, så¯ä»¥ç›´æ¥ä»¥å¥—æ¥å­—æ–‡ä»¶å¯åŠ¨ =systemctl start tftp.socket=;
       
-      Èç¹ûÒªÍ£µôTFTP·şÎñ, ¾ÍÒªÍ£Ö¹Ì×½Ó×ÖÎÄ¼ş =systemctl stop tftp.socket=;
-    - ¸´ÖÆÎÄ¼şµ½TFTP·şÎñÆ÷¸ùÄ¿Â¼ÏÂ
-      - *vmlinux* ¿ÉÒÔ´ÓÏµÍ³ÅÌÖĞ¸´ÖÆ;
-      - *initrd.img* Í¬ÉÏ;
-      - *pxelinux.0* ¿ÉÒÔÍ¨¹ı°²×°syslinux°ü»ñÈ¡; yum°²×°ºó¿ÉÒÔÔÚ/usr/share/syslinuxÏÂÕÒµ½
-      - ĞÂ½¨pxelinux.cfgÄ¿Â¼, ²¢¸´ÖÆ°²×°¹âÅÌÖĞisolinux.cfgµ½Ä¿Â¼ÖĞ, ¼ÇÎªdefault
+      å¦‚æœè¦åœæ‰TFTPæœåŠ¡, å°±è¦åœæ­¢å¥—æ¥å­—æ–‡ä»¶ =systemctl stop tftp.socket=;
+    - å¤åˆ¶æ–‡ä»¶åˆ°TFTPæœåŠ¡å™¨æ ¹ç›®å½•ä¸‹
+      - *vmlinux* å¯ä»¥ä»ç³»ç»Ÿç›˜ä¸­å¤åˆ¶;
+      - *initrd.img* åŒä¸Š;
+      - *pxelinux.0* å¯ä»¥é€šè¿‡å®‰è£…syslinuxåŒ…è·å–; yumå®‰è£…åå¯ä»¥åœ¨/usr/share/syslinuxä¸‹æ‰¾åˆ°
+      - æ–°å»ºpxelinux.cfgç›®å½•, å¹¶å¤åˆ¶å®‰è£…å…‰ç›˜ä¸­isolinux.cfgåˆ°ç›®å½•ä¸­, è®°ä¸ºdefault
 	#+BEGIN_EXAMPLE
 	default ks
 	label ks
 	kernel vmlinuz
 	append initrd=initrd.img ksdevice=eth0 ks=nfs:10.10.10.1:/tftpboot/ks.cfg
 	#+END_EXAMPLE
-	×¢£ºksdevice=eth0 ÕâÒ»¾ä¿ÉÒÔÖ¸¶¨ÓÉÄÄÒ»¸öÍø¿¨°²×°£¬¶ÔÓÚ¶àÍø¿¨µÄ»úÆ÷ÓÃ;
+	æ³¨ï¼šksdevice=eth0 è¿™ä¸€å¥å¯ä»¥æŒ‡å®šç”±å“ªä¸€ä¸ªç½‘å¡å®‰è£…ï¼Œå¯¹äºå¤šç½‘å¡çš„æœºå™¨ç”¨;
 
-	ksÏîÖ¸¶¨°²×°·şÎñÆ÷ÉÏµÄksÎÄ¼şµÄÎ»ÖÃ;
+	ksé¡¹æŒ‡å®šå®‰è£…æœåŠ¡å™¨ä¸Šçš„ksæ–‡ä»¶çš„ä½ç½®;
 
-* 2. °²×°·şÎñÆ÷ÉÏµÄ²Ù×÷
-  - NFSµÄ°²×°
+* 2. å®‰è£…æœåŠ¡å™¨ä¸Šçš„æ“ä½œ
+  - NFSçš„å®‰è£…
     - =yum install nfs-utils=
-    - ±à¼­ =vim /etc/exports=
+    - ç¼–è¾‘ =vim /etc/exports=
       #+BEGIN_EXAMPLE
-      # Ö¸¶¨°²×°½éÖÊºÍksÅäÖÃÎÄ¼şËùÔÚÎ»ÖÃ
+      # æŒ‡å®šå®‰è£…ä»‹è´¨å’Œksé…ç½®æ–‡ä»¶æ‰€åœ¨ä½ç½®
       /instsvr *(rw,sync)
       #+END_EXAMPLE
 
-* 3. ¾ÖÓòÍøÄÚ´ı°²×°»úÆ÷µÄ²Ù×÷
+* 3. å±€åŸŸç½‘å†…å¾…å®‰è£…æœºå™¨çš„æ“ä½œ
