@@ -21,10 +21,24 @@
     | -gt    | 检测左边的数是否大于右边的，如果是，则返回 true     | [ $a -gt $b ] 返回 false | great than  |
     | -lt    | 检测左边的数是否小于右边的，如果是，则返回 true     | [ $a -lt $b ] 返回 true  | less than   |
     | -ge    | 检测左边的数是否大于等于右边的，如果是，则返回 true | [ $a -ge $b ] 返回 false | great equal |
-    | -le    | 检测左边的数是否小于等于右边的，如果是，则返回 true | [ $a -le $b ] 返回 true  | less equal  | 
+    | -le    | 检测左边的数是否小于等于右边的，如果是，则返回 true | [ $a -le $b ] 返回 true  | less equal  |
   
-*** 文件测试运算符
-    文件测试运算符用于检测 Unix 文件的各种属性
-    [[./image/file-test-operator.png]]
    
 
+** 数组
+
+   - 数组的声明
+
+     Array=('abc' 'cde' 'ghi')
+
+   - 元素的增加/替换
+
+     Array[key]='xyz'
+
+   - 元素的删除
+
+     =Array[key]== 或者 =unset Array[key]=
+
+   - 数组长度的计算
+
+     echo ${#Array[*]} 或者 echo ${#Array[@]}

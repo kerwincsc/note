@@ -1,0 +1,107 @@
+#+TITLE: import 循环导入迷宫
+
+** import 循环导入模块
+*** 情景设想
+
+    假设有以下两个文件:
+
+    A.py
+    #+BEGIN_SRC python
+
+    import B
+
+    print("B.py was printed!")
+    class D:
+      pass
+
+    #+END_SRC
+
+    B.py
+    #+BEGIN_SRC python
+   
+    import A
+
+    print("A.py was printed!")
+    class C:
+      pass
+
+    #+END_SRC
+
+    有如下问题:
+
+    - 先执行A.py和先执行B.py有什么不同?
+    - 会不会循环导入变成死循环?
+*** python import机制
+
+    #+BEGIN_EXAMPLE
+    [A.py]
+    from B import D
+    class C:pass
+
+    [B.py]
+    from A import C
+    class D:pass
+    #+END_EXAMPLE
+
+    为什么执行A的时候不能加载D呢?
+
+    如果将A.py改为：import B就可以了.
+    
+    这是怎么回事呢? 这取决于 =import机制=
+
+      1. A.py 被执行;
+      2. 解释器在 =sys.modules= 中查找符号 *B* ;
+      3. 如果符号 *B* 存在, 则获得符号 B 对应的 module 对象 <module 'B'> ;
+         - 从<module 'B'>的 __dict__中获得符号 "D" 对应的对象, 如果"D"不存在, 则抛出异常;
+      4. 如果符号 *B* 不存在, 则创建一个新的module对象 <module 'B'> 注意, 这时, module 对象的 __dict__为空;
+         - 执行B.py中的表达式, 填充 <module 'B'> 的__dict__;
+         - 从 <module 'B'> 的 __dict__中获得 "D" 对应的对象, 如果 "D" 不存在, 则抛出异常;
+
+   此例执行如下:
+
+   #+BEGIN_EXAMPLE
+   1. 执行A.py中的from B import D
+        由于是执行的python A.py，所以在sys.modules中并没有<module B>存在，
+        首先为B.py创建一个module对象(<module B>)，
+        注意，这时创建的这个module对象是空的，里边啥也没有，
+    在Python内部创建了这个module对象之后，就会解析执行B.py，其目的是填充<module B>这个dict。
+
+    2. 执行B.py中的from A import C
+        在执行B.py的过程中，会碰到这一句，
+        首先检查sys.modules这个module缓存中是否已经存在<module A>了，
+        由于这时缓存还没有缓存<module A>，
+        所以类似的，Python内部会为A.py创建一个module对象(<module A>)，
+        然后，同样地，执行A.py中的语句
+
+    3. 再次执行A.py中的from B import D
+        这时，由于在第1步时，创建的<module B>对象已经缓存在了sys.modules中，
+        所以直接就得到了<module B>，
+        但是，注意，从整个过程来看，我们知道，这时<module B>还是一个空的对象，里面啥也没有，
+        所以从这个module中获得符号"D"的操作就会抛出异常。
+        如果这里只是import B，由于"B"这个符号在sys.modules中已经存在，所以是不会抛出异常的
+   #+END_EXAMPLE
+
+    在开始的两个示例中, 如果先执行A.py, 将会有如下情形:
+
+    #+BEGIN_QUOTE
+    1. A.py 被执行;
+    2. import B 时, 解释器会在 sys.modules内查找是否存在 <module B> ,
+       因为是先执行的A.py, 所以此时 sys.modules 内是不存在 <module B> ,
+       解释器将创建一个新的module对象, 此时这个新的module对象B(<module B>)
+       的 __dict__ 为空; 在创建 <module B> 后, 解释器就会开始解释B.py,
+       其目的是填充 <module B> 的dict;
+    3. import A 时, 解释器查找是否存在 <module A> , 由于此时并不存在 <module A> ,
+       所以, 类似地, 解释器会为 A.py 创建一个 module对象<module A>;
+       同样, 为了填充__list__, 解释器开始解释 A.py;
+    4. 再一次 import B 时, 由于此时 sys.modules 中已经存在 <module B> ,
+       所以解释器跳过此句, 继续执行下面的语句, 就会输出 =A.py was printed!= ;
+    5. A.py执行完毕后, <module A> 的__list__被填充完毕, 跳到上一层(即3中),
+       开始解释B.py中剩下的部分, 即输出 =B.py was printed!= ; 同样,
+       <module B> 的__list__被填充后, 再跳到上一层(即2中), 开始解释A.py中
+       剩余的部分, 即输出 =A.py was printed!= ;
+    6. 故, 结果中将出现两次 =A.py was printed!= , 并且不会出现死循环;
+    #+END_QUOTE
+* Footnotes
+
+  参考资料:
+  - https://wiki.woodpecker.org.cn/moin/MiscItems/2008-11-25

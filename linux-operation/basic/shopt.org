@@ -1,0 +1,151 @@
+#+TITLE: shopt
+#+OPTIONS: ^:{}
+#+BEGIN_QUOTE
+shopt [-pqsu] [-o] [optname ...]
+#+END_QUOTE
+切换控制可选的shell行为的变量的值.
+没有使用选项, 或者使用 -p 选项, 则显示一个所有可设置选项的列表, 此列表带有是否每一个已被设置的指示.
+*-p* 选项导致输出以重新作为输入使用的形式显示.
+其他选项有以下含义:
+- *-s*     允许 (设定) 每一个 _optname_
+- *-u*     禁止 (取消设定) 每一个 _optname_
+- *-q*     抑制正常的输出 (安静模式) ; 返回值指示了 _optname_ 是否被设定或未被设定; 如果多个 _optname_ 被给了 *-q* ,
+           且如果所有的 _optname_ 是打开的, 那么返回值将是 0; 否则返回非零;
+- *-o*     限制输出 _optname_ 的值为定义在 *-o* 选项后面的 _optname_ .
+
+
+如果 *-s* 或者 *-u* 被使用时不带 _optname_ 参数, 分别地限制显示这些设定的或者未设定的选项[fn:1].
+除非另外说明, *shopt* 选项默认情况下是关闭的(未设定).
+
+当列举选项时, 如果所有的 _optname_ 是打开的, 返回值是零, 否则就是非零[fn:2];
+当设定或取消设定选项时, 除非 _optname_ 不是合法的shell选项, 否则返回值就是零;
+
+*shopt* 的选项列表如下:
+#+BEGIN_QUOTE
+- *autocd*      :: 如果设定, 则执行名称为目录名称的命令名称，就好像它是cd命令的参数一样[fn:3];
+- cdable_vars :: 如果设定, 如果给cd内置命令的参数不是一个目录，就假设它是一个变量名，变量的值是将要转换到的目录;
+- *cdspell*     :: 纠正cd命令中目录名的较小拼写错误. 检查的错误包括颠倒顺序的字符, 遗漏的字符以及重复的字符.
+                如果发现一处纠正, 正确的路径就打印出, 命令将继续. 只用于交互式shell; 
+- *checkhash*   :: bash在试图执行一个命令前, 先在哈希表中寻找, 以确定命令是否存在。如果命令不存在, 就执行正常路径搜索;
+- *checkjobs*   :: 在退出交互式shell前, *bash* 会列出任何被停止的和运行中的作业.
+                如果一些作业正在运行中, 这将引起退出被推迟, 直到尝试第二个退出, 其间没有命令(被执行)(参考作业控制)[fn:4].
+                如果一些作业被中止了, shell总会延迟退出;
+- *checkwinsize* :: *bash* 在每一条命令后面检查窗口的大小, 并且, 如果必要的话, 会更新 *LINES* 和 *COLUMNS* 的值.
+- *cmdhist* :: *bash* 尝试在同一历史条目里保存一条多行命令的所有行. 这使得多行命令的重新编辑更加容易.
+- *compat31* :: *bash* 把它的行为改变成3.1版本, 以遵守条件命令 *[[* 的 *=~* 操作符的参数引用[fn:5].
+- *compat32* :: *bash* 把它的行为改成3.2版本, 以遵守特定区域的字符串比较, 当使用条件命令 *[[* 的 *< 和 >* 操作符时.
+                bash4.1之前的版本使用ASCII码整理和字符比较; bash4.1及其之后使用当前区域的整理顺序和字符串比较;
+- *compat40* :: *bash* 更改自己的行为以适应4.0版本, 来遵守特定区域的字符串比较,
+                当使用条件命令 *[[* 的 *< 和 >* 操作符时(参考上一项) 和遵守中断命令列表的效果;
+- *compat41* :: 当在posix模式里时, *bash* 把一个在双引号参数扩展里的单引号当成是一个特殊的字符. 单引号必须匹配(一个偶数),
+                并且在单引号之间的字符串被认为是被引用的. 这是经由版本4.1的 posix模式的行为. 在以前版本的bash中, 默认的bash行为保留;
+- *direxpand* :: 当执行文件名补全时, *bash* 以单词扩展的结果取代目录名. 这改变了readline编辑缓冲区的内容;
+                 如果没有设定的话, *bash* 尝试去保存用户的输入.
+- *dirspell* :: 如果最初提供的目录名不存在, 在单词补全期间, *bash* 尝试在目录名上进行拼写检查.
+- *dotglob* :: bash在文件名扩展的结果中包括以点（.）开头的文件名
+- execfail :: 一个非交互式的shell将不会退出, 如果它不能执行一个作为内置命令 *exec* 的参数的指定文件.
+              一个交互式的shell不会退出, 假如 *exec* 执行失败;
+- expand_aliases :: 别名在别名下扩展为如上所述[fn:6]. 此选项在交互式shell中默认打开;
+- extdebug :: 打开调试器以使用预期的行为:
+  1. 内置的 *declare* 的 *-F* 选项相应地显示每一个当成参数的函数名源文件名和行号;
+     #+BEGIN_SRC shell
+     shopt -s extdebug
+     declare -F quote
+     >>> quote 143 /usr/share/bash-completion/bash_completion
+                 
+     shopt -u extdebug
+     declare -F quote
+     >>> quote
+     #+END_SRC
+
+  2. 如果通过 *DEBUG* 陷阱运行的命令返回了一个非零的值, 那么下一个命令将被跳过并且不执行;
+
+  3. 如果通过 *DEBUG* 陷阱运行的命令返回了值 2, 并且shell正在子程序中执行(通过 *.* 或者 *source* 执行的shell函数或shell脚本),
+     那么 *return* 的调用就是模拟的;
+
+  4. *BASH_ARGC* 和 *BASH_ARGV* 就像上面他们描述的那样被更新;
+
+  5. 函数跟踪被打开: 被 ( _command_ ) 调用的命令替换, shell函数和子shell继承了 *DEBUG* 和 *RETURN* 陷阱;
+
+  6. 错误追踪被打开: 被 ( _command_ ) 调用的命令替换, shell函数和子shell继承了 *ERR* 陷阱;
+- extglob :: 如果设置, 像上面描述在 *参数扩展* 部分下的可扩展的模式匹配特性将被开启;
+- extquote :: 此选项默认开启[fn:7];
+- failglob :: 如果设置, 在路径名扩展期间, 匹配文件名失败的模式将引起扩展错误;
+              #+BEGIN_SRC shell
+              # 在当前目录下新建文件 hello.py , 且未开启 failglob
+              ls helll*
+              >>> ls: 无法访问helll*: 没有那个文件或目录
+              # 此结果的返回值为 2
+
+              # 同样的条件下, 开启 failglob
+              ls helll*
+              >>> bash: 没有匹配: helll*
+              # 此结果的返回值为 1
+
+              # 在开启 failglob 的情况下, 文件名自动补全是失效的, 只要按tab尝试自动补全就会报错;
+              #+END_SRC
+- force_fignore :: 当执行单词补全时, 被shell变量 *FIGNORE* 指定的后缀将导致单词被忽略, 即使被忽略的单词是唯一补全.
+                   参考之前的shell变量部分, 可以找到关于 *FIGNORE* 的描述. 此项默认开启;
+- globstar :: 如果设置, 在路径名扩展上下文中使用的模式 **** 将会匹配所有的文件和匹配 0 或更多的目录和子目录.
+              如果模式后面跟着一个 */* , 那仅匹配目录或目录;
+- gnu_errfmt :: 如果设置, shell错误消息将被写成标准的GNU错误信息形式;
+- histappend :: 当shell退出时, 历史列表将被追加到以 *HISTFILE* 变量的值命名的文件, 而不是覆盖那个文件[fn:8];
+- histreedit :: 如果设置, 并且 *readline* 正被使用, 用户有机会重新编辑失败的历史替换;
+- histverify :: 如果设置, 并且 *readline* 正被使用, 历史替换的结果不会立刻传递给shell解析器.
+                反而, 结果行被载入 *readline* 编辑缓冲区, 允许进一步地修改;
+- hostcomplete :: 如果设置, 并且 *readline* 正被使用, *bash* 将尝试去执行主机名补全, 当一个包含 *@* 单词正要被补全时;
+                  (参考 *READLINE* 下的 *Completing*) 这个默认是开启的;
+- huponexit :: 如果设置, 当一个交互式登录shell退出时, *bash* 将会给所有的任务发送 *SIGHUP* ;
+- interactive_comments :: 如果设置, 在交互式的shell里将允许一个以 *#* 开始的单词去引起那个单词和在那行上的所有剩余的字符串被忽略.
+                          (参考上面的 *注释*) 此选项默认打开;
+- lastpipe :: 如果设置, 且作业控制不起作用, shell将会在当前shell环境中在后台运行管道的最后的未被执行的命令;
+- lithist :: 如果设置, 且 *cmdhist* 选项是打开的, 多行命令将以内嵌式换行符的形式被保存到命令历史中,
+             而不是在可能的地方使用分号分隔符;
+- login_shell :: 如果shell被作为login-shell启动, 它会设定此项(参考 *INVOCATION* ). 这个值不可以被改变[fn:9].
+- mailwarn :: 如果设置，且bash用来检查邮件的文件自从上次检查后已经被访问，将显示消息"The mail in mailfile has been read";
+- no_empty_cmd_completion :: 如果设置, 且 *readline* 正在被使用,当在一个空行上尝试补全时, *bash* 将不会尝试去为了可能的补全搜索 *PATH* ;
+- nocaseglob :: 当执行路径名扩展时(参考 *路径名扩展*), *bash* 将以大小写不敏感的方式匹配文件名.
+- nocasematch :: 当执行匹配同时执行条件命令 *case或者[[* 时, 将以大小写不敏感的方式匹配模式;
+- nullglob :: 如果设置，bash允许没有匹配任何文件的文件名模式扩展成一个空串，而不是它们本身;
+- progcomp :: 如果设置, 则启用可编程补全装置; 此项默认打开;
+- promptvars :: 如果设置, 提示字符串在像上面的 *PROMPTING* 里描述的那样被展开之后才会经历参数展开, 命令替换, 算术展开和引用移除.
+                此选项默认打开;
+- restricted_shell :: 如果shell以限制模式启动, 它就会设置这个选项(参考 *RESTRICTED SHELL* ). 此值不可以被改变.
+                      当执行启动文件时, 不能复位该选项, 允许启动文件发现shell是否是受限的;
+- shift_verbose :: 如果设置, 当偏移数量超过了位置参数的个数时, 内置命令 *shift* 就会打印错误消息;
+- sourcepath :: 如果设置, source内置命令使用PATH的值来寻找包含作为参数提供的文件的目录. 默认为打开;
+- xpg_echo :: 如果设置, 内置的 *echo* 将默认展开反斜杠转义序列[fn:10];
+#+END_QUOTE
+
+* Footnotes
+
+[fn:1] 即打开的shopt和未打开的shopt分别显示;
+
+[fn:2] 与上方的 *-p* 选项相照应;
+
+[fn:3] 这个选项有个坑, 如果目录名和shell中的命令名相同, 则会优先执行命令名; 只有当命令名执行失败, 才会执行目录名(这个观点我未实验过, 不过在zsh中是这样的)
+
+[fn:4] 经过尝试, 如果在执行第一个 *exit* 前, 先执行过了 jobs, 那么执行第一个exit时, 就会直接退出;
+猜测是因为bash已经确认你知道当前shell有被停止或正在运行的作业, 所以第一个exit即可立即退出shell;
+
+[fn:5] 有如下示例:
+#+BEGIN_SRC shell
+newip='192.168.1.100'
+if [[ "$newip" =~ '^([0-9]{1,3}\.){3}[0-9]{1,3}$' ]]
+then
+    echo '找到了ip地址'
+fi
+#+END_SRC
+如果 =shopt -s compat31= ,即开启compat31, 则可以正确输出 ='找到了ip地址'= , 否则不行, 需要将正则的引号去除才能正确匹配;
+
+[fn:6] 简单说来, 打开此选项, 则可能使用别名执行命令, 反之则不行, 尽管存在那个别名也不行;
+
+[fn:7] 此项解释实在看不明白, 也没试出来, 有机会再说. 
+原文: If set, $'string'  and  $"string"  quoting  is  performed  within ${parameter}  expansions  enclosed in double quotes.  This option is enabled by default.
+
+[fn:8] =echo $HISTFILE= 将返回 =$USER/.bash_history=
+
+[fn:9] 如果是login-shell这项就是打开的, 如果不是login-shell, 此项就是关闭的, 并且相互之间无法切换;
+
+[fn:10] 打开此项, 就相当于使用了 =echo -e=
+
