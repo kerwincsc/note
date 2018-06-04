@@ -1,0 +1,52 @@
+* Centos7 Nginx 开机启动
+
+  Centos 系统服务脚本目录：
+
+  用户（user）
+
+  用户登录后才能运行的程序，存在用户（user）
+
+  #+BEGIN_SRC shell
+  /usr/lib/systemd/
+  #+END_SRC
+
+  系统（system）
+
+  如需要开机没有登陆情况下就能运行的程序，存在系统服务（system）里
+
+  #+BEGIN_SRC shell
+  /lib/systemd/system/
+  #+END_SRC
+
+  服务以.service结尾
+
+  #+BEGIN_SRC shell
+  vim /lib/systemd/system/nginx.service
+  #+END_SRC
+
+  #+BEGIN_SRC shell
+  [Unit]
+  Description=nginx
+  After=network.target
+
+  [Service]
+  Type=forking
+  ExeStart=/usr/local/nginx/sbin/nginx
+  ExeReload=/usr/local/nginx/sbin/nginx -s reload
+  ExeStop=/usr/local/nginx/sbin/nginx -s stop
+  PrivateTmp=true
+
+  [Install]
+  WantedBy=multi-user.target
+  #+END_SRC
+
+  设置开机启动
+
+  #+BEGIN_SRC shell
+  systemctl enable nginx.service
+  #+END_SRC
+
+  备注:
+
+      如果之前手动启动了nginx, 请一定要终止nginx进程后,
+      再使用 =systemctl enable nginx= ;

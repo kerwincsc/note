@@ -1,0 +1,60 @@
+#+TITLE: VirtualBox 里的虚拟网络
+
+* VirtualBox 里的虚拟网络
+
+  virtualbox里总共有 6 种网络硬件和 7 种网络连接方式; 他给每台虚拟机提供了8个网卡接口;
+
+  主要网络模式连通性一览表
+  
+  |             | VM<->Host | VM1<->VM2 | VM->Internet | VM<-Internet    |
+  |-------------+-----------+-----------+--------------+-----------------|
+  | Host-only   | +         | +         | -            | -               |
+  | Internal    | -         | +         | -            | -               |
+  | Bridged     | +         | +         | +            | +               |
+  | NAT         | -         | -         | +            | Port forwarding |
+  | NAT Network | -         | +         | +            | Prot forwarding |
+  
+
+** NAT(NetworkAddressTranslation)
+
+   1. 将网络的连接方式修改为 "NAT(网络地址转换)";
+   2. 虚拟机网卡选择DHCP, 就能自动获得地址; 如果想要设置静态地址,
+      按获取到的IP设置即可;
+   3. 到此, 虚拟机应该就可以访问外部网络了, 也可以PING通宿主机,
+      但是要注意, 此时宿主机无法PING虚拟机, 需要设置虚拟机的 *Port Forwarding* 功能;
+   4. 在虚拟机的网络设置中, 点开高级选项, 其中就有端口转发(PortForwading);
+      填写规则名称, 使用的协议, 且至少需要配置主机端口和子系统端口;
+   5. 然后, 就可以在宿主机中使用ssh客户端连接虚拟机, 或者进行其它连接;
+
+
+命令行模式:
+#+BEGIN_SRC cmd
+vboxmanage modifyvm <vm_name>
+    --nic<1-N> nat
+    --nictype<1-N> 82540EM|82543GC|82545EM 
+    --natpf<1-N> <rulename>,tcp|udp,[<hostip>],<hostport>,[<guestip>],<guestport>
+
+vboxmanage modifyvm test --nic1 nat --nictype1 82540EM --natpf1 "test,tcp,,2222,,22"
+#+END_SRC
+
+** NAT Network
+
+   这项网络配置和NAT功能相似, 但是此网络中虚拟机之间是互通的;
+
+   同样地, 如果宿主机需要与虚拟机连接, 就要使用端口转发功能;
+
+** Bridged Networking 桥接网络
+
+** Internal networing 内部网络
+
+** Host-only networking 仅主机
+
+   此网络默认情况下仅与主机通信, 但是如果宿主机是windows,
+   可以在 *VirtualBox Host-Only Network* 上配置网络共享, 以访问外网;
+
+** UDP Tunnel networking UDP 隧道网络
+
+   可以实现两个宿主机上的虚拟机之间的访问, 在此同时, 两个宿主机却无法与虚拟机相通;
+
+** VDE networking 
+   此功能需要从源码编译使用
