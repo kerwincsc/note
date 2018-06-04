@@ -1,112 +1,112 @@
 #+TITLE:saltstack
-* °²×°Ç°×¼±¸
-  - °²×°À©Õ¹Ô´ =yum install -y epel-release=
-  - ÉèÖÃË«·½µÄhostnameÒÔ¼°hosts
-  - ¹Ø±Õselinux, Çå¿Õiptables¹æÔò
-* °²×°
-** ·şÎñ¶Ë
-   - =yum install -y salt-master salt-minion= ·şÎñ¶Ë³ÌĞòºÍ¿Í»§¶Ë³ÌĞò¶¼°²×°
-   - ÅäÖÃminionÒªÁ¬½ÓµÄ·şÎñ¶ËµÄµØÖ· =vim /etc/salt/minion=
+* å®‰è£…å‰å‡†å¤‡
+  - å®‰è£…æ‰©å±•æº =yum install -y epel-release=
+  - è®¾ç½®åŒæ–¹çš„hostnameä»¥åŠhosts
+  - å…³é—­selinux, æ¸…ç©ºiptablesè§„åˆ™
+* å®‰è£…
+** æœåŠ¡ç«¯
+   - =yum install -y salt-master salt-minion= æœåŠ¡ç«¯ç¨‹åºå’Œå®¢æˆ·ç«¯ç¨‹åºéƒ½å®‰è£…
+   - é…ç½®minionè¦è¿æ¥çš„æœåŠ¡ç«¯çš„åœ°å€ =vim /etc/salt/minion=
      #+BEGIN_EXAMPLE
      master: server.kerwin.com
      #+END_EXAMPLE
-     ËµÃ÷: ÕâÀïµÄmasterÌîµÄÊÇ·şÎñ¶ËÓòÃû,Ò²¿ÉÒÔÊÇIP, ÇÒÃ°ºÅºóÃæÓĞ¿Õ¸ñ
-   - Æô¶¯·şÎñ¶Ë =/etc/init.d/salt-master start=
-   - Æô¶¯¿Í»§¶Ë =/etc/init.d/salt-minion start=
-** ¿Í»§¶Ë
-   - =yum install -y salt-minion= Ö»°²×°¿Í»§¶Ë³ÌĞò
-   - ÅäÖÃminionÒªÁ¬½ÓµÄ·şÎñ¶ËµÄµØÖ· =vim /etc/salt/minion= ÄÚÈİÍ¬ÉÏ
-   - Æô¶¯¿Í»§¶Ë =/etc/init.d/salt-minion start=
-* ÈÏÖ¤
-  - =salt-key= ²é¿´ËùÓĞµÄÒÑÈÏÖ¤µÄ, Î´ÈÏÖ¤µÄ,¾Ü¾øÈÏÖ¤µÄ¿Í»§¶Ë
+     è¯´æ˜: è¿™é‡Œçš„masterå¡«çš„æ˜¯æœåŠ¡ç«¯åŸŸå,ä¹Ÿå¯ä»¥æ˜¯IP, ä¸”å†’å·åé¢æœ‰ç©ºæ ¼
+   - å¯åŠ¨æœåŠ¡ç«¯ =/etc/init.d/salt-master start=
+   - å¯åŠ¨å®¢æˆ·ç«¯ =/etc/init.d/salt-minion start=
+** å®¢æˆ·ç«¯
+   - =yum install -y salt-minion= åªå®‰è£…å®¢æˆ·ç«¯ç¨‹åº
+   - é…ç½®minionè¦è¿æ¥çš„æœåŠ¡ç«¯çš„åœ°å€ =vim /etc/salt/minion= å†…å®¹åŒä¸Š
+   - å¯åŠ¨å®¢æˆ·ç«¯ =/etc/init.d/salt-minion start=
+* è®¤è¯
+  - =salt-key= æŸ¥çœ‹æ‰€æœ‰çš„å·²è®¤è¯çš„, æœªè®¤è¯çš„,æ‹’ç»è®¤è¯çš„å®¢æˆ·ç«¯
 
     [[file:image/salt-key.png]]
 
-  - =salt-key -a client.kerwin.com= Ìí¼Óclient.kerwin.comµÄÈÏÖ¤
+  - =salt-key -a client.kerwin.com= æ·»åŠ client.kerwin.comçš„è®¤è¯
     
-    ´ËÊ±, ÎÒÃÇÔÚclientµÄ/etc/salt/pki/minionÄ¿Â¼ÏÂ»á¶à³öÒ»¸öminion_master.pubÎÄ¼ş
-    - =salt-key -A= ¿ÉÒÔ½«ËùÓĞÎ´ÊÚÈ¨µÄ½øĞĞÍ³Ò»ÊÚÈ¨
-* Ô¶³ÌÖ´ĞĞÃüÁî
-  - =salt '*' test.ping= ÕâÀïµÄ*±íÊ¾ÒÑ¾­Ç©ÃûµÄ¿Í»§¶Ë, Ò²¿ÉÒÔÖ¸¶¨ÆäÖĞÒ»¸ö, ±ÈÈçserver.kerwin.com
+    æ­¤æ—¶, æˆ‘ä»¬åœ¨clientçš„/etc/salt/pki/minionç›®å½•ä¸‹ä¼šå¤šå‡ºä¸€ä¸ªminion_master.pubæ–‡ä»¶
+    - =salt-key -A= å¯ä»¥å°†æ‰€æœ‰æœªæˆæƒçš„è¿›è¡Œç»Ÿä¸€æˆæƒ
+* è¿œç¨‹æ‰§è¡Œå‘½ä»¤
+  - =salt '*' test.ping= è¿™é‡Œçš„*è¡¨ç¤ºå·²ç»ç­¾åçš„å®¢æˆ·ç«¯, ä¹Ÿå¯ä»¥æŒ‡å®šå…¶ä¸­ä¸€ä¸ª, æ¯”å¦‚server.kerwin.com
 
-    Õâ¸ötest.pingÊÇsaltstackµÄÒ»¸ö²âÊÔÄ£¿é, ÔÚ´î½¨Íê³Éºó, ¿ÉÒÔÊ×ÏÈÊ¹ÓÃÕâ¸öÃüÁîÀ´²âÊÔ;
-  - ÀûÓÃcmd.run
+    è¿™ä¸ªtest.pingæ˜¯saltstackçš„ä¸€ä¸ªæµ‹è¯•æ¨¡å—, åœ¨æ­å»ºå®Œæˆå, å¯ä»¥é¦–å…ˆä½¿ç”¨è¿™ä¸ªå‘½ä»¤æ¥æµ‹è¯•;
+  - åˆ©ç”¨cmd.run
     #+BEGIN_EXAMPLE
     salt '*' cmd.run 'df -h' 
     #+END_EXAMPLE
-    ËµÃ÷:
+    è¯´æ˜:
 
-    ÕâÀïµÄ*±ØĞëÊÇÔÚmasterÉÏÒÑ¾­±»½ÓÊÜ¹ıµÄ¿Í»§¶Ë, ¿ÉÒÔÍ¨¹ısalt-key²éµ½, Í¨³£ÊÇÎÒÃÇÒÑ¾­Éè¶¨µÄidÖµ. ¹ØÓÚÕâ²¿·ÖÄÚÈİ, ËüÖ§³ÖÍ¨Åä, ÁĞ±íÒÔ¼°ÕıÔò.
+    è¿™é‡Œçš„*å¿…é¡»æ˜¯åœ¨masterä¸Šå·²ç»è¢«æ¥å—è¿‡çš„å®¢æˆ·ç«¯, å¯ä»¥é€šè¿‡salt-keyæŸ¥åˆ°, é€šå¸¸æ˜¯æˆ‘ä»¬å·²ç»è®¾å®šçš„idå€¼. å…³äºè¿™éƒ¨åˆ†å†…å®¹, å®ƒæ”¯æŒé€šé…, åˆ—è¡¨ä»¥åŠæ­£åˆ™.
 
-    ±ÈÈçÁ½Ì¨¿Í»§¶Ë web10 web11, ÎÒÃÇ¿ÉÒÔĞ´³É
+    æ¯”å¦‚ä¸¤å°å®¢æˆ·ç«¯ web10 web11, æˆ‘ä»¬å¯ä»¥å†™æˆ
     #+BEGIN_EXAMPLE
     salt 'web*'
     salt 'web1[01]'
     salt -L 'web10,web11'
     salt -E 'web(10|11)'
     #+END_EXAMPLE
-    µÈĞÎÊ½, Ê¹ÓÃÁĞ±í,¼´¶à¸ö»úÆ÷ÓÃ¶ººÅ·Ö¸ô,¶øÇÒĞèÒª¼Ó-L; Ê¹ÓÃÕıÔò±ØĞë´ø-E; Ëü»¹Ö§³Ögrains, ¼Ó-G, pillar¼Ó-I;
+    ç­‰å½¢å¼, ä½¿ç”¨åˆ—è¡¨,å³å¤šä¸ªæœºå™¨ç”¨é€—å·åˆ†éš”,è€Œä¸”éœ€è¦åŠ -L; ä½¿ç”¨æ­£åˆ™å¿…é¡»å¸¦-E; å®ƒè¿˜æ”¯æŒgrains, åŠ -G, pillaråŠ -I;
   - grains
-    - grainsÊÇminionÔÚÆô¶¯Ê±ÊÕ¼¯µ½µÄÒ»Ğ©ĞÅÏ¢, ±ÈÈç²Ù×÷ÏµÍ³ÀàĞÍ¡¢Íø¿¨IP¡¢ÄÚºË°æ±¾¡¢CPU¼Ü¹¹µÈ;
+    - grainsæ˜¯minionåœ¨å¯åŠ¨æ—¶æ”¶é›†åˆ°çš„ä¸€äº›ä¿¡æ¯, æ¯”å¦‚æ“ä½œç³»ç»Ÿç±»å‹ã€ç½‘å¡IPã€å†…æ ¸ç‰ˆæœ¬ã€CPUæ¶æ„ç­‰;
 
-    - ÁĞ³öËùÓĞµÄgrainsÏîÄ¿Ãû×Ö =salt 'client.kerwin.com' grains.ls=
+    - åˆ—å‡ºæ‰€æœ‰çš„grainsé¡¹ç›®åå­— =salt 'client.kerwin.com' grains.ls=
 
-    - ÁĞ³öËùÓĞgrainsÏîÄ¿ÒÔ¼°Öµ =salt 'client.kerwin.com' grains.items=
+    - åˆ—å‡ºæ‰€æœ‰grainsé¡¹ç›®ä»¥åŠå€¼ =salt 'client.kerwin.com' grains.items=
 
-    - grainsµÄĞÅÏ¢²¢²»ÊÇ¶¯Ì¬µÄ, ²¢²»»áÊ±Ê±±ä¸ü, ËüÖ»ÊÇÔÚminionÆô¶¯Ê±ÊÕ¼¯µ½µÄ;
+    - grainsçš„ä¿¡æ¯å¹¶ä¸æ˜¯åŠ¨æ€çš„, å¹¶ä¸ä¼šæ—¶æ—¶å˜æ›´, å®ƒåªæ˜¯åœ¨minionå¯åŠ¨æ—¶æ”¶é›†åˆ°çš„;
 
-    - ÎÒÃÇ¿ÉÒÔ¸ù¾İgrainsÊÕ¼¯µ½µÄÒ»Ğ©ĞÅÏ¢, ×öÅäÖÃ¹ÜÀí¹¤×÷;
+    - æˆ‘ä»¬å¯ä»¥æ ¹æ®grainsæ”¶é›†åˆ°çš„ä¸€äº›ä¿¡æ¯, åšé…ç½®ç®¡ç†å·¥ä½œ;
 
-    - grainsÖ§³Ö×Ô¶¨ÒåĞÅÏ¢;
-      - =vim /etc/salt/grains= ´ËÎÄ¼şÄ¬ÈÏ²»´æÔÚ
+    - grainsæ”¯æŒè‡ªå®šä¹‰ä¿¡æ¯;
+      - =vim /etc/salt/grains= æ­¤æ–‡ä»¶é»˜è®¤ä¸å­˜åœ¨
 	#+BEGIN_EXAMPLE
 	role: nginx
 	env: test
 	#+END_EXAMPLE
-	ËµÃ÷: Ã¿Ò»ĞĞµÄÃ°ºÅºóÃæ¶¼ÒªÓĞÒ»¸ö¿Õ¸ñ; ÓÉÓÚgrainsĞÅÏ¢ÊÇÔÚminionÆô¶¯Ê±ÊÕ¼¯µÄ,ËùÒÔÅäÖÃÍê³Éºó, ÒªÖØÆôminion¿Í»§¶Ë;
-      - ÖØÆôminion·şÎñ =service salt-minion restart=
-      - »ñÈ¡Ö¸¶¨ÏîÄ¿Ãû³ÆµÄgrainsĞÅÏ¢ =salt '*' grains.item role env=
+	è¯´æ˜: æ¯ä¸€è¡Œçš„å†’å·åé¢éƒ½è¦æœ‰ä¸€ä¸ªç©ºæ ¼; ç”±äºgrainsä¿¡æ¯æ˜¯åœ¨minionå¯åŠ¨æ—¶æ”¶é›†çš„,æ‰€ä»¥é…ç½®å®Œæˆå, è¦é‡å¯minionå®¢æˆ·ç«¯;
+      - é‡å¯minionæœåŠ¡ =service salt-minion restart=
+      - è·å–æŒ‡å®šé¡¹ç›®åç§°çš„grainsä¿¡æ¯ =salt '*' grains.item role env=
 
-	×¢Òâ, ÕâÀïµÄÊÇ *grains.item* , ½áÎ²Ã»ÓĞ *s*
-    - ¿ÉÒÔ½èÖúgrainsµÄÒ»Ğ©ÊôĞÔĞÅÏ¢À´Ö´ĞĞÔ¶³ÌÃüÁî
+	æ³¨æ„, è¿™é‡Œçš„æ˜¯ *grains.item* , ç»“å°¾æ²¡æœ‰ *s*
+    - å¯ä»¥å€ŸåŠ©grainsçš„ä¸€äº›å±æ€§ä¿¡æ¯æ¥æ‰§è¡Œè¿œç¨‹å‘½ä»¤
       #+BEGIN_EXAMPLE
       salt -G role:nginx cmd.run 'hostname'
       #+END_EXAMPLE
   - pillar
-    - pillarºÍgrains²»Ò»Ñù, ËüÊÇÔÚmasterÉÏ¶¨ÒåµÄ, ²¢ÇÒÊÇÕë¶Ôminion¶¨ÒåµÄÒ»Ğ©ĞÅÏ¢. ÏñÒ»Ğ©±È½ÏÖØÒªµÄÊı¾İ,ÈçÃÜÂë,¿ÉÒÔ´æÔÚpillarÀï, »¹¿ÉÒÔ¶¨Òå±äÁ¿µÈ;
+    - pillarå’Œgrainsä¸ä¸€æ ·, å®ƒæ˜¯åœ¨masterä¸Šå®šä¹‰çš„, å¹¶ä¸”æ˜¯é’ˆå¯¹minionå®šä¹‰çš„ä¸€äº›ä¿¡æ¯. åƒä¸€äº›æ¯”è¾ƒé‡è¦çš„æ•°æ®,å¦‚å¯†ç ,å¯ä»¥å­˜åœ¨pillaré‡Œ, è¿˜å¯ä»¥å®šä¹‰å˜é‡ç­‰;
 
-    - ÅäÖÃ×Ô¶¨Òåpillar
-      - =vim /etc/salt/master= ÕÒµ½ÈçÏÂÅäÖÃ, ²¢È¡Ïû×¢ÊÍ
+    - é…ç½®è‡ªå®šä¹‰pillar
+      - =vim /etc/salt/master= æ‰¾åˆ°å¦‚ä¸‹é…ç½®, å¹¶å–æ¶ˆæ³¨é‡Š
 	#+BEGIN_EXAMPLE
 	pillar_roots:
 	  base:
 	    - /srv/pillar
 	#+END_EXAMPLE
-	ËµÃ÷: »»ĞĞÒÀ´ÎËõ½ø2¿Õ¸ñ
-      - °´ÅäÖÃÎÄ¼şÄÚµÄÂ·¾¶ĞÂ½¨Ä¿Â¼, ²¢½«*.slsÎÄ¼ş·ÅÈëÆäÖĞ =mkdir /srv/pillar=
-      - =vim /src/pillar/test.sls= ÄÚÈİÈçÏÂ:
+	è¯´æ˜: æ¢è¡Œä¾æ¬¡ç¼©è¿›2ç©ºæ ¼
+      - æŒ‰é…ç½®æ–‡ä»¶å†…çš„è·¯å¾„æ–°å»ºç›®å½•, å¹¶å°†*.slsæ–‡ä»¶æ”¾å…¥å…¶ä¸­ =mkdir /srv/pillar=
+      - =vim /src/pillar/test.sls= å†…å®¹å¦‚ä¸‹:
 	#+BEGIN_EXAMPLE
 	conf: /etc/123.conf
 	#+END_EXAMPLE
-	ËµÃ÷: Ã°ºÅºóÃæÒª¸ú¿Õ¸ñ, ÕâÊÇyamlµÄ¸ñÊ½ÒªÇó; ÇÒÅäÖÃÎÄ¼şµÄÎÄ¼şÃû²»ÄÜÊÇÊı×Ö¿ª¹Ø, ×¢ÒâvimµÄ×Ô¶¯Ëõ½ø¿ÉÄÜ»áÓ°Ïìµ½.slsÎÄ¼şÄ¬ÈÏµÄËõ½ø;
-      - ±à¼­ÅäÖÃpillarÈë¿ÚslsÅäÖÃÎÄ¼ş =vim /srv/pillar/top.sls= Ãû×ÖÒ»¶¨ÊÇ top.sls
+	è¯´æ˜: å†’å·åé¢è¦è·Ÿç©ºæ ¼, è¿™æ˜¯yamlçš„æ ¼å¼è¦æ±‚; ä¸”é…ç½®æ–‡ä»¶çš„æ–‡ä»¶åä¸èƒ½æ˜¯æ•°å­—å¼€å…³, æ³¨æ„vimçš„è‡ªåŠ¨ç¼©è¿›å¯èƒ½ä¼šå½±å“åˆ°.slsæ–‡ä»¶é»˜è®¤çš„ç¼©è¿›;
+      - ç¼–è¾‘é…ç½®pillarå…¥å£slsé…ç½®æ–‡ä»¶ =vim /srv/pillar/top.sls= åå­—ä¸€å®šæ˜¯ top.sls
 	#+BEGIN_EXAMPLE
 	base:
 	  'client.kerwin.com':
 	    - test
 	#+END_EXAMPLE
-	ËµÃ÷: µÚ¶şĞĞÎªÖ÷»úÃû, µÚÈıĞĞÎªsls×ÓÅäÖÃÎÄ¼ş; ÒÔºóÃ¿¶àÒ»¸öslsÅäÖÃÎÄ¼ş,¾Í¶àĞ´Ò»ĞĞ;
-      - ÅäÖÃÍê³Éºó,¿ÉÒÔ²»ÓÃÖØÆômaster,Ê¹ÓÃÃüÁîË¢ĞÂ, pillarÅäÖÃ¼´¿ÉÉúĞ§
+	è¯´æ˜: ç¬¬äºŒè¡Œä¸ºä¸»æœºå, ç¬¬ä¸‰è¡Œä¸ºslså­é…ç½®æ–‡ä»¶; ä»¥åæ¯å¤šä¸€ä¸ªslsé…ç½®æ–‡ä»¶,å°±å¤šå†™ä¸€è¡Œ;
+      - é…ç½®å®Œæˆå,å¯ä»¥ä¸ç”¨é‡å¯master,ä½¿ç”¨å‘½ä»¤åˆ·æ–°, pillaré…ç½®å³å¯ç”Ÿæ•ˆ
 	#+BEGIN_EXAMPLE
 	salt 'master-centos6' saltutil.refresh_pillar
 	#+END_EXAMPLE
-	Ë¢ĞÂÍê³Éºó, Ê¹ÓÃ =salt 'master-centos6' pillar.items= À´²é¿´ÊÇ·ñË¢ĞÂ³É¹¦
-    - ¿ÉÒÔ½èÖúpillarµÄÒ»Ğ©ÊôĞÔĞÅÏ¢À´Ö´ĞĞÔ¶³ÌÃüÁî
+	åˆ·æ–°å®Œæˆå, ä½¿ç”¨ =salt 'master-centos6' pillar.items= æ¥æŸ¥çœ‹æ˜¯å¦åˆ·æ–°æˆåŠŸ
+    - å¯ä»¥å€ŸåŠ©pillarçš„ä¸€äº›å±æ€§ä¿¡æ¯æ¥æ‰§è¡Œè¿œç¨‹å‘½ä»¤
       #+BEGIN_EXAMPLE
       salt -I name:kerwinchen cmd.run 'w'
       #+END_EXAMPLE
-* ¾ÙÀı:ÀûÓÃpillarÅäÖÃ¹ÜÀí°²×°apache
-  - =vim /etc/salt/master= ËÑË÷ÕÒµ½file_roots, ´ò¿ªÈçÏÂÄÚÈİµÄ×¢ÊÍ
+* ä¸¾ä¾‹:åˆ©ç”¨pillaré…ç½®ç®¡ç†å®‰è£…apache
+  - =vim /etc/salt/master= æœç´¢æ‰¾åˆ°file_roots, æ‰“å¼€å¦‚ä¸‹å†…å®¹çš„æ³¨é‡Š
     #+BEGIN_EXAMPLE
     file_roots:
       base:
@@ -114,14 +114,14 @@
     #+END_EXAMPLE
 
   - =mkdir /srv/salt; cd /srv/salt=
-  - =vim /srv/salt/top.sls= ²¢¼ÓÈëÒÔÏÂÄÚÈİ
+  - =vim /srv/salt/top.sls= å¹¶åŠ å…¥ä»¥ä¸‹å†…å®¹
     #+BEGIN_EXAMPLE
     base:
       '*':
         - apache
     #+END_EXAMPLE
-    ÒâË¼ÊÇ, ÔÚËùÓĞµÄ¿Í»§¶ËÉÏÖ´ĞĞapacheÄ£¿é
-  - ÖØÆô·şÎñ¶Ë =/etc/init.d/salt-master restart=
+    æ„æ€æ˜¯, åœ¨æ‰€æœ‰çš„å®¢æˆ·ç«¯ä¸Šæ‰§è¡Œapacheæ¨¡å—
+  - é‡å¯æœåŠ¡ç«¯ =/etc/init.d/salt-master restart=
 
   - =vim /srv/salt/apache.sls=
     #+BEGIN_EXAMPLE
@@ -134,10 +134,10 @@
         - name: httpd
         - enable: True
     #+END_EXAMPLE
-    ËµÃ÷: apache-servicejÊÇidµÄÃû×Ö, ×Ô¶¨ÒåµÄ. pkg.installed Îª°ü°²×°º¯Êı, ÏÂÃæÊÇÒª°²×°µÄ°üµÄÃû×Ö. service.running Ò²ÊÇÒ»¸öº¯Êı, À´±£Ö¤Ö¸¶¨µÄ·şÎñÆô¶¯, enable±íÊ¾¿ª»úÆô¶¯;
-* ÎÄ¼şÖĞÅäÖÃ¹ÜÀíÎÄ¼şºÍÄ¿Â¼
-** ÅäÖÃ¹ÜÀíÎÄ¼ş
-   - =vim /srv/salt/filetest.sls= ²¢Ğ´ÈëÈçÏÂÄÚÈİ
+    è¯´æ˜: apache-servicejæ˜¯idçš„åå­—, è‡ªå®šä¹‰çš„. pkg.installed ä¸ºåŒ…å®‰è£…å‡½æ•°, ä¸‹é¢æ˜¯è¦å®‰è£…çš„åŒ…çš„åå­—. service.running ä¹Ÿæ˜¯ä¸€ä¸ªå‡½æ•°, æ¥ä¿è¯æŒ‡å®šçš„æœåŠ¡å¯åŠ¨, enableè¡¨ç¤ºå¼€æœºå¯åŠ¨;
+* æ–‡ä»¶ä¸­é…ç½®ç®¡ç†æ–‡ä»¶å’Œç›®å½•
+** é…ç½®ç®¡ç†æ–‡ä»¶
+   - =vim /srv/salt/filetest.sls= å¹¶å†™å…¥å¦‚ä¸‹å†…å®¹
      #+BEGIN_EXAMPLE
      file_test:
        file.managed:
@@ -147,16 +147,16 @@
          - group: root
          - mode: 644
      #+END_EXAMPLE
-     ËµÃ÷: µÚÒ»ĞĞµÄfile_testÎª×Ô¶¨µÄÃû×Ö, ±íÊ¾¸ÃÅäÖÃ¶ÎµÄÃû×Ö, ¿ÉÒÔÔÚ±ğµÄÅäÖÃ¶ÎÖĞÒıÓÃËü, sourceÖ¸¶¨ÎÄ¼ş´ÓÄÄÀï¿½±´, ÕâÀïµÄtestÏàµ±ÓÚ/srv/salt/test
-   - ÔÚtop.slsÖĞÒıÓÃfiletest
+     è¯´æ˜: ç¬¬ä¸€è¡Œçš„file_testä¸ºè‡ªå®šçš„åå­—, è¡¨ç¤ºè¯¥é…ç½®æ®µçš„åå­—, å¯ä»¥åœ¨åˆ«çš„é…ç½®æ®µä¸­å¼•ç”¨å®ƒ, sourceæŒ‡å®šæ–‡ä»¶ä»å“ªé‡Œæ‹·è´, è¿™é‡Œçš„testç›¸å½“äº/srv/salt/test
+   - åœ¨top.slsä¸­å¼•ç”¨filetest
      #+BEGIN_EXAMPLE
      base:
        'master-centos6':
          - filetest
      #+END_EXAMPLE
-   - ÅäÖÃÍê³Éºó, ÔËĞĞ =salt '*' state.highstate= ½øĞĞÅäÖÃµÄ¸üĞÂ
-** ÅäÖÃ¹ÜÀíÄ¿Â¼
-   - =vim /srv/salt/filedir.sls= ²¢Ğ´ÈëÈçÏÂÄÚÈİ
+   - é…ç½®å®Œæˆå, è¿è¡Œ =salt '*' state.highstate= è¿›è¡Œé…ç½®çš„æ›´æ–°
+** é…ç½®ç®¡ç†ç›®å½•
+   - =vim /srv/salt/filedir.sls= å¹¶å†™å…¥å¦‚ä¸‹å†…å®¹
      #+BEGIN_EXAMPLE
      file_dir:
        file.recurse:
@@ -168,8 +168,8 @@
          - mkdir: True
          - clean: True
      #+END_EXAMPLE
-     ËµÃ÷: mkdirÊôĞÔÎªTrue, ËµÃ÷¿ÉÒÔÔÚ¿Í»§¶ËÉÏ´´½¨Ä¿Â¼, ¾­¹ı²âÊÔÈÔÈ»¿ÉÒÔ´´½¨Ä¿Â¼; cleanÊôĞÔÎªTrue, ÒâË¼ÊÇËµµ±·şÎñ¶ËÉÏÏàÓ¦µÄÄ¿Â¼ÎÄ¼şÉ¾³ıºó, ¿Í»§¶ËÒ²É¾³ı, ¾­Êµ¼Ê²âÊÔ, ÎªFalseÊ±,¿Í»§¶ËÈÔÈ»ÄÜ¹»ºÍ·şÎñ¶Ë±£³ÖÒ»ÖÂ;
-* ÎÄ¼şÖĞÅäÖÃÔ¶³ÌÖ´ĞĞÃüÁî
+     è¯´æ˜: mkdirå±æ€§ä¸ºTrue, è¯´æ˜å¯ä»¥åœ¨å®¢æˆ·ç«¯ä¸Šåˆ›å»ºç›®å½•, ç»è¿‡æµ‹è¯•ä»ç„¶å¯ä»¥åˆ›å»ºç›®å½•; cleanå±æ€§ä¸ºTrue, æ„æ€æ˜¯è¯´å½“æœåŠ¡ç«¯ä¸Šç›¸åº”çš„ç›®å½•æ–‡ä»¶åˆ é™¤å, å®¢æˆ·ç«¯ä¹Ÿåˆ é™¤, ç»å®é™…æµ‹è¯•, ä¸ºFalseæ—¶,å®¢æˆ·ç«¯ä»ç„¶èƒ½å¤Ÿå’ŒæœåŠ¡ç«¯ä¿æŒä¸€è‡´;
+* æ–‡ä»¶ä¸­é…ç½®è¿œç¨‹æ‰§è¡Œå‘½ä»¤
   - =cd /srv/salt=
   - =vim cmdtest.sls=
     #+BEGIN_EXAMPLE
@@ -187,7 +187,7 @@
       'master-centos6':
         - cmdtest
     #+END_EXAMPLE
-* ÅäÖÃ¹ÜÀíÔ¶³ÌÖ´ĞĞ½Å±¾
+* é…ç½®ç®¡ç†è¿œç¨‹æ‰§è¡Œè„šæœ¬
   - =vim /srv/salt/shelltest.sls=
     #+BEGIN_EXAMPLE
     shell_test:
@@ -195,8 +195,8 @@
         - source: salt://test/test.sh
         - user: root
     #+END_EXAMPLE
-    ËµÃ÷: Õâ¸öslsÎÄ¼şÓëÆäËûÎÄ¼şµÄÇø±ğÔÚÓÚÖ´ĞĞº¯Êı²»Í¬, cmd.scriptÊÇÓÃÀ´Ö´ĞĞ½Å±¾µÄº¯Êı
-* ÅäÖÃ¹ÜÀíÈÎÎñ¼Æ»®
+    è¯´æ˜: è¿™ä¸ªslsæ–‡ä»¶ä¸å…¶ä»–æ–‡ä»¶çš„åŒºåˆ«åœ¨äºæ‰§è¡Œå‡½æ•°ä¸åŒ, cmd.scriptæ˜¯ç”¨æ¥æ‰§è¡Œè„šæœ¬çš„å‡½æ•°
+* é…ç½®ç®¡ç†ä»»åŠ¡è®¡åˆ’
   - =vim /srv/salt/crontest.sls=
     #+BEGIN_EXAMPLE
     cron_test:
@@ -209,17 +209,17 @@
         - month: '2,5'
         - dayweek: '*'
     #+END_EXAMPLE
-    ËµÃ÷: cron.presentÊÇÉú³ÉÈçÏÂµÄcron, ÈçÏÂÉ¾³ı, ½«cron.present¸Ä³Écron.absent¼´¿É; Èç¹û·ÖÊ±ÈÕÔÂÖÜµÄÈÎÒâÒ»ĞĞÃ»Ğ´, ÄÇÃ´½«Ä¬ÈÏÒÔ * ´úÌæ;
-* ¿ÉÄÜ»áÓÃµ½µÄÃüÁî
-  - ¿½±´masterÉÏµÄÎÄ¼şµ½¿Í»§¶Ë =cp.get_file=
+    è¯´æ˜: cron.presentæ˜¯ç”Ÿæˆå¦‚ä¸‹çš„cron, å¦‚ä¸‹åˆ é™¤, å°†cron.presentæ”¹æˆcron.absentå³å¯; å¦‚æœåˆ†æ—¶æ—¥æœˆå‘¨çš„ä»»æ„ä¸€è¡Œæ²¡å†™, é‚£ä¹ˆå°†é»˜è®¤ä»¥ * ä»£æ›¿;
+* å¯èƒ½ä¼šç”¨åˆ°çš„å‘½ä»¤
+  - æ‹·è´masterä¸Šçš„æ–‡ä»¶åˆ°å®¢æˆ·ç«¯ =cp.get_file=
     #+BEGIN_EXAMPLE
     salt 'master-centos6' cp.get_file salt://apache.sls /tmp/aminglinux.sls
     #+END_EXAMPLE
-    ËµÃ÷: salt://apache.sls ÊÇÖ¸ÔÚÅäÖÃÎÄ¼şÖĞ¶¨ÒåµÄ /srv/salt/ÏÂµÄapache.sls; ºóÃæ¸úµÄÊÇ¿Í»§¶ËµÄÂ·¾¶;
-  - ¿½±´Ä¿Â¼ =cp.get_dir=
+    è¯´æ˜: salt://apache.sls æ˜¯æŒ‡åœ¨é…ç½®æ–‡ä»¶ä¸­å®šä¹‰çš„ /srv/salt/ä¸‹çš„apache.sls; åé¢è·Ÿçš„æ˜¯å®¢æˆ·ç«¯çš„è·¯å¾„;
+  - æ‹·è´ç›®å½• =cp.get_dir=
     #+BEGIN_EXAMPLE
     salt 'master-centos6' cp.get_dir salt://test /tmp/aminglinux
     #+END_EXAMPLE
-    ËµÃ÷: Õâ²½²Ù×÷»á½«Ä¿Â¼test¿½±´ÖÁaminglinuxÄ¿Â¼ÏÂ, Èç¹û²»´æÔÚaminglinuxÄ¿Â¼, Ôò»á´´½¨Ëû;
-  - ÏÔÊ¾´æ»îµÄminion =salt-run manage.up=
-  - ÔÚÖ¸¶¨¿Í»§¶ËÉÏÖ´ĞĞ·şÎñ¶ËÉÏµÄ½Å±¾ =salt 'master-centos6' cmd.script salt://1.sh=
+    è¯´æ˜: è¿™æ­¥æ“ä½œä¼šå°†ç›®å½•testæ‹·è´è‡³aminglinuxç›®å½•ä¸‹, å¦‚æœä¸å­˜åœ¨aminglinuxç›®å½•, åˆ™ä¼šåˆ›å»ºä»–;
+  - æ˜¾ç¤ºå­˜æ´»çš„minion =salt-run manage.up=
+  - åœ¨æŒ‡å®šå®¢æˆ·ç«¯ä¸Šæ‰§è¡ŒæœåŠ¡ç«¯ä¸Šçš„è„šæœ¬ =salt 'master-centos6' cmd.script salt://1.sh=

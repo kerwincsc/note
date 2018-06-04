@@ -1,11 +1,11 @@
-#+TITLE: �����ļ��Ľ��ͷ���
+#+TITLE: 配置文件的解释范例
 #+AUTHOR: kerwincsc
 #+EMAIL: kerwincsc@gmail.com
 #+DATE: 2017-05-12
 
-����ļ���Ҫ������¼һЩ�������ļ����н��ʱ, һЩ�õķ�ʽ
+这个文件主要用来记录一些对配置文件进行解读时, 一些好的方式
 
-| ����      | ��������    | ����  |
+| 参数      | 参数配置    | 描述  |
 |-----------+-------------+-------|
 | ProxyMode | ProxyMode=0 | ..... |
 | ProxyMode | ProxyMode=1 | ....  |

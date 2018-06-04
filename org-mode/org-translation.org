@@ -1,2 +1,2 @@
-#+TITLE: Org ÊÖ²á
+#+TITLE: Org æ‰‹å†Œ
 #+Author: kerwin

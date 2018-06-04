@@ -1,0 +1,42 @@
+#+TITLE: itertools.dropwhile 的疑惑
+
+#+BEGIN_SRC python
+# -*- coding: utf-8 -*-
+import itertools
+
+l = [1,1,1,1,2,2,2,3,4,5,6,7,8,9,10]
+
+def predicate(x):
+    '''如果变量x不能被2整除, 则返回真, 否则为假'''
+    if x % 2 != 0:
+        return True
+    else:
+        return False
+
+def predicate2(x):
+    if x < 5 :
+        return True
+    else:
+        return False
+
+a = itertools.dropwhile(predicate, l)
+b = itertools.dropwhile(predicate2, l)
+
+print("变量a的类型是{}".format(type(a)))
+
+for i in a:
+    print(i), # 结果为: 2 2 2 3 4 5 6 7 8 9 10
+
+print('\n')
+
+for m in b:
+    print(m), # 结果为: 5 6 7 8 9 10
+#+END_SRC
+
+我理解错误: 认为 =itertools.dropwhile= 接收一个谓词 /predicate/ ,
+当这个谓词为真时, 就会删除 /l/ 内的元素, 然后将剩余的元素打印出来;
+
+这么理解不正确, 正确的理解应为: 逐次迭代可迭代对象, 并将迭代出的元素传递给 /predicate/ ,
+谓词返回的值为True时, 则删除当前迭代出的元素, 并进行下一次迭代;
+一旦谓词返回值为False时, 终止迭代, 并将当前元素和迭代对象内的剩余元素全部输出,
+即使迭代对象内的剩余元素满足谓词返回True的要求, 也不会继续迭代下去;

@@ -1,4 +1,3 @@
-
 * BASH内建工具
 
 ** alias
@@ -19,9 +18,7 @@
 
 
 ** bg|fg|jobs
-
 *** bg
-
     #+BEGIN_QUOTE
     bg [ _jobsepc_ ...]
     #+END_QUOTE
